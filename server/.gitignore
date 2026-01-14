@@ -1,9 +1,13 @@
 .env
 myenv
 venv
-backend/.env
-backend/venv
+server/.env
+server/venv
 # Ignore Python cache files
 __pycache__/
 *.py[cod]
-
+ml_model/
+data/
+.venv
+env/
+venv/
