@@ -1,0 +1,36 @@
+
+# =========================
+# Common
+# =========================
+.env
+.env.*
+*.log
+
+# =========================
+# Node / Next.js
+# =========================
+node_modules/
+.next/
+out/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# =========================
+# Python / FastAPI
+# =========================
+venv/
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+
+# =========================
+# OS / Editor
+# =========================
+.DS_Store
+.vscode/
+.idea/
