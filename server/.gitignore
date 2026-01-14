@@ -1,0 +1,9 @@
+.env
+myenv
+venv
+backend/.env
+backend/venv
+# Ignore Python cache files
+__pycache__/
+*.py[cod]
+
