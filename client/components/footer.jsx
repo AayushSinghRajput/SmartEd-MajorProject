@@ -26,11 +26,11 @@ export default function Footer() {
           >
             <div className="flex items-center gap-2 mb-3">
               <FaBookOpen className="text-3xl text-yellow-300" />
-              <h2 className="text-2xl font-bold">SmartPrep AI</h2>
+              <h2 className="text-2xl font-bold">SmartED AI</h2>
             </div>
             <p className="text-gray-200">
               Personalized AI-powered learning platform for +2 Science students.
-              Learn smarter, revise faster, and succeed with SmartPrep AI.
+              Learn smarter, revise faster, and succeed with SmartED AI.
             </p>
           </motion.div>
 
@@ -42,10 +42,10 @@ export default function Footer() {
           >
             <h3 className="text-xl font-semibold mb-4">Quick Links</h3>
             <ul className="space-y-2">
-              {["Home", "About", "Features", "Contact"].map((link, i) => (
+              {["Home", "Dashboard", "About", "Contact"].map((link, i) => (
                 <li key={i}>
                   <a
-                    href={`#${link.toLowerCase()}`}
+                    href={link === "Home" ? "/" : `/${link.toLowerCase()}`}
                     className="hover:text-yellow-300 transition"
                   >
                     {link}
@@ -117,8 +117,8 @@ export default function Footer() {
           transition={{ delay: 0.8, duration: 0.8 }}
           className="mt-12 border-t border-gray-600 pt-6 text-center text-sm text-gray-300"
         >
-          © {new Date().getFullYear()} SmartPrep AI. All rights reserved. | Built
-          with ❤️ for learners.
+          © {new Date().getFullYear()} SmartPrep AI. All rights reserved. |
+          Built with ❤️ for learners.
         </motion.div>
       </div>
     </footer>

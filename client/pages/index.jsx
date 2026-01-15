@@ -1,19 +1,25 @@
 "use client";
 
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import Lottie from "lottie-react";
 import { motion } from "framer-motion";
 import chatbotAnimation from "../animations/chatbot.json";
-import TopViewedBooks from '../components/topviewedbooks';
-import TopPerformers from '../components/topperformers';
-import About from './about';
-import Contact from './contact';
+import PredefinedStudyPlan from "../components/PredefinedStudyPlan";
+import { useAuth } from "../context/AuthContext";
+import Loader from "../components/ui/Loader";
 
 export default function Home() {
   const router = useRouter();
+  const { user, loading } = useAuth();
+
+  if (loading) return <Loader />;
 
   const handleGetStarted = () => {
-    router.push("/signup");
+    if (user) {
+      router.push("/dashboard");
+    } else {
+      router.push("/signup");
+    }
   };
 
   // Animation variants
@@ -102,18 +108,8 @@ export default function Home() {
         id="topviewbooks"
         className="py-16 bg-gradient-to-r from-indigo-50 to-blue-50"
       >
-        <TopViewedBooks />
+        <PredefinedStudyPlan />
       </section>
-
-      <section
-        id="topperformers"
-        className="py-16 bg-gradient-to-r from-indigo-50 to-blue-50"
-      >
-        <TopPerformers />
-      </section>
-
-      <About/>
-      <Contact/>
     </>
   );
 }
