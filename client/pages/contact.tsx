@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import {submitContactForm} from '../lib/api';
+import { submitContactForm } from "../lib/api";
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -12,7 +12,9 @@ export default function ContactPage() {
   const [showSuccess, setShowSuccess] = useState(false);
   const [error, setError] = useState("");
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
@@ -44,7 +46,8 @@ export default function ContactPage() {
           We'd love to hear from you
         </h1>
         <p className="text-gray-300 text-lg sm:text-xl">
-          Whether you're curious about features, a demo, or anything else — we're ready to answer all your questions.
+          Whether you're curious about features, a demo, or anything else —
+          we're ready to answer all your questions.
         </p>
       </div>
 
@@ -52,7 +55,9 @@ export default function ContactPage() {
       <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Let's Connect Form Card */}
         <div className="bg-white/10 backdrop-blur-xl p-6 sm:p-8 rounded-3xl shadow-2xl border border-white/20 hover:bg-white/15 transition-all duration-500">
-          <h2 className="text-2xl font-semibold text-white mb-4">Let's Connect</h2>
+          <h2 className="text-2xl font-semibold text-white mb-4">
+            Let's Connect
+          </h2>
           <form onSubmit={handleSubmit} className="space-y-4">
             <input
               type="text"
@@ -88,28 +93,40 @@ export default function ContactPage() {
             >
               {loading ? "Sending..." : "Send Message"}
             </button>
-            {showSuccess && <p className="text-green-400 text-sm pt-2">Message sent successfully!</p>}
+            {showSuccess && (
+              <p className="text-green-400 text-sm pt-2">
+                Message sent successfully!
+              </p>
+            )}
             {error && <p className="text-red-400 text-sm pt-2">{error}</p>}
           </form>
         </div>
 
         {/* Contact Info Card */}
         <div className="bg-white/10 backdrop-blur-xl p-6 sm:p-8 rounded-3xl shadow-2xl border border-white/20 hover:bg-white/15 transition-all duration-500">
-          <h2 className="text-2xl font-semibold text-white mb-4">Contact Information</h2>
+          <h2 className="text-2xl font-semibold text-white mb-4">
+            Contact Information
+          </h2>
           <div className="text-gray-300 space-y-4 text-lg">
             <p>
               📧 Email:{" "}
-              <a href="mailto:you@example.com" className="text-blue-400 hover:underline">
-                you@example.com
+              <a
+                href="mailto:smarted.ai@gmail.com"
+                className="text-blue-400 hover:underline"
+              >
+                smarted.ai@gmail.com
               </a>
             </p>
             <p>
               📞 Phone:{" "}
-              <a href="tel:+1234567890" className="text-blue-400 hover:underline">
-                +1 234 567 890
+              <a
+                href="tel:+9779860123456"
+                className="text-blue-400 hover:underline"
+              >
+                +977 9860123456
               </a>
             </p>
-            <p>📍 Address: 123 Street Name, City, Country</p>
+            <p>📍 Address: Dharan, Nepal</p>
           </div>
 
           {/* Google Map Embed */}
