@@ -4,6 +4,7 @@ from routes import content
 from routes import pdf
 from routes import mcq
 from routes import predefined
+from routes import mock_routes
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(
@@ -19,14 +20,14 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
-)
+)   
 
 app.include_router(auth.router)
 app.include_router(pdf.router)
 app.include_router(content.router)
 app.include_router(mcq.router)
 app.include_router(predefined.router)
-
+app.include_router(mock_routes.router)
 
 @app.get("/")
 def root():

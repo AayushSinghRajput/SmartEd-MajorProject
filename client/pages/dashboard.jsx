@@ -1,142 +1,129 @@
 "use client";
 
 import { useState } from "react";
+import { FiPlus } from "react-icons/fi";
 import ProtectedRoute from "../components/ProtectedRoute";
 import Sidebar from "../components/Sidebar";
-import DashboardShell from "../components/DashboardShell";
 import { useAuth } from "../context/AuthContext";
 
-// Tab Components
 import Service from "./service";
-import ProgressTracker from "./progresstracker";
 import MCQSection from "./mcqsection";
 import NotesSection from "./notesection";
 import ChatPage from "./chatpage";
 import DashboardContent from "../components/dashboardcontent";
 import MockTest from "../components/MockTest";
+import StudyBooksGrid from "../components/StudyBooksGrid";
+import DashboardShell from "../components/DashboardShell";
 
 export default function Dashboard() {
-  const [activeTab, setActiveTab] = useState("dashboard");
-  const [showServiceView, setShowServiceView] = useState(false);
-  const [aiPlan, setAiPlan] = useState(null);
+  const [activeTab, setActiveTab] = useState("dashboard"); // current active tab
+  const [showServiceView, setShowServiceView] = useState(false); // whether Service view is active
+  const [showUploadPopup, setShowUploadPopup] = useState(false); // Upload popup state
+  const [aiPlan, setAiPlan] = useState(null); // Data from AI plan
   const { user } = useAuth();
 
+  // Handle successful upload
   const handleUploadSuccess = (data) => {
-    console.log("Dashboard received data:", data); // Debug log
-    
-    if (data) {
-      // Make sure we're passing the correct data structure
-      const planData = {
-        schedule: data.schedule || [], // The schedule array
-        days: data.days || 0,
-        pdf_hash: data.pdf_hash || "",
-        subject: data.subject || "General",
-        bookTitle: data.bookTitle || "PDF Document",
-        fileHash: data.pdf_hash || "",
-        _id: data._id || data.id || "temp-id"
-      };
-      
-      setAiPlan(planData);
-      setShowServiceView(true);
-    }
+    setAiPlan(data);
+    setShowServiceView(true);
+    setShowUploadPopup(false);
   };
 
+  /**
+   * Renders content for tabs other than StudyBooksGrid.
+   * For performance, we no longer render ProgressTracker.
+   */
   const renderContent = () => {
     if (showServiceView && aiPlan) {
-      console.log("Rendering Service with planData:", aiPlan); // Debug log
       return <Service planData={aiPlan} />;
     }
 
     switch (activeTab) {
-      case "dashboard":
-        return <DashboardContent onUploadSuccess={handleUploadSuccess} />;
-
-      case "progress":
-        return (
-          <DashboardShell
-            title="Academic Metrics"
-            subtitle="Visualizing your progress across the curriculum"
-          >
-            <ProgressTracker />
-          </DashboardShell>
-        );
-
       case "mcq":
         return (
           <DashboardShell
-            title="Practice Center"
-            subtitle="Master your subjects through active testing"
+            title="MCQ Section"
+            subtitle="Take MCQ tests to improve your knowledge"
           >
             <MCQSection />
           </DashboardShell>
         );
-
       case "notes":
         return (
           <DashboardShell
-            title="Study Vault"
-            subtitle="Your personalized digital repository"
+            title="Notes Section"
+            subtitle="Take notes to improve your knowledge"
           >
             <NotesSection />
           </DashboardShell>
         );
-
-      case "chat":
-        return (
-          <div className="flex flex-col h-[80vh] bg-white rounded-[2.5rem] shadow-sm overflow-hidden border border-slate-100">
-            <ChatPage />
-          </div>
-        );
-
       case "mock":
         return (
           <DashboardShell
-            title="Mock Test"
-            subtitle="Test your knowledge before the real exam"
+            title="Mock Test Section"
+            subtitle="Take Mock Tests to improve your knowledge"
           >
             <MockTest />
           </DashboardShell>
         );
-
       default:
-        return (
-          <div className="text-center py-20">
-            <div className="text-6xl mb-6">🎓</div>
-            <h3 className="text-2xl font-black text-slate-900">
-              Select a Module
-            </h3>
-          </div>
-        );
+        // For dashboard and performance, we don't render additional content here.
+        return null;
     }
   };
 
+  // Show Upload button and StudyBooksGrid for all tabs except "mock"
+  const showUploadSection = activeTab !== "mock";
+
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50 p-5 md:p-10">
-        <div className="flex flex-col md:flex-row mt-20 md:mt-24 px-2 md:px-6 gap-8 items-start">
-          <aside className="w-full md:w-72 sticky top-28 h-fit hidden md:flex">
-            <Sidebar
-              user={user}
-              activeTab={activeTab}
-              setActiveTab={setActiveTab}
-              setShowServiceView={setShowServiceView}
-            />
-          </aside>
-          <div className="w-full md:hidden mb-6">
-            <Sidebar
-              user={user}
-              activeTab={activeTab}
-              setActiveTab={setActiveTab}
-              setShowServiceView={setShowServiceView}
-            />
-          </div>
+      <div className="pt-16">
+        <div className="flex min-h-[calc(100vh-4rem)]">
+          {/* Sidebar */}
+          <Sidebar
+            user={user}
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            setShowServiceView={setShowServiceView}
+          />
 
-          {/* MAIN CONTENT AREA */}
-          <main className="flex-1 w-full overflow-visible">
-            <div className="max-w-6xl mx-auto">{renderContent()}</div>
-          </main>
+          {/* Main content area */}
+          <div className="flex-1 px-6 py-6 relative mt-10">
+            {/* Upload button */}
+            {showUploadSection && (
+              <button
+                onClick={() => setShowUploadPopup(true)}
+                className="absolute top-2 right-6 flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-full hover:bg-indigo-700 transition z-10"
+              >
+                <FiPlus />
+                Upload New Book
+              </button>
+            )}
+
+            {/* StudyBooksGrid */}
+            {showUploadSection && (
+              <div className="mt-20 mb-6">
+                <StudyBooksGrid activeTab={activeTab} />
+              </div>
+            )}
+
+            {/* Render other tab content if applicable */}
+            {renderContent()}
+          </div>
         </div>
       </div>
+
+      {/* Upload popup modal */}
+      {showUploadPopup && (
+        <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center">
+          <div className="bg-white rounded-3xl w-full max-w-3xl max-h-[90vh] overflow-y-auto p-6 md:p-8">
+            <DashboardContent
+              onUploadSuccess={handleUploadSuccess}
+              onClose={() => setShowUploadPopup(false)}
+            />
+          </div>
+        </div>
+      )}
     </ProtectedRoute>
   );
 }

@@ -13,6 +13,7 @@ export default function UploadUI({ onUploadSuccess }) {
   const [filename, setFilename] = useState("");
   const [days, setDays] = useState(""); // store number of study days
   const [tempData, setTempData] = useState(null);
+  const [bookName, setBookName] = useState("");
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -37,8 +38,8 @@ export default function UploadUI({ onUploadSuccess }) {
   };
 
   const handleLearnNow = async () => {
-    if (!pdfFile) {
-      toast.error("Please select a PDF file first.");
+    if (!pdfFile || !days || !bookName) {
+      toast.error("Please fill all fields.");
       return;
     }
 
@@ -51,9 +52,13 @@ export default function UploadUI({ onUploadSuccess }) {
     setLoading(true);
 
     try {
-      const result = await uploadPdfAndGenerateSchedule(pdfFile, numDays);
+      const result = await uploadPdfAndGenerateSchedule(
+        pdfFile,
+        numDays,
+        bookName
+      );
       if (result.success) {
-        console.log("API Response:",result); //debug log
+        console.log("API Response:", result); //debug log
         setTempData(result);
         toast.success("Study schedule generated successfully!");
         onUploadSuccess(result); // send schedule back to parent
@@ -82,8 +87,12 @@ export default function UploadUI({ onUploadSuccess }) {
       {loading && (
         <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-white/90 backdrop-blur-sm rounded-3xl">
           <FiLoader className="text-5xl text-indigo-600 animate-spin mb-4" />
-          <p className="text-indigo-900 font-semibold text-lg">AI is analyzing your PDF...</p>
-          <p className="text-xs text-gray-500 mt-2">Extracting topics and generating your plan</p>
+          <p className="text-indigo-900 font-semibold text-lg">
+            AI is analyzing your PDF...
+          </p>
+          <p className="text-xs text-gray-500 mt-2">
+            Extracting topics and generating your plan
+          </p>
         </div>
       )}
 
@@ -95,12 +104,16 @@ export default function UploadUI({ onUploadSuccess }) {
         <FiUploadCloud className="text-6xl text-indigo-500 mb-4" />
         {!filename ? (
           <>
-            <h2 className="text-xl font-semibold text-indigo-900">Upload Your Study Notes</h2>
+            <h2 className="text-xl font-semibold text-indigo-900">
+              Upload Your Study Notes
+            </h2>
             <p className="text-sm text-gray-600 mt-2">PDF files only</p>
           </>
         ) : (
           <>
-            <h2 className="text-xl font-semibold text-indigo-900">Selected PDF:</h2>
+            <h2 className="text-xl font-semibold text-indigo-900">
+              Selected PDF:
+            </h2>
             <p className="text-sm text-gray-700 mt-2 font-medium">{filename}</p>
           </>
         )}
@@ -123,6 +136,16 @@ export default function UploadUI({ onUploadSuccess }) {
           onChange={handleDaysChange}
           className="border border-indigo-300 rounded-lg p-2 w-full text-center text-indigo-900 font-semibold placeholder-indigo-400"
           placeholder="Enter number of study days"
+        />
+      </div>
+      {/* BOOK NAME INPUT */}
+      <div className="mt-4 w-full flex justify-center">
+        <input
+          type="text"
+          placeholder="Enter Book Name (Physics, Chemistry...)"
+          value={bookName}
+          onChange={(e) => setBookName(e.target.value)}
+          className="w-full mb-4 border border-indigo-300 rounded-lg p-2 text-center font-semibold"
         />
       </div>
 

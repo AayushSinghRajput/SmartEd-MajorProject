@@ -1,63 +1,91 @@
+import { useState } from "react";
 import { DASHBOARD_TABS } from "../lib/constants";
 import { formatAcademicId, getCleanUsername } from "../lib/utils";
 
-export default function Sidebar({ user, activeTab, setActiveTab, setShowServiceView }) {
+export default function Sidebar({
+  user,
+  activeTab,
+  setActiveTab,
+  setShowServiceView,
+}) {
+  const [collapsed, setCollapsed] = useState(false);
+
   return (
-    <div className="w-full md:w-72 bg-white shadow-xl md:rounded-2xl p-6 flex flex-col border border-indigo-50">
-      {/* Profile Section */}
-      <div className="text-center mb-8">
-        <div className="relative inline-block mb-4">
-          <div className="absolute -inset-1 bg-gradient-to-tr from-indigo-600 to-purple-400 rounded-full blur opacity-10"></div>
-          <div className="relative w-24 h-24 rounded-full overflow-hidden mx-auto shadow-sm border-4 border-white">
-            {user?.profileImageUrl ? (
-              <img src={user.profileImageUrl} alt="Profile" className="w-full h-full object-cover" />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center bg-indigo-50 text-indigo-700 text-4xl font-black">
-                {getCleanUsername(user).charAt(0)}
-              </div>
-            )}
-          </div>
-        </div>
-        <h2 className="text-xl font-black text-slate-800 tracking-tight">{getCleanUsername(user)}</h2>
-        <p className="text-indigo-600 text-[10px] font-bold uppercase tracking-[0.2em] mt-1">
-          {user?.publicMetadata?.role || "Science Student"}
-        </p>
-
-        {/* Academic ID */}
-        <div className="mt-4 flex flex-col items-center">
-          <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Institutional ID</span>
-          <div className="px-4 py-1.5 bg-slate-50 border border-slate-200 rounded-lg">
-            <span className="text-sm font-mono font-bold text-slate-700 tracking-tight">
-              {formatAcademicId(user?._id || user?.id, user?.createdAt)}
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {/* Navigation */}
-      <nav className="flex-1 flex flex-col gap-2">
-        {DASHBOARD_TABS.map((tab) => (
+    <aside
+      className={`
+        sticky top-16 left-0
+        ${collapsed ? "w-20" : "w-72"}
+        h-[calc(100vh-4rem)]
+        bg-white
+        transition-all duration-300
+        flex-shrink-0
+      `}
+    >
+      <div className="flex flex-col h-full px-4 py-5">
+        {/* TOGGLE */}
+        <div className="flex justify-end mb-6">
           <button
-            key={tab.name}
-            className={`flex items-center px-4 py-3 rounded-xl text-sm font-bold transition-all duration-300 ${
-              activeTab === tab.name
-                ? "bg-indigo-600 text-white shadow-lg shadow-indigo-100"
-                : "text-slate-500 hover:bg-indigo-50 hover:text-indigo-700"
-            }`}
-            onClick={() => {
-              setShowServiceView(false);
-              setActiveTab(tab.name);
-            }}
+            onClick={() => setCollapsed(!collapsed)}
+            className={`relative w-12 h-6 rounded-full transition-colors
+              ${collapsed ? "bg-indigo-600" : "bg-slate-300"}`}
           >
-            <span className="mr-3 text-lg">{tab.icon}</span>
-            {tab.label}
+            <span
+              className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow
+                transition-transform duration-300
+                ${collapsed ? "translate-x-6" : ""}`}
+            />
           </button>
-        ))}
-      </nav>
+        </div>
 
-      <div className="mt-8 pt-4 border-t border-slate-100 text-center">
-        <span className="text-[10px] font-bold text-slate-300 tracking-tighter uppercase">Academic Standard 2026</span>
+        {/* PROFILE */}
+        <div className="text-center mb-8">
+          <div className="w-14 h-14 mx-auto rounded-full bg-indigo-100 flex items-center justify-center text-xl font-bold">
+            {getCleanUsername(user).charAt(0)}
+          </div>
+
+          {!collapsed && (
+            <>
+              <h3 className="mt-3 font-bold text-slate-800">
+                {getCleanUsername(user)}
+              </h3>
+              <p className="text-xs text-indigo-600">
+                {user?.publicMetadata?.role || "Student"}
+              </p>
+              <p className="mt-2 text-[10px] font-mono text-slate-400">
+                {formatAcademicId(user?._id || user?.id, user?.createdAt)}
+              </p>
+            </>
+          )}
+        </div>
+
+        {/* NAVIGATION */}
+        <nav className="flex-1 space-y-2">
+          {DASHBOARD_TABS.map((tab) => (
+            <button
+              key={tab.name}
+              onClick={() => {
+                setShowServiceView(false);
+                setActiveTab(tab.name);
+              }}
+              className={`flex items-center gap-3 w-full px-3 py-2 rounded-xl text-sm font-semibold transition
+                ${
+                  activeTab === tab.name
+                    ? "bg-indigo-600 text-white"
+                    : "text-slate-600 hover:bg-indigo-50"
+                }`}
+            >
+              <span className="text-lg">{tab.icon}</span>
+              {!collapsed && tab.label}
+            </button>
+          ))}
+        </nav>
+
+        {!collapsed && (
+          <div className="pt-4 mt-6 text-center text-xs text-slate-400">
+            Academic Standard 2026
+          </div>
+        )}
       </div>
-    </div>
+    </aside>
   );
 }
