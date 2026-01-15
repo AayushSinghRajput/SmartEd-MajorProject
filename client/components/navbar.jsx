@@ -6,7 +6,6 @@ import { usePathname, useRouter } from "next/navigation";
 import { FiMenu, FiX, FiUser, FiLogOut, FiAward } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
-// import logo from "../assets/images/logo.jpg";
 import Company_Logo from "../assets/images/Company_Logo.png";
 import { useAuth } from "@/context/AuthContext";
 
@@ -129,7 +128,7 @@ export default function Navbar() {
               href="/"
               className="text-xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent"
             >
-              SmartPrep AI
+              SmartED AI
             </Link>
           </motion.div>
 

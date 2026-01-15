@@ -3,6 +3,7 @@ from routes import auth
 from routes import content
 from routes import pdf
 from routes import mcq
+from routes import predefined
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(
@@ -24,7 +25,7 @@ app.include_router(auth.router)
 app.include_router(pdf.router)
 app.include_router(content.router)
 app.include_router(mcq.router)
-
+app.include_router(predefined.router)
 
 
 @app.get("/")

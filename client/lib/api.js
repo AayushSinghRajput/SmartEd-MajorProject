@@ -1,4 +1,4 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
 
 
 
@@ -157,13 +157,7 @@ export const getUserStudyPlans = async () => {
   return handleResponse(response);
 };
 
-export const getGlobalPlan = async (subject) => {
-  const response = await fetch(`${API_URL}/ai/predefined-study-plan/${subject}`,{
-    method:'GET',
-    headers:getAuthHeaders(),
-  });
-  return handleResponse(response);
-}
+
 
 export const getMockTest = async (mock_type)=>{
   const response = await fetch(`${API_URL}/exams/${mock_type}`,{
