@@ -7,14 +7,10 @@ import MCQSection from "./mcqsection";
 import { useServiceLogic } from "../hooks/useServiceLogic";
 import { useEffect } from "react";
 
-export default function Service({ planData, onScheduleUpdate }) {
-  console.log("Service component received planData:", planData); // Debug log
-  
+export default function Service({ planData, onScheduleUpdate }) {  
   const { state, actions } = useServiceLogic(planData);
-  
   // when we receive the schedule data
   useEffect(() => {
-    console.log("Service useEffect - planData:", planData); // Debug log
     if (planData?.schedule) {
       onScheduleUpdate?.(planData.schedule);
     }

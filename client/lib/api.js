@@ -159,12 +159,6 @@ export const getUserStudyPlans = async () => {
 
 
 
-export const getMockTest = async (mock_type)=>{
-  const response = await fetch(`${API_URL}/exams/${mock_type}`,{
-    method:"GET",
-    headers:getAuthHeaders(),
-  });
-  return handleResponse(response);
-}
+
 
 
