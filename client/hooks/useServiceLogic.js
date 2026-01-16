@@ -1,14 +1,18 @@
 import { useState, useEffect, useRef } from "react";
 import { toast } from "react-hot-toast";
 import { generateContent } from "../api/content";
+import { summarizeDayNotes } from "../api/note";
 
-export function useServiceLogic(planData) {
+//  Add `mode` to distinguish "study" vs "mcq" / "notes"
+export function useServiceLogic(planData, mode = "study") {
   /* -------------------- STATE -------------------- */
   const [localSchedule, setLocalSchedule] = useState([]);
   const [expandedDays, setExpandedDays] = useState(new Set());
   const [expandedTopics, setExpandedTopics] = useState(new Map());
   const [selectedSubtopic, setSelectedSubtopic] = useState(null);
   const [loadingContent, setLoadingContent] = useState(false);
+  // ✅ For MCQ / Notes: store selected day
+  const [selectedDay, setSelectedDay] = useState(null);
 
   /* -------------------- METADATA -------------------- */
   const metaData = {
@@ -19,7 +23,11 @@ export function useServiceLogic(planData) {
   };
 
   /* Prevent duplicate fetch */
-  const fetchingRef = useRef({ dayNum: null, topicIdx: null, subtopicIdx: null });
+  const fetchingRef = useRef({
+    dayNum: null,
+    topicIdx: null,
+    subtopicIdx: null,
+  });
 
   /* -------------------- INIT -------------------- */
   useEffect(() => {
@@ -85,8 +93,9 @@ export function useServiceLogic(planData) {
   /* -------------------- DATA ACCESS -------------------- */
   const getSubtopic = (dayNum, topicIdx, subtopicIdx) => {
     return (
-      localSchedule?.[dayNum - 1]?.topics?.[topicIdx]?.subtopics?.[subtopicIdx] ||
-      null
+      localSchedule?.[dayNum - 1]?.topics?.[topicIdx]?.subtopics?.[
+        subtopicIdx
+      ] || null
     );
   };
 
@@ -168,8 +177,8 @@ export function useServiceLogic(planData) {
 
     if (direction === "next") {
       if (s + 1 < day.topics[t].subtopics.length) s++;
-      else if (t + 1 < day.topics.length) (t++, (s = 0));
-      else if (d < localSchedule.length) (d++, (t = 0), (s = 0));
+      else if (t + 1 < day.topics.length) t++, (s = 0);
+      else if (d < localSchedule.length) d++, (t = 0), (s = 0);
     } else {
       if (s > 0) s--;
       else if (t > 0) {
@@ -188,21 +197,82 @@ export function useServiceLogic(planData) {
 
   const computeNavigation = () => {
     if (!selectedSubtopic) return { hasNext: false, hasPrevious: false };
+
+    // If it's notes/MCQ, no subtopics exist
+    if (mode === "notes" || mode === "mcq") {
+      return { hasNext: false, hasPrevious: false };
+    }
     const { currentDay, topicIdx, subtopicIdx } = selectedSubtopic;
     const day = localSchedule[currentDay - 1];
     const topic = day?.topics?.[topicIdx];
+
+    if (!topic || !topic.subtopics)
+      return { hasNext: false, hasPrevious: false };
 
     return {
       hasNext:
         subtopicIdx + 1 < topic.subtopics.length ||
         topicIdx + 1 < day.topics.length ||
         currentDay < localSchedule.length,
-      hasPrevious:
-        subtopicIdx > 0 || topicIdx > 0 || currentDay > 1,
+      hasPrevious: subtopicIdx > 0 || topicIdx > 0 || currentDay > 1,
     };
   };
 
   const { hasNext, hasPrevious } = computeNavigation();
+
+  // -------------------- MCQ / Notes Day Click --------------------
+  const handleDayClick = async (dayNumber) => {
+    setSelectedDay(dayNumber); //mark selected day
+    if (mode === "mcq") {
+      // Load MCQs for the day
+      console.log("MCQ mode: clicked day", dayNumber);
+    } else if (mode === "notes") {
+      // Load Notes for the day
+      try {
+        setLoadingContent(true);
+        //call the api
+        const notesContent = await summarizeDayNotes({
+          book_id: metaData.fileHash, //pdf_hash
+          day_number: dayNumber,
+        });
+        console.log("Calling summarizeDayNotes with:", {
+          book_id: metaData.fileHash,
+          day_number: dayNumber,
+        });
+        // If notesContent is an object { notes, cached }, use notes
+        setSelectedSubtopic({
+          title: `Day ${dayNumber} Notes`,
+          content: notesContent?.notes || "No notes available for this day.",
+          currentDay: dayNumber,
+        });
+      } catch (error) {
+        toast.error("Complete your study plan for this day");
+        console.error(error);
+      } finally {
+        setLoadingContent(false);
+      }
+    }
+
+    setSelectedDay(dayNumber); // ✅ mark selected day
+  };
+
+  // ✅ Move to next day and load notes
+  const goToNextDay = async () => {
+    if (!selectedDay) return;
+    const nextDay = selectedDay + 1;
+    if (nextDay > localSchedule.length) return; // no more days
+    setSelectedDay(nextDay);
+    await handleDayClick(nextDay); // reuse handleDayClick to load notes
+    console.log("Going to next day:", nextDay, "selectedDay:", selectedDay);
+  };
+
+  // ✅ Move to previous day and load notes
+  const goToPreviousDay = async () => {
+    if (!selectedDay || selectedDay <= 1) return;
+    const prevDay = selectedDay - 1;
+    setSelectedDay(prevDay);
+    await handleDayClick(prevDay); // reuse handleDayClick to load notes
+  };
 
   return {
     state: {
@@ -216,12 +286,16 @@ export function useServiceLogic(planData) {
       metaData,
       hasNext,
       hasPrevious,
+      selectedDay, // ✅ for MCQ / Notes
     },
     actions: {
       toggleDayExpand,
       toggleTopicExpand,
       handleSubtopicClick,
       goToSubtopic,
+      handleDayClick, // ✅ for MCQ / Notes
+      goToNextDay, // ✅ for MCQ / Notes
+      goToPreviousDay, // ✅ for MCQ / Notes
     },
   };
 }
