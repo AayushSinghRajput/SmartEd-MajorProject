@@ -4,11 +4,26 @@ import Sidebar from "../components/Service/Sidebar";
 import SubtopicViewer from "../components/Service/SubtopicViewer";
 import WelcomeState from "../components/Service/WelcomeState";
 import { useServiceLogic } from "../hooks/useServiceLogic";
+import { getWelcomeText } from "../constants/getWelcomeText";
 import { useEffect } from "react";
 
-export default function Service({ planData, onScheduleUpdate }) {
-  // Initialize service logic hook
-  const { state, actions } = useServiceLogic(planData);
+export default function Service({
+  planData,
+  onScheduleUpdate,
+  activeTab = "dashboard",
+}) {
+  // ✅ Determine service mode: "study" (default) or "mcq"/"notes"
+  const mode =
+    activeTab === "mcq" || activeTab === "notes" ? activeTab : "study";
+
+  // ✅ Pass mode to your hook
+  const { state, actions } = useServiceLogic(planData, mode);
+
+  // Get dynamic text
+  const { welcomeHeading, welcomeDescription } = getWelcomeText({
+    mode,
+    state,
+  });
 
   // Notify parent of schedule updates
   useEffect(() => {
@@ -24,8 +39,11 @@ export default function Service({ planData, onScheduleUpdate }) {
         <div className="text-center">
           <div className="text-6xl mb-6">📚</div>
           <h3 className="text-2xl font-bold text-slate-900">
-            No Schedule Available
+            {mode === "study"
+              ? "No Schedule Available"
+              : `No ${mode.toUpperCase()} data available`}
           </h3>
+
           <p className="text-slate-600 mt-2">
             Please upload a PDF to generate a study schedule.
           </p>
@@ -37,7 +55,7 @@ export default function Service({ planData, onScheduleUpdate }) {
   return (
     <div className="flex w-full h-screen bg-white overflow-hidden">
       {/* Sidebar */}
-      <Sidebar 
+      <Sidebar
         localSchedule={state.localSchedule}
         expandedDays={state.expandedDays}
         expandedTopics={state.expandedTopics}
@@ -47,6 +65,7 @@ export default function Service({ planData, onScheduleUpdate }) {
         loadingContent={state.loadingContent}
         metaData={state.metaData}
         actions={actions}
+        mode={mode}
       />
 
       {/* Main Content Area */}
@@ -55,13 +74,24 @@ export default function Service({ planData, onScheduleUpdate }) {
           <SubtopicViewer
             subtopic={state.selectedSubtopic}
             loadingContent={state.loadingContent}
-            hasPrevious={state.hasPrevious}
-            hasNext={state.hasNext}
-            onPrevious={() => actions.goToSubtopic("previous")}
-            onNext={() => actions.goToSubtopic("next")}
+            hasPrevious={state.selectedDay > 1}
+            hasNext={state.selectedDay < state.localSchedule.length}
+            onPrevious={
+              mode === "notes"
+                ? actions.goToPreviousDay
+                : () => actions.goToSubtopic("previous")
+            }
+            onNext={
+              mode === "notes"
+                ? actions.goToNextDay
+                : () => actions.goToSubtopic("next")
+            }
           />
         ) : (
-          <WelcomeState />
+          <WelcomeState
+            heading={welcomeHeading}
+            description={welcomeDescription}
+          />
         )}
       </div>
     </div>
