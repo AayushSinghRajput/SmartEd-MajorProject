@@ -1,10 +1,10 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import List
 
 
 class MCQRequest(BaseModel):
-    context: str
-    num_questions: int = 5
+    pdf_hash: str = Field(..., min_length=1)
+    day_number: int = Field(..., ge=1)
 
 
 class MCQItem(BaseModel):
