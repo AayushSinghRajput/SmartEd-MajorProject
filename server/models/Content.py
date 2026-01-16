@@ -1,3 +1,4 @@
+from typing import Optional
 from pydantic import BaseModel, Field
 from typing import List, Dict, Any
 
@@ -34,6 +35,8 @@ class UploadScheduleResponse(BaseModel):
     status_code: int
     message: str
     pdf_hash: str
+    book_name: str
     days: int
     schedule: List[Dict[str, Any]]  # schedule with topics and subtopics
     cached: bool
+    image_url: Optional[str] = None

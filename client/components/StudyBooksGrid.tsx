@@ -1,40 +1,56 @@
 "use client";
 
-import StudyBookCard from "./ui/Card";
-import { DUMMY_BOOKS } from "../assets/data/studybooksgriddata";
-import { FaBookOpen } from "react-icons/fa";
+import { useEffect, useState } from "react";
+import StudyBookCard from "../components/ui/Card";
+import { getUserBooks } from "../api/pdf";
+import Loader from "../components/ui/Loader";
+import { TAB_HEADERS } from "../lib/studygridconstants";
 
-const TAB_HEADERS = {
-  dashboard: {
-    heading: "My Study Books",
-    subheading: null,
-    icon: <FaBookOpen className="text-indigo-600" />,
-  },
-  performance: {
-    heading: "Academic Performance",
-    subheading: "Track your academic progress and stay on top of your studies",
-    icon: <FaBookOpen className="text-indigo-600" />,
-  },
-  mcq: {
-    heading: "MCQ Section",
-    subheading: "Take MCQ tests to improve your knowledge",
-    icon: <FaBookOpen className="text-indigo-600" />,
-  },
-  notes: {
-    heading: "Notes Section",
-    subheading: "Take notes to improve your knowledge",
-    icon: <FaBookOpen className="text-indigo-600" />,
-  },
-};
+interface StudyBook {
+  id: number;
+  pdf_hash: string;
+  name: string;
+  image?: string;
+  progress?: number;
+  pdf_url: string;
+}
 
 interface StudyBooksGridProps {
   activeTab?: "dashboard" | "performance" | "mcq" | "notes";
+  onBookClick?: (book: StudyBook) => void;
 }
 
-export default function StudyBooksGrid({ activeTab = "dashboard" }: StudyBooksGridProps) {
-  const { heading, subheading, icon } = TAB_HEADERS[activeTab] || TAB_HEADERS.dashboard;
+export default function StudyBooksGrid({
+  activeTab = "dashboard",
+  onBookClick,
+}: StudyBooksGridProps) {
+  const [books, setBooks] = useState<StudyBook[]>([]);
+  const [loading, setLoading] = useState(true);
 
+  useEffect(() => {
+    getUserBooks()
+      .then((data) => {
+        const mappedBooks = (data.books || []).map((book: StudyBook) => ({
+          id: book.id,
+          pdf_hash: book.pdf_hash,
+          name: book.name || "Untitled Book",
+          image: book.image || "/images/Company_Logo.png",
+          progress: book.progress ?? 0,
+          pdf_url: book.pdf_url || "#",
+        }));
+        setBooks(mappedBooks);
+      })
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, []);
+
+  const { heading, subheading, icon } = TAB_HEADERS[activeTab] || TAB_HEADERS.dashboard;
   const cardVariant = activeTab === "performance" ? "performance" : "dashboard";
+
+  // hide edit for mcq / notes
+  const allowImageEdit = activeTab === "dashboard";
+
+  if (loading) return <Loader />;
 
   return (
     <div className="mt-20 mb-6">
@@ -45,11 +61,21 @@ export default function StudyBooksGrid({ activeTab = "dashboard" }: StudyBooksGr
         {subheading && <p className="text-gray-600 mt-1">{subheading}</p>}
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
-        {DUMMY_BOOKS.map((book) => (
-          <StudyBookCard key={book.id} book={book} variant={cardVariant} />
-        ))}
-      </div>
+      {books.length === 0 ? (
+        <p className="text-gray-500">No books uploaded yet.</p>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
+          {books.map((book) => (
+            <StudyBookCard
+              key={book.id}
+              book={book}
+              variant={cardVariant}
+              allowImageEdit={allowImageEdit} // ✅ pass this prop
+              onClick={() => onBookClick?.(book)}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
