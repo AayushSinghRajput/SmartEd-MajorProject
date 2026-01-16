@@ -17,10 +17,10 @@ export default function Dashboard() {
   // -----------------------------
   // STATE
   // -----------------------------
-  const [activeTab, setActiveTab] = useState("dashboard"); 
-  const [showServiceView, setShowServiceView] = useState(false); 
-  const [showUploadPopup, setShowUploadPopup] = useState(false); 
-  const [aiPlan, setAiPlan] = useState(null); 
+  const [activeTab, setActiveTab] = useState("dashboard");
+  const [showServiceView, setShowServiceView] = useState(false);
+  const [showUploadPopup, setShowUploadPopup] = useState(false);
+  const [aiPlan, setAiPlan] = useState(null);
   const { user } = useAuth();
 
   // -----------------------------
@@ -51,7 +51,8 @@ export default function Dashboard() {
     const toastId = toast.loading("Fetching schedule for this book...");
 
     try {
-      const { success, schedule, book_name, image, pdf_url, message } = await getBookSchedule(pdf_hash);
+      const { success, schedule, book_name, image, pdf_url, message } =
+        await getBookSchedule(pdf_hash);
 
       if (success) {
         setAiPlan({
@@ -86,15 +87,24 @@ export default function Dashboard() {
   // -----------------------------
   const renderContent = () => {
     if (showServiceView && aiPlan) {
-      return <Service planData={aiPlan} />;
+      return (
+        <Service
+          planData={aiPlan}
+          activeTab={activeTab} // ✅ PASS CURRENT TAB (dashboard / mcq / notes)
+        />
+      );
     }
+
     if (activeTab === "mock") {
       return <MockTest />;
     }
-    return <StudyBooksGrid activeTab={activeTab} onBookClick={handleBookClick} />;
+
+    return (
+      <StudyBooksGrid activeTab={activeTab} onBookClick={handleBookClick} />
+    );
   };
 
-  const showUploadSection = activeTab !== "mock"; 
+  const showUploadSection = activeTab !== "mock";
   const shouldShowStudyGrid = showUploadSection && !showServiceView;
 
   // -----------------------------
@@ -129,8 +139,10 @@ export default function Dashboard() {
 
         {showUploadPopup && (
           <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center">
-            <div className="bg-white rounded-3xl w-full max-w-3xl
-                            max-h-[90vh] overflow-y-auto p-6 md:p-8">
+            <div
+              className="bg-white rounded-3xl w-full max-w-3xl
+                            max-h-[90vh] overflow-y-auto p-6 md:p-8"
+            >
               <DashboardContent
                 onUploadSuccess={handleUploadSuccess}
                 onClose={() => setShowUploadPopup(false)}
