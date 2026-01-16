@@ -1,250 +1,227 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { toast } from "react-hot-toast";
-import {
-  sendContext,
-  getMCQs,
-  toggleSubtopicProgress,
-  hydrateDayWithImages,
-} from "../lib/api";
+import { generateContent } from "../api/content";
 
 export function useServiceLogic(planData) {
+  /* -------------------- STATE -------------------- */
   const [localSchedule, setLocalSchedule] = useState([]);
-  const [expandedDayIdx, setExpandedDayIdx] = useState(null);
-  const [expandedTopicIdx, setExpandedTopicIdx] = useState(null);
+  const [expandedDays, setExpandedDays] = useState(new Set());
+  const [expandedTopics, setExpandedTopics] = useState(new Map());
   const [selectedSubtopic, setSelectedSubtopic] = useState(null);
-  const [generatingDay, setGeneratingDay] = useState(null);
-  const [generatingMCQ, setGeneratingMCQ] = useState(null);
-  const [activeQuiz, setActiveQuiz] = useState(null);
-  const [isToggling, setIsToggling] = useState(false);
-  const [hydratingDays, setHydratingDays] = useState({});
+  const [loadingContent, setLoadingContent] = useState(false);
 
-  console.log("useServiceLogic - planData received:", planData); // Debug log
-
-  // Initialize schedule from planData
-  useEffect(() => {
-    if (planData?.schedule) {
-      console.log("Setting localSchedule:", planData.schedule); // Debug log
-      setLocalSchedule(planData.schedule);
-    } else {
-      console.log("No schedule in planData:", planData); // Debug log
-      setLocalSchedule([]);
-    }
-  }, [planData]);
-
+  /* -------------------- METADATA -------------------- */
   const metaData = {
-    subject: planData?.subject || "Study Material",
+    subject: planData?.book_name || "Study Material",
     title: planData?.bookTitle || "Your PDF",
     fileHash: planData?.pdf_hash || planData?.fileHash || "default_hash",
     planId: planData?._id || planData?.id || "temp-id",
   };
 
-  console.log("metaData:", metaData); // Debug log
-  console.log("localSchedule:", localSchedule); // Debug log
+  /* Prevent duplicate fetch */
+  const fetchingRef = useRef({ dayNum: null, topicIdx: null, subtopicIdx: null });
 
-  const handleDayExpand = async (idx, dayNum) => {
-    const isExpanding = expandedDayIdx !== idx;
-
-    if (isExpanding) {
-      setExpandedDayIdx(idx);
-      setExpandedTopicIdx(null);
-      setSelectedSubtopic(null);
-
-      // If closing the previous day, collapse it first
-      if (expandedDayIdx !== null) {
-        const prevDay = localSchedule[expandedDayIdx]?.day;
-        setHydratingDays((prev) => ({ ...prev, [prevDay]: false }));
-      }
-
-      // Check if day exists in schedule
-      const dayItem = localSchedule[idx];
-      if (!dayItem?.topics || dayItem.topics.length === 0) {
-        toast.error("No topics found for this day");
-        return;
-      }
-
-      const firstSubtopic = dayItem.topics[0]?.subtopics?.[0];
-
-      // Logic to check if we need to fetch images (hydration)
-      const needsHydration =
-        !firstSubtopic?.images ||
-        firstSubtopic.images.length === 0 ||
-        typeof firstSubtopic.images[0] === "string";
-
-      if (needsHydration && !hydratingDays[dayNum] && metaData.planId) {
-        const toastId = `hydrate-${dayNum}`;
-
-        try {
-          setHydratingDays((prev) => ({ ...prev, [dayNum]: true }));
-
-          toast.loading(`Generating educational diagrams...`, {
-            id: toastId,
-          });
-
-          const res = await hydrateDayWithImages(metaData.planId, dayNum);
-
-          if (res.success) {
-            // Update the local schedule with the new data containing image objects
-            const updatedSchedule = localSchedule.map((d) =>
-              d.day === dayNum ? res.data : d
-            );
-            setLocalSchedule(updatedSchedule);
-
-            // Update the selected subtopic if it's from this day
-            if (selectedSubtopic && selectedSubtopic.currentDay === dayNum) {
-              for (let t of res.data.topics) {
-                const freshSubtopic = t.subtopics.find(
-                  (s) => s.title === selectedSubtopic.title
-                );
-                if (freshSubtopic) {
-                  setSelectedSubtopic({ ...freshSubtopic, currentDay: dayNum });
-                }
-              }
-            }
-
-            toast.success("Generated successfully created your diagrams!", {
-              id: toastId,
-            });
-          } else {
-            toast.error("Couldn't generate images right now.", {
-              id: toastId,
-            });
-          }
-        } catch (err) {
-          console.error("Hydration Error:", err);
-          toast.error("Connection error. Please try again.", { id: toastId });
-        } finally {
-          setHydratingDays((prev) => ({ ...prev, [dayNum]: false }));
-        }
-      }
+  /* -------------------- INIT -------------------- */
+  useEffect(() => {
+    if (planData?.schedule) {
+      setLocalSchedule(planData.schedule);
     } else {
-      setExpandedDayIdx(null);
-      setExpandedTopicIdx(null);
-      setSelectedSubtopic(null);
+      setLocalSchedule([]);
     }
-  };
+  }, [planData]);
 
-  const handleToggleComplete = async (day, subtopicTitle) => {
-    if (isToggling) return;
-    setIsToggling(true);
-    try {
-      const res = await toggleSubtopicProgress(
-        metaData.planId,
-        day,
-        subtopicTitle
-      );
-      if (res.success) {
-        const updatedSchedule = localSchedule.map((d) =>
-          d.day === day
-            ? {
-                ...d,
-                topics: d.topics.map((t) => ({
-                  ...t,
-                  subtopics: t.subtopics.map((st) =>
-                    st.title === subtopicTitle
-                      ? { ...st, completed: res.completed }
-                      : st
-                  ),
-                })),
-              }
-            : d
-        );
-        setLocalSchedule(updatedSchedule);
-        setSelectedSubtopic(
-          (prev) =>
-            prev && {
-              ...prev,
-              completed: res.completed,
-            }
-        );
-        toast.success(
-          res.completed ? "Marked as completed!" : "Reset to incomplete"
-        );
-      }
-    } catch (err) {
-      toast.error("Update failed");
-    } finally {
-      setIsToggling(false);
-    }
-  };
+  /* -------------------- HELPERS -------------------- */
+  const isDayExpanded = (dayIndex) => expandedDays.has(dayIndex);
 
-  const handleGenerateMCQ = async (dayNum) => {
-    const dayItem = localSchedule.find((d) => d.day === dayNum);
-    if (!dayItem) return;
-    setGeneratingMCQ(dayNum);
-    setActiveQuiz(null);
+  const isTopicExpanded = (dayIndex, topicIndex) =>
+    expandedTopics.get(dayIndex)?.has(topicIndex) || false;
 
-    const combinedContext = dayItem.topics
-      .map((t) =>
-        t.subtopics
-          .map((s) => `${s.title}: ${s.content || s.description || ""}`)
-          .join("\n")
-      )
-      .join("\n\n");
+  /* -------------------- TOGGLES -------------------- */
 
-    try {
-      const res = await getMCQs(combinedContext, metaData.fileHash, dayNum);
-      if (res.success) {
-        setActiveQuiz({ day: dayNum, fileHash: metaData.fileHash });
-        setSelectedSubtopic(null);
-        setExpandedDayIdx(null);
-        setExpandedTopicIdx(null);
+  // Toggle Day (expand / collapse)
+  const toggleDayExpand = (dayIndex) => {
+    setExpandedDays((prev) => {
+      const updated = new Set(prev);
+
+      if (updated.has(dayIndex)) {
+        // Collapse day
+        updated.delete(dayIndex);
+
+        // Collapse all topics of this day
+        setExpandedTopics((prevTopics) => {
+          const map = new Map(prevTopics);
+          map.delete(dayIndex);
+          return map;
+        });
+
+        // Clear selected subtopic if it belongs to this day
+        if (selectedSubtopic?.currentDay === dayIndex + 1) {
+          setSelectedSubtopic(null);
+        }
       } else {
-        toast.error("Failed to generate MCQs");
+        // Expand day
+        updated.add(dayIndex);
       }
-    } catch (err) {
-      console.error("MCQ Generation Error:", err);
-      toast.error("Quiz generation failed");
-    } finally {
-      setGeneratingMCQ(null);
-    }
+
+      return updated;
+    });
   };
 
-  const handleGenerateDayNote = async (dayNum) => {
-    const dayItem = localSchedule.find((d) => d.day === dayNum);
-    if (!dayItem) return;
-    setGeneratingDay(dayNum);
+  // Toggle Topic (expand / collapse)
+  const toggleTopicExpand = (dayIndex, topicIndex) => {
+    setExpandedTopics((prev) => {
+      const map = new Map(prev);
+      const topicSet = map.get(dayIndex) || new Set();
 
-    const combinedContext = dayItem.topics
-      .map((t) =>
-        t.subtopics
-          .map((s) => `${s.title}: ${s.content || s.description || ""}`)
-          .join("\n")
-      )
-      .join("\n\n");
+      topicSet.has(topicIndex)
+        ? topicSet.delete(topicIndex)
+        : topicSet.add(topicIndex);
+
+      map.set(dayIndex, topicSet);
+      return map;
+    });
+  };
+
+  /* -------------------- DATA ACCESS -------------------- */
+  const getSubtopic = (dayNum, topicIdx, subtopicIdx) => {
+    return (
+      localSchedule?.[dayNum - 1]?.topics?.[topicIdx]?.subtopics?.[subtopicIdx] ||
+      null
+    );
+  };
+
+  const isContentEmpty = (subtopic) =>
+    !subtopic?.content || subtopic.content.trim() === "";
+
+  /* -------------------- FETCH CONTENT -------------------- */
+  const fetchSubtopicContent = async (dayNum, topicIdx, subtopicIdx) => {
+    if (
+      fetchingRef.current.dayNum === dayNum &&
+      fetchingRef.current.topicIdx === topicIdx &&
+      fetchingRef.current.subtopicIdx === subtopicIdx
+    )
+      return;
+
+    const subtopic = getSubtopic(dayNum, topicIdx, subtopicIdx);
+    if (!subtopic) return toast.error("Subtopic not found");
+
+    fetchingRef.current = { dayNum, topicIdx, subtopicIdx };
+    setLoadingContent(true);
 
     try {
-      const res = await sendContext(combinedContext, metaData.fileHash, dayNum);
-      if (res.success) toast.success(`Note saved successfully!`);
-      else toast.error("Failed to save note");
-    } catch (err) {
-      console.error("Note Generation Error:", err);
-      toast.error("Note generation failed");
+      const res = await generateContent({
+        book_id: metaData.fileHash,
+        day_number: dayNum,
+        topic_index: topicIdx,
+        subtopic_index: subtopicIdx,
+      });
+
+      const updatedSubtopic = {
+        ...subtopic,
+        content: res?.content || "No content available.",
+        currentDay: dayNum,
+        topicIdx,
+        subtopicIdx,
+      };
+
+      const updatedSchedule = [...localSchedule];
+      updatedSchedule[dayNum - 1].topics[topicIdx].subtopics[subtopicIdx] =
+        updatedSubtopic;
+
+      setLocalSchedule(updatedSchedule);
+      setSelectedSubtopic(updatedSubtopic);
+    } catch {
+      toast.error("Failed to load content");
     } finally {
-      setGeneratingDay(null);
+      setLoadingContent(false);
+      fetchingRef.current = {};
     }
   };
+
+  /* -------------------- SUBTOPIC CLICK -------------------- */
+  const handleSubtopicClick = async (dayNum, topicIdx, subtopicIdx) => {
+    const subtopic = getSubtopic(dayNum, topicIdx, subtopicIdx);
+    if (!subtopic) return;
+
+    if (isContentEmpty(subtopic)) {
+      await fetchSubtopicContent(dayNum, topicIdx, subtopicIdx);
+    } else {
+      setSelectedSubtopic({
+        ...subtopic,
+        currentDay: dayNum,
+        topicIdx,
+        subtopicIdx,
+      });
+    }
+  };
+
+  /* -------------------- NAVIGATION -------------------- */
+  const goToSubtopic = async (direction) => {
+    if (!selectedSubtopic) return;
+
+    const { currentDay, topicIdx, subtopicIdx } = selectedSubtopic;
+    const day = localSchedule[currentDay - 1];
+
+    let d = currentDay,
+      t = topicIdx,
+      s = subtopicIdx;
+
+    if (direction === "next") {
+      if (s + 1 < day.topics[t].subtopics.length) s++;
+      else if (t + 1 < day.topics.length) (t++, (s = 0));
+      else if (d < localSchedule.length) (d++, (t = 0), (s = 0));
+    } else {
+      if (s > 0) s--;
+      else if (t > 0) {
+        t--;
+        s = day.topics[t].subtopics.length - 1;
+      } else if (d > 1) {
+        d--;
+        const prev = localSchedule[d - 1];
+        t = prev.topics.length - 1;
+        s = prev.topics[t].subtopics.length - 1;
+      }
+    }
+
+    await handleSubtopicClick(d, t, s);
+  };
+
+  const computeNavigation = () => {
+    if (!selectedSubtopic) return { hasNext: false, hasPrevious: false };
+    const { currentDay, topicIdx, subtopicIdx } = selectedSubtopic;
+    const day = localSchedule[currentDay - 1];
+    const topic = day?.topics?.[topicIdx];
+
+    return {
+      hasNext:
+        subtopicIdx + 1 < topic.subtopics.length ||
+        topicIdx + 1 < day.topics.length ||
+        currentDay < localSchedule.length,
+      hasPrevious:
+        subtopicIdx > 0 || topicIdx > 0 || currentDay > 1,
+    };
+  };
+
+  const { hasNext, hasPrevious } = computeNavigation();
 
   return {
     state: {
       localSchedule,
-      expandedDayIdx,
-      expandedTopicIdx,
+      expandedDays,
+      expandedTopics,
+      isDayExpanded,
+      isTopicExpanded,
       selectedSubtopic,
-      generatingDay,
-      generatingMCQ,
-      activeQuiz,
-      isToggling,
-      hydratingDays,
+      loadingContent,
       metaData,
+      hasNext,
+      hasPrevious,
     },
     actions: {
-      setExpandedTopicIdx,
-      setSelectedSubtopic,
-      setActiveQuiz,
-      handleDayExpand,
-      handleToggleComplete,
-      handleGenerateMCQ,
-      handleGenerateDayNote,
+      toggleDayExpand,
+      toggleTopicExpand,
+      handleSubtopicClick,
+      goToSubtopic,
     },
   };
 }
