@@ -5,6 +5,7 @@ from routes import pdf
 from routes import mcq
 from routes import predefined
 from routes import mock_routes
+from routes import notes_summarizer
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(
@@ -28,6 +29,7 @@ app.include_router(content.router)
 app.include_router(mcq.router)
 app.include_router(predefined.router)
 app.include_router(mock_routes.router)
+app.include_router(notes_summarizer.router)
 
 @app.get("/")
 def root():
