@@ -13,3 +13,4 @@ env/
 venv/
 pyproject.toml
 uv.lock
+chatbot.db
