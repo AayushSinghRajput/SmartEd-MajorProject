@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from "react";
 import { toast } from "react-hot-toast";
 import { generateContent } from "../api/content";
 import { summarizeDayNotes } from "../api/note";
+import { generateMCQs } from "../api/mcq";
+import {formatMCQsToMarkdown} from '../utils/formatmcqs';
 
 //  Add `mode` to distinguish "study" vs "mcq" / "notes"
 export function useServiceLogic(planData, mode = "study") {
@@ -226,6 +228,29 @@ export function useServiceLogic(planData, mode = "study") {
     if (mode === "mcq") {
       // Load MCQs for the day
       console.log("MCQ mode: clicked day", dayNumber);
+      try {
+        setLoadingContent(true);
+        //call the api
+        const mcqs = await generateMCQs({
+          pdf_hash: metaData.fileHash, //pdf_hash
+          day_number: dayNumber,
+        });
+        console.log("Calling generateMCQs with:", {
+          pdf_hash: metaData.fileHash, //pdf_hash
+          day_number: dayNumber,
+        });
+        // If mcqs is an object { mcqs, cached }, use mcqs
+        setSelectedSubtopic({
+          title: `Day ${dayNumber} MCQs`,
+          content: mcqs || [], //always an array
+          currentDay: dayNumber,
+        });
+      } catch (error) {
+        toast.error("Complete your study plan for this day");
+        console.error(error);
+      } finally {
+        setLoadingContent(false);
+      }
     } else if (mode === "notes") {
       // Load Notes for the day
       try {
