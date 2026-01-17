@@ -9,6 +9,7 @@ from routes import notes_summarizer
 from fastapi.middleware.cors import CORSMiddleware
 from routes import chat_api
 from routes import contact
+from routes import performance
 
 app = FastAPI(
     title="AI Virtual Teacher",
@@ -34,6 +35,7 @@ app.include_router(mock_routes.router)
 app.include_router(notes_summarizer.router)
 app.include_router(contact.router)
 app.include_router(chat_api.router)
+app.include_router(performance.router)
 
 
 @app.get("/")
