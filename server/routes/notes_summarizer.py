@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from models.short_notes import ShortNotesRequest, ShortNotesResponse
-from services.notes_summarizer import generate_day_notes
+from services.notes_summary.notes_summarizer import generate_day_notes
 
 
 router = APIRouter(prefix="/api/notes", tags=["short_notes"])

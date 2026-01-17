@@ -1,9 +1,9 @@
 import random
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-from utils.keyword_extractor import extract_keywords
-from utils.question import generate_question
-from utils.distractor_generator import generate_distractors
+from services.mcq.keyword_extractor import extract_keywords
+from services.mcq.question import generate_question
+from services.mcq.distractor_generator import generate_distractors
 
 
 def _generate_single_mcq(context: str, kw: str) -> dict:

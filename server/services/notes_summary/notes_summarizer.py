@@ -1,4 +1,4 @@
-from utils.content_fetcher_day import fetch_day_content
+from services.notes_summary.content_fetcher_day import fetch_day_content
 from core.llm import get_llm
 from datetime import datetime
 from db.config import db

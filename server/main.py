@@ -7,7 +7,7 @@ from routes import predefined
 from routes import mock_routes
 from routes import notes_summarizer
 from fastapi.middleware.cors import CORSMiddleware
-from chatbot import chat_api
+from routes import chat_api
 
 app = FastAPI(
     title="AI Virtual Teacher",
