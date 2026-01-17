@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException
-from models.short_notes import ShortNotesRequest, ShortNotesResponse
+from schemas.short_notes import ShortNotesRequest, ShortNotesResponse
 from services.notes_summary.notes_summarizer import generate_day_notes
 
 
