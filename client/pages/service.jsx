@@ -88,6 +88,8 @@ export default function Service({
                 : () => actions.goToSubtopic("next")
             }
             mode={mode} //pass the variable
+            pdfHash={state.metaData.fileHash}
+            day={state.selectedDay}
           />
         ) : (
           <WelcomeState
