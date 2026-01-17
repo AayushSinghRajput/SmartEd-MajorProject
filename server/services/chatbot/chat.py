@@ -12,7 +12,7 @@ from langgraph.graph import add_messages
 
 from core.llm import get_llm
 from db.config import db
-from utils.context_fetcher_subtopic import fetch_subtopic_content
+from services.chatbot.context_fetcher_subtopic import fetch_subtopic_content
 
 
 # -------------------------

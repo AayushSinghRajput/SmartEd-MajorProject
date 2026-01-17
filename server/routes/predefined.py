@@ -6,7 +6,7 @@ from models.predefined_plan import (
     GetPlanResponse,
     UpdatePlanRequest
 )
-from services.predefined_service import PredefinedPlanService
+from services.predefined_service.predefined_service import PredefinedPlanService
 from db.config import db
 
 # Create router

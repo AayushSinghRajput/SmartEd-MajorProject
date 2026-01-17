@@ -1,6 +1,6 @@
 from models.chatbot import ChatRequest
 from fastapi import APIRouter
-from chatbot.chat import chatbot
+from services.chatbot.chat import chatbot
 from langchain_core.messages import HumanMessage
 
 router = APIRouter(prefix="/api/chat", tags=["chat_bot"])

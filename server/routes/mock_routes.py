@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends
-from services.mock_service import create_mock_test, get_mock_test
+from services.mock_exam.mock_service import create_mock_test, get_mock_test
 from models.Mock import Mock
 from middleware.auth_middleware import get_current_user
 
