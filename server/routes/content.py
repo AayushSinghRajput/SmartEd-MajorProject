@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from models.Content import ContentGenerationRequest, ContentResponse
-from services.content_generator import generate_topic_content
+from services.content.content_generator import generate_topic_content
 
 router = APIRouter(prefix="/api/content", tags=["Content"])
 

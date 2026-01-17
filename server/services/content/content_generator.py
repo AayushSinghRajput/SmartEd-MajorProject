@@ -75,6 +75,7 @@ Explain simply using:
 - Bullet points
 - Examples
 - Key takeaways
+- Response text content similar to number of words in PDF content
 
 Use markdown formatting.
 """

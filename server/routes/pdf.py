@@ -1,7 +1,7 @@
 from fastapi import APIRouter, UploadFile, File, Query, HTTPException, Depends, Response, Form
 from utils.file_hash import compute_md5
-from services.study_scheduler import generate_study_schedule_from_toc
-from services.pdf_loader import extract_toc
+from services.pdf_upload.study_scheduler import generate_study_schedule_from_toc
+from services.pdf_upload.pdf_loader import extract_toc
 from db.cloudinary import upload_pdf_to_cloudinary_bytes, upload_image_to_cloudinary_bytes
 from db.config import db
 from models.Content import UploadScheduleResponse
