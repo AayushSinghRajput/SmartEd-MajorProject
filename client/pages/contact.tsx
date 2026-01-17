@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { submitContactForm } from "../lib/api";
+import { submitContactForm } from "../api/contact";
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
