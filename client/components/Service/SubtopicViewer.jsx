@@ -12,13 +12,9 @@ export default function SubtopicViewer({
   hasPrevious,
   hasNext,
   mode,
+  pdfHash,
+  day,
 }) {
-  // ✅ Debug logs
-  console.log("SubtopicViewer Render");
-  console.log("Mode:", mode);
-  console.log("Subtopic content type:", typeof subtopic?.content);
-  console.log("Subtopic content:", subtopic?.content);
-
   // Wrapped click handlers to prevent multiple clicks during loading
   const handlePrevious = () => {
     if (!loadingContent && hasPrevious) onPrevious();
@@ -40,7 +36,7 @@ export default function SubtopicViewer({
         {loadingContent ? (
           <Loader />
         ) : mode === "mcq" && Array.isArray(subtopic?.content) ? (
-          <MCQViewer mcqs={subtopic.content} />
+          <MCQViewer mcqs={subtopic.content} pdfHash={pdfHash} day={day} />
         ) : typeof subtopic?.content === "string" ? (
           <ReactMarkdown
             remarkPlugins={[remarkMath]}
