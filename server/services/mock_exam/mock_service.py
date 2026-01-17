@@ -1,5 +1,5 @@
 from db.config import db
-from models.Mock import Mock
+from schemas.Mock import Mock
 from typing import List, Dict, Any
 from bson import ObjectId
 

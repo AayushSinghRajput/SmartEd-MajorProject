@@ -4,7 +4,7 @@ import os
 
 from langchain_community.document_loaders import PyPDFLoader
 from core.llm import get_llm
-from models.Pdf import TableOfContents
+from schemas.Pdf import TableOfContents
 
 llm = get_llm(temperature=0.5)
 structured_llm = llm.with_structured_output(TableOfContents)

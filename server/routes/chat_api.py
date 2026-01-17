@@ -1,4 +1,4 @@
-from models.chatbot import ChatRequest
+from schemas.chatbot import ChatRequest
 from fastapi import APIRouter
 from services.chatbot.chat import chatbot
 from langchain_core.messages import HumanMessage

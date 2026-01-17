@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, status, Depends
 from typing import List
-from models.predefined_plan import (
+from schemas.predefined_plan import (
     CreatePlanRequest,
     CreatePlanResponse,
     GetPlanResponse,

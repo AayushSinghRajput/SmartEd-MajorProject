@@ -2,7 +2,7 @@ from typing import List
 from datetime import datetime
 import re
 from fastapi import HTTPException, status
-from models.predefined_plan import (
+from schemas.predefined_plan import (
     CreatePlanResponse,
     GetPlanResponse
 )
