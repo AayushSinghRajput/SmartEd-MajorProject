@@ -72,25 +72,43 @@ export default function Service({
       {/* Main Content Area */}
       <div className="w-3/4 h-full overflow-y-auto bg-white relative">
         {state.selectedSubtopic ? (
-          <SubtopicViewer
-            subtopic={state.selectedSubtopic}
-            loadingContent={state.loadingContent}
-            hasPrevious={state.selectedDay > 1}
-            hasNext={state.selectedDay < state.localSchedule.length}
-            onPrevious={
-              mode === "notes" || mode === "mcq"
-                ? actions.goToPreviousDay
-                : () => actions.goToSubtopic("previous")
-            }
-            onNext={
-              mode === "notes" || mode === "mcq"
-                ? actions.goToNextDay
-                : () => actions.goToSubtopic("next")
-            }
-            mode={mode} //pass the variable
-            pdfHash={state.metaData.fileHash}
-            day={state.selectedDay}
-          />
+          // ✅ Compute previous/next dynamically for MCQ/Notes mode
+          (() => {
+            const hasPreviousDay = state.selectedDay && state.selectedDay > 1;
+            const hasNextDay =
+              state.selectedDay &&
+              state.selectedDay < state.localSchedule.length;
+
+            return (
+              <SubtopicViewer
+                subtopic={state.selectedSubtopic}
+                loadingContent={state.loadingContent}
+                hasPrevious={
+                  mode === "notes" || mode === "mcq"
+                    ? hasPreviousDay
+                    : state.hasPrevious
+                }
+                hasNext={
+                  mode === "notes" || mode === "mcq"
+                    ? hasNextDay
+                    : state.hasNext
+                }
+                onPrevious={
+                  mode === "notes" || mode === "mcq"
+                    ? actions.goToPreviousDay
+                    : () => actions.goToSubtopic("previous")
+                }
+                onNext={
+                  mode === "notes" || mode === "mcq"
+                    ? actions.goToNextDay
+                    : () => actions.goToSubtopic("next")
+                }
+                mode={mode} //pass the variable
+                pdfHash={state.metaData.fileHash}
+                day={state.selectedDay}
+              />
+            );
+          })()
         ) : (
           <WelcomeState
             heading={welcomeHeading}
@@ -98,6 +116,7 @@ export default function Service({
           />
         )}
       </div>
+
       {/* Chat Button */}
       {mode === "study" && (
         <ChatWidget

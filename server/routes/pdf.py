@@ -132,49 +132,80 @@ async def update_book_image(
 @router.get("/my-books", summary="Get all uploaded PDFs with progress")
 async def get_user_books(current_user=Depends(get_current_user)):
     """
-    Returns all uploaded PDFs for the logged-in user
-    Each book contains: pdf_hash, book_name, pdf_url, image_url, progress (0-100)
+    Returns all uploaded PDFs for the logged-in user.
+
+    Each book contains:
+    - pdf_hash
+    - name
+    - image
+    - pdf_url
+    - study_progress (day completion based)
+    - performance_progress (MCQ score based)
     """
     try:
         user_id = current_user["id"]
 
-        # Get all PDFs uploaded by the user
-        pdfs_cursor = db.pdfs.find({"user_id": user_id})
-        pdfs_list = await pdfs_cursor.to_list(length=100)
+        # ---------------- FETCH USER PDFs ----------------
+        pdfs = await db.pdfs.find({"user_id": user_id}).to_list(length=100)
+
+        # ---------------- FETCH STUDY PROGRESS ----------------
+        progress_docs = await db.study_progress.find(
+            {"user_id": user_id}
+        ).to_list(length=100)
+
+        # Map: pdf_hash -> study_progress
+        study_progress_map = {
+            p["pdf_hash"]: p.get("study_progress", 0)
+            for p in progress_docs
+        }
 
         books = []
 
-        # For each PDF, fetch performance and calculate progress
-        for pdf_doc in pdfs_list:
+        for pdf_doc in pdfs:
             pdf_hash = pdf_doc["pdf_hash"]
 
-            # Fetch the user's performance for this PDF
+            # ---------------- PERFORMANCE PROGRESS ----------------
             perf_doc = await db.performance.find_one({
                 "user_id": user_id,
                 "pdf_hash": pdf_hash
             })
 
-            progress = 0
-
+            performance_progress = 0
             if perf_doc and perf_doc.get("day_wise_scores"):
-                # Cast scores to int explicitly to avoid Decimal128 issues
-                total_score = sum(int(d.get("score", 0)) for d in perf_doc["day_wise_scores"])
-                total_questions = sum(int(d.get("total_questions", 0)) for d in perf_doc["day_wise_scores"])
-                
-                if total_questions > 0:
-                    progress = int((total_score / total_questions) * 100)
+                total_score = sum(
+                    int(d.get("score", 0))
+                    for d in perf_doc["day_wise_scores"]
+                )
+                total_questions = sum(
+                    int(d.get("total_questions", 0))
+                    for d in perf_doc["day_wise_scores"]
+                )
 
-            # Build book object
+                if total_questions > 0:
+                    performance_progress = int(
+                        (total_score / total_questions) * 100
+                    )
+
+            # ---------------- STUDY PROGRESS ----------------
+            study_progress = study_progress_map.get(pdf_hash, 0)
+
+            # ---------------- BUILD RESPONSE ----------------
             books.append({
                 "id": pdf_hash,
                 "pdf_hash": pdf_hash,
                 "name": pdf_doc.get("book_name", "Untitled"),
                 "image": pdf_doc.get("image_url") or "/images/dummy-book.png",
                 "pdf_url": pdf_doc.get("pdf_url"),
-                "progress": progress
+
+                # 🔥 separated progress types
+                "study_progress": study_progress,
+                "performance_progress": performance_progress,
             })
 
-        return {"status": "success", "books": books}
+        return {
+            "status": "success",
+            "books": books
+        }
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
