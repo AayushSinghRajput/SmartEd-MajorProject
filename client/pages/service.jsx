@@ -78,15 +78,16 @@ export default function Service({
             hasPrevious={state.selectedDay > 1}
             hasNext={state.selectedDay < state.localSchedule.length}
             onPrevious={
-              mode === "notes"
+              mode === "notes" || mode === "mcq"
                 ? actions.goToPreviousDay
                 : () => actions.goToSubtopic("previous")
             }
             onNext={
-              mode === "notes"
+              mode === "notes" || mode === "mcq"
                 ? actions.goToNextDay
                 : () => actions.goToSubtopic("next")
             }
+            mode={mode} //pass the variable
           />
         ) : (
           <WelcomeState
