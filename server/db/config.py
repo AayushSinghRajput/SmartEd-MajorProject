@@ -12,5 +12,6 @@ db = client[DB_NAME]
 pdf_collection = db.pdfs
 schedule_collection = db.schedules
 subtopic_collection = db.subtopics
+contacts_collection = db.contacts
 
 print("MongoDB connected!")

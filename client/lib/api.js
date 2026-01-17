@@ -2,26 +2,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
 
 
 
-//contact route
-export const submitContactForm = async (contactData) => {
-  try {
-    const response = await fetch(`${API_URL}/contact`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(contactData),
-    });
-    const data = await response.json();
-    if (!response.ok) {
-      throw new Error(data.message || "Something went wrong.");
-    }
-    return data;
-  } catch (error) {
-    console.error("Contact form submission error:", error);
-    throw error;
-  }
-};
+
 
 //ai routes
 
