@@ -5,7 +5,7 @@ from langchain_core.messages import HumanMessage
 
 router = APIRouter(prefix="/api/chat", tags=["chat_bot"])
 
-@router.post("/chat")
+@router.post("/aichat")
 async def chat(request: ChatRequest):
     result = await chatbot.ainvoke({
         "user_id": request.user_id,
