@@ -4,6 +4,7 @@ import Image from "next/image";
 import { FiEdit } from "react-icons/fi";
 import { useState } from "react";
 import { updateBookImage } from "../../api/pdf";
+import CylindricalProgress from "./CylindricalProgress";
 
 interface StudyBookCardProps {
   book?: {
@@ -11,7 +12,8 @@ interface StudyBookCardProps {
     pdf_hash?: string;
     name?: string;
     image?: string;
-    progress?: number;
+    performance_progress?: number; // performance progress
+    study_progress?: number; //for dashboard progress
   };
   variant?: "dashboard" | "performance";
   onClick?: () => void;
@@ -27,11 +29,12 @@ export default function StudyBookCard({
   const fallbackImage = "/images/Company_Logo.png";
 
   const [currentImage, setCurrentImage] = useState<string>(
-    book?.image || fallbackImage
+    book?.image || fallbackImage,
   );
   const [uploading, setUploading] = useState(false);
 
-  const progress = book?.progress ?? 0;
+  const performance_progress = book?.performance_progress ?? 0;
+  const studyProgress = book?.study_progress ?? 0;
   const name = book?.name ?? "Untitled Book";
   const pdf_hash = book?.pdf_hash ?? "";
 
@@ -39,7 +42,7 @@ export default function StudyBookCard({
 
   // ================= IMAGE UPLOAD HANDLER =================
   const handleFileChange = async (
-    event: React.ChangeEvent<HTMLInputElement>
+    event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     event.stopPropagation();
 
@@ -69,7 +72,7 @@ export default function StudyBookCard({
     const strokeWidth = 8;
     const radius = (size - strokeWidth) / 2;
     const circumference = 2 * Math.PI * radius;
-    const offset = circumference * (1 - progress / 100);
+    const offset = circumference * (1 - performance_progress / 100);
 
     return (
       <div className="flex flex-col items-center gap-4 bg-white rounded-2xl shadow-md p-6">
@@ -113,9 +116,7 @@ export default function StudyBookCard({
           </svg>
         </div>
 
-        <h3 className="text-lg font-bold text-gray-800 text-center">
-          {name}
-        </h3>
+        <h3 className="text-lg font-bold text-gray-800 text-center">{name}</h3>
       </div>
     );
   }
@@ -156,9 +157,7 @@ export default function StudyBookCard({
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation(); // prevent card click
-                document
-                  .getElementById(`file-input-${pdf_hash}`)
-                  ?.click();
+                document.getElementById(`file-input-${pdf_hash}`)?.click();
               }}
             >
               {uploading ? "..." : <FiEdit size={14} />}
@@ -167,9 +166,8 @@ export default function StudyBookCard({
         )}
       </div>
 
-      <h3 className="text-lg font-bold text-gray-800 truncate px-1">
-        {name}
-      </h3>
+      <h3 className="text-lg font-bold text-gray-800 truncate px-1">{name}</h3>
+      {studyProgress > 0 && <CylindricalProgress value={studyProgress} />}
     </div>
   );
 }
