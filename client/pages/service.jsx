@@ -5,6 +5,7 @@ import SubtopicViewer from "../components/Service/SubtopicViewer";
 import WelcomeState from "../components/Service/WelcomeState";
 import { useServiceLogic } from "../hooks/useServiceLogic";
 import { getWelcomeText } from "../constants/getWelcomeText";
+import ChatWidget from "../components/ChatWidget";
 import { useEffect } from "react";
 
 export default function Service({
@@ -94,6 +95,13 @@ export default function Service({
           />
         )}
       </div>
+      {/* Chat Button */}
+      {mode === "study" && (
+        <ChatWidget
+          metaData={state.metaData}
+          selectedSubtopic={state.selectedSubtopic}
+        />
+      )}
     </div>
   );
 }
