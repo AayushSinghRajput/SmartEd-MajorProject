@@ -3,7 +3,7 @@ import { toast } from "react-hot-toast";
 import { generateContent } from "../api/content";
 import { summarizeDayNotes } from "../api/note";
 import { generateMCQs } from "../api/mcq";
-import {formatMCQsToMarkdown} from '../utils/formatmcqs';
+import { updateProgress } from "../api/progress";
 
 //  Add `mode` to distinguish "study" vs "mcq" / "notes"
 export function useServiceLogic(planData, mode = "study") {
@@ -178,10 +178,52 @@ export function useServiceLogic(planData, mode = "study") {
       s = subtopicIdx;
 
     if (direction === "next") {
-      if (s + 1 < day.topics[t].subtopics.length) s++;
-      else if (t + 1 < day.topics.length) t++, (s = 0);
-      else if (d < localSchedule.length) d++, (t = 0), (s = 0);
+      const isLastSubtopic =
+        subtopicIdx === day.topics[topicIdx].subtopics.length - 1;
+
+      const isLastTopic = topicIdx === day.topics.length - 1;
+
+      // ✅ CASE 1: Still inside same topic
+      if (!isLastSubtopic) {
+        s++;
+      }
+
+      // ✅ CASE 2: Move to next topic
+      else if (!isLastTopic) {
+        t++;
+        s = 0;
+      }
+
+      // ✅ CASE 3: DAY COMPLETED (last subtopic of last topic)
+      else {
+        try {
+          const completedDays = currentDay;
+          const totalDays = localSchedule.length;
+
+          await updateProgress({
+            pdf_hash: metaData.fileHash,
+            completed_days: completedDays,
+            total_days: totalDays,
+          });
+
+          toast.success(`Day ${currentDay} completed 🎉`);
+        } catch (err) {
+          console.error(err);
+          toast.error("Failed to update progress");
+        }
+
+        // Move to next day if exists
+        if (currentDay < localSchedule.length) {
+          d = currentDay + 1;
+          t = 0;
+          s = 0;
+        } else {
+          // Last day of entire schedule → stop navigation
+          return;
+        }
+      }
     } else {
+      // ⬅️ PREVIOUS logic (unchanged)
       if (s > 0) s--;
       else if (t > 0) {
         t--;
@@ -286,8 +328,8 @@ export function useServiceLogic(planData, mode = "study") {
     if (!selectedDay) return;
     const nextDay = selectedDay + 1;
     if (nextDay > localSchedule.length) return; // no more days
-    setSelectedDay(nextDay);
     await handleDayClick(nextDay); // reuse handleDayClick to load notes
+    setSelectedDay(nextDay);
     console.log("Going to next day:", nextDay, "selectedDay:", selectedDay);
   };
 
@@ -295,8 +337,9 @@ export function useServiceLogic(planData, mode = "study") {
   const goToPreviousDay = async () => {
     if (!selectedDay || selectedDay <= 1) return;
     const prevDay = selectedDay - 1;
-    setSelectedDay(prevDay);
+    //call handleDayclick firs
     await handleDayClick(prevDay); // reuse handleDayClick to load notes
+    setSelectedDay(prevDay);
   };
 
   return {

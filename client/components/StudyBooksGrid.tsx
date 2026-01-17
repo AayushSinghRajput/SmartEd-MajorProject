@@ -11,7 +11,8 @@ interface StudyBook {
   pdf_hash: string;
   name: string;
   image?: string;
-  progress?: number;
+  performance_progress?: number;
+  study_progress?:number;
   pdf_url: string;
 }
 
@@ -35,7 +36,8 @@ export default function StudyBooksGrid({
           pdf_hash: book.pdf_hash,
           name: book.name || "Untitled Book",
           image: book.image || "/images/Company_Logo.png",
-          progress: book.progress ?? 0,
+          performance_progress: book.performance_progress ?? 0,
+          study_progress: book.study_progress ?? 0,
           pdf_url: book.pdf_url || "#",
         }));
         setBooks(mappedBooks);
