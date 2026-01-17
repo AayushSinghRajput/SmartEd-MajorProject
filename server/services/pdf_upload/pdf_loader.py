@@ -12,7 +12,7 @@ from prompts.pdf_upload.toc import build_toc_extraction_prompt
 # -------------------------
 # LLM setup
 # -------------------------
-llm = get_llm(temperature=0.5)
+llm = get_llm(provider='gemini',temperature=0.5)
 structured_llm = llm.with_structured_output(TableOfContents)
 
 
