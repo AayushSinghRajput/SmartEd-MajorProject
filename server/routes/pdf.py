@@ -4,7 +4,7 @@ from services.pdf_upload.study_scheduler import generate_study_schedule_from_toc
 from services.pdf_upload.pdf_loader import extract_toc
 from db.cloudinary import upload_pdf_to_cloudinary_bytes, upload_image_to_cloudinary_bytes
 from db.config import db
-from models.Content import UploadScheduleResponse
+from schemas.Content import UploadScheduleResponse
 from middleware.auth_middleware import get_current_user
 
 router = APIRouter(prefix="/api/study", tags=["Study Plan"])

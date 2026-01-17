@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException
-from models.Mcq import MCQRequest, MCQResponse
+from schemas.Mcq import MCQRequest, MCQResponse
 from services.mcq.mcq_question import mcq_generator
 from services.mcq.content_fetcher_mcq import fetch_day_content
 
