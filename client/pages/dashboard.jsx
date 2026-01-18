@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { FiPlus } from "react-icons/fi";
 import { toast } from "react-hot-toast";
 
@@ -21,62 +21,60 @@ export default function Dashboard() {
   const [showServiceView, setShowServiceView] = useState(false);
   const [showUploadPopup, setShowUploadPopup] = useState(false);
   const [aiPlan, setAiPlan] = useState(null);
-  const { user } = useAuth();
 
-  // -----------------------------
-  // EFFECT: Restore last opened book
-  // -----------------------------
-  useEffect(() => {
-    const lastBookHash = localStorage.getItem("lastBookHash");
-    if (lastBookHash) {
-      fetchBookSchedule(lastBookHash);
-    }
-  }, []);
+  const { user } = useAuth();
 
   // -----------------------------
   // HANDLERS
   // -----------------------------
 
+  // After successful upload → open Service
   const handleUploadSuccess = (data) => {
     setAiPlan(data);
     setShowServiceView(true);
     setShowUploadPopup(false);
 
-    if (data?.pdf_hash) localStorage.setItem("lastBookHash", data.pdf_hash);
+    if (data?.pdf_hash) {
+      localStorage.setItem("lastBookHash", data.pdf_hash);
+    }
   };
 
+  // Fetch schedule ONLY when user clicks a book
   const fetchBookSchedule = async (pdf_hash) => {
     if (!pdf_hash) return;
 
-    const toastId = toast.loading("Fetching schedule for this book...");
+    const toastId = toast.loading("Fetching schedule...");
 
     try {
       const { success, schedule, book_name, image, pdf_url, message } =
         await getBookSchedule(pdf_hash);
 
-      if (success) {
-        setAiPlan({
-          pdf_hash,
-          book_name,
-          image,
-          pdf_url,
-          schedule: schedule || [],
-        });
-        setShowServiceView(true);
-        localStorage.setItem("lastBookHash", pdf_hash);
-        toast.success("Schedule loaded!", { id: toastId });
-      } else {
+      if (!success) {
         toast.error(message || "Failed to fetch schedule", { id: toastId });
+        return;
       }
-    } catch (error) {
-      console.error("Error fetching book schedule:", error);
-      toast.error("Failed to fetch schedule", { id: toastId });
+
+      setAiPlan({
+        pdf_hash,
+        book_name,
+        image,
+        pdf_url,
+        schedule: schedule || [],
+      });
+
+      setShowServiceView(true);
+      localStorage.setItem("lastBookHash", pdf_hash);
+      toast.success("Schedule loaded!", { id: toastId });
+    } catch (err) {
+      console.error(err);
+      toast.error("Something went wrong", { id: toastId });
     }
   };
 
+  // Book card click → open Service
   const handleBookClick = (book) => {
     if (!book?.pdf_hash) {
-      toast.error("PDF not found for this book");
+      toast.error("PDF not found");
       return;
     }
     fetchBookSchedule(book.pdf_hash);
@@ -86,26 +84,32 @@ export default function Dashboard() {
   // RENDER HELPERS
   // -----------------------------
   const renderContent = () => {
+    // Service View (opened only after click/upload)
     if (showServiceView && aiPlan) {
       return (
         <Service
           planData={aiPlan}
-          activeTab={activeTab} // ✅ PASS CURRENT TAB (dashboard / mcq / notes)
+          activeTab={activeTab}
         />
       );
     }
 
+    // Mock Test Tab
     if (activeTab === "mock") {
       return <MockTest />;
     }
 
+    // Default: Study Grid
     return (
-      <StudyBooksGrid activeTab={activeTab} onBookClick={handleBookClick} />
+      <StudyBooksGrid
+        activeTab={activeTab}
+        onBookClick={handleBookClick}
+      />
     );
   };
 
-  const showUploadSection = activeTab !== "mock";
-  const shouldShowStudyGrid = showUploadSection && !showServiceView;
+  const showUploadButton =
+    activeTab === "dashboard" && !showServiceView;
 
   // -----------------------------
   // RENDER
@@ -122,7 +126,8 @@ export default function Dashboard() {
           />
 
           <div className="flex-1 px-6 py-6 relative mt-10">
-            {shouldShowStudyGrid && activeTab === "dashboard" && (
+            {/* Upload Button */}
+            {showUploadButton && (
               <button
                 onClick={() => setShowUploadPopup(true)}
                 className="absolute top-2 right-6 flex items-center gap-2
@@ -133,16 +138,16 @@ export default function Dashboard() {
                 Upload New Book
               </button>
             )}
+
             {renderContent()}
           </div>
         </div>
 
+        {/* Upload Popup */}
         {showUploadPopup && (
           <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center">
-            <div
-              className="bg-white rounded-3xl w-full max-w-3xl
-                            max-h-[90vh] overflow-y-auto p-6 md:p-8"
-            >
+            <div className="bg-white rounded-3xl w-full max-w-3xl
+                            max-h-[90vh] overflow-y-auto p-6 md:p-8">
               <DashboardContent
                 onUploadSuccess={handleUploadSuccess}
                 onClose={() => setShowUploadPopup(false)}
