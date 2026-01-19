@@ -12,6 +12,7 @@ import Service from "./service";
 import MockTest from "../components/MockTest";
 import { useAuth } from "../context/AuthContext";
 import { getBookSchedule } from "../api/pdf";
+import CommunityPage from "../components/Community/CommunityPage";
 
 export default function Dashboard() {
   // -----------------------------
@@ -97,6 +98,11 @@ export default function Dashboard() {
     // Mock Test Tab
     if (activeTab === "mock") {
       return <MockTest />;
+    }
+
+    //Community Tab
+    if(activeTab === "community"){
+      return <CommunityPage />
     }
 
     // Default: Study Grid
