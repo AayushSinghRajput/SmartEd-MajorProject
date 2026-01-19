@@ -52,7 +52,7 @@ export default function Navbar() {
 
   /* -------------------- Center Links -------------------- */
   const centerLinks = ["/", "/about", "/contact"];
-  if (user) centerLinks.push("/dashboard");
+  if (user) centerLinks.push("/community", "/dashboard"); // Show only if user is logged in
 
   return (
     <motion.nav
@@ -69,22 +69,11 @@ export default function Navbar() {
         {/* ======================= DESKTOP ======================= */}
         <div className="hidden md:grid grid-cols-[auto_1fr_auto] items-center h-16">
           {/* LEFT: LOGO */}
-          <motion.div
-            whileHover={{ scale: 1.05 }}
-            className="flex items-center gap-2"
-          >
+          <motion.div whileHover={{ scale: 1.05 }} className="flex items-center gap-2">
             <div className="relative h-10 w-10 rounded-lg overflow-hidden shadow-md bg-white p-1.5">
-              <Image
-                src={Company_Logo}
-                alt="SmartED Logo"
-                fill
-                className="object-contain"
-              />
+              <Image src={Company_Logo} alt="SmartED Logo" fill className="object-contain" />
             </div>
-            <Link
-              href="/"
-              className="text-xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent"
-            >
+            <Link href="/" className="text-xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
               SmartED AI
             </Link>
           </motion.div>
@@ -93,20 +82,17 @@ export default function Navbar() {
           <div className="flex justify-center gap-2">
             {centerLinks.map((link) => {
               const label =
-                link === "/"
-                  ? "Home"
-                  : link === "/dashboard"
-                  ? "Dashboard"
-                  : link.charAt(1).toUpperCase() + link.slice(2);
+                link === "/" ? "Home" :
+                link === "/dashboard" ? "Dashboard" :
+                link === "/community" ? "Community" :
+                link.charAt(1).toUpperCase() + link.slice(2);
 
               return (
                 <Link
                   key={link}
                   href={link}
                   className={`px-4 py-2 rounded-md text-sm font-medium transition ${
-                    pathname === link
-                      ? "text-indigo-700 bg-indigo-50"
-                      : "text-gray-600 hover:text-indigo-600 hover:bg-indigo-50/50"
+                    pathname === link ? "text-indigo-700 bg-indigo-50" : "text-gray-600 hover:text-indigo-600 hover:bg-indigo-50/50"
                   }`}
                 >
                   {label}
@@ -123,16 +109,14 @@ export default function Navbar() {
                   onClick={handleLoginClick}
                   className="flex items-center border border-indigo-200 text-indigo-600 px-4 py-2 rounded-full text-sm font-medium hover:bg-indigo-50 transition"
                 >
-                  <FiUser className="mr-1.5" size={16} />
-                  Login
+                  <FiUser className="mr-1.5" size={16} /> Login
                 </button>
 
                 <button
                   onClick={handleSignupClick}
                   className="flex items-center bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-4 py-2 rounded-full text-sm font-medium hover:shadow-md transition"
                 >
-                  <FiAward className="mr-1.5" size={16} />
-                  Sign Up
+                  <FiAward className="mr-1.5" size={16} /> Sign Up
                 </button>
               </>
             ) : (
@@ -140,8 +124,7 @@ export default function Navbar() {
                 onClick={handleSignOut}
                 className="flex items-center bg-red-600 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-red-700 transition"
               >
-                <FiLogOut className="mr-1.5" size={16} />
-                Sign Out
+                <FiLogOut className="mr-1.5" size={16} /> Sign Out
               </button>
             )}
           </div>
@@ -151,20 +134,12 @@ export default function Navbar() {
         <div className="flex md:hidden justify-between items-center h-16">
           <Link href="/" className="flex items-center gap-2">
             <div className="relative h-9 w-9">
-              <Image
-                src={Company_Logo}
-                alt="SmartED Logo"
-                fill
-                className="object-contain"
-              />
+              <Image src={Company_Logo} alt="SmartED Logo" fill className="object-contain" />
             </div>
             <span className="font-bold text-indigo-700">SmartED AI</span>
           </Link>
 
-          <button
-            onClick={() => setMenuOpen(!menuOpen)}
-            className="p-2 rounded-lg text-gray-600 hover:bg-indigo-50"
-          >
+          <button onClick={() => setMenuOpen(!menuOpen)} className="p-2 rounded-lg text-gray-600 hover:bg-indigo-50">
             {menuOpen ? <FiX size={24} /> : <FiMenu size={24} />}
           </button>
         </div>
@@ -182,11 +157,10 @@ export default function Navbar() {
             <div className="px-4 pt-3 pb-6 space-y-1">
               {centerLinks.map((link) => {
                 const label =
-                  link === "/"
-                    ? "Home"
-                    : link === "/dashboard"
-                    ? "Dashboard"
-                    : link.charAt(1).toUpperCase() + link.slice(2);
+                  link === "/" ? "Home" :
+                  link === "/dashboard" ? "Dashboard" :
+                  link === "/community" ? "Community" :
+                  link.charAt(1).toUpperCase() + link.slice(2);
 
                 return (
                   <Link

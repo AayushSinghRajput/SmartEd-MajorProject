@@ -64,7 +64,7 @@ export default function Footer() {
             <h3 className="text-xl font-semibold mb-4">Resources</h3>
             <ul className="space-y-2">
               <li>
-                <a href="#" className="hover:text-yellow-300 transition">
+                <a href="/dashboard" className="hover:text-yellow-300 transition">
                   Entrance Prep
                 </a>
               </li>
@@ -74,7 +74,7 @@ export default function Footer() {
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-yellow-300 transition">
+                <a href="/dashboard" className="hover:text-yellow-300 transition">
                   AI Quiz Generator
                 </a>
               </li>
