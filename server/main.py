@@ -11,6 +11,8 @@ from routes import chat_api
 from routes import contact
 from routes import performance
 from routes import progress
+from routes import community
+
 
 app = FastAPI(
     title="AI Virtual Teacher",
@@ -38,6 +40,7 @@ app.include_router(contact.router)
 app.include_router(chat_api.router)
 app.include_router(performance.router)
 app.include_router(progress.router)
+app.include_router(community.router)
 
 @app.get("/")
 def root():

@@ -32,3 +32,12 @@ async def upload_image_to_cloudinary_bytes(image_bytes: bytes) -> str:
         folder="study_books"
     )
     return result["secure_url"]
+
+
+async def upload_post_image_to_cloudinary_bytes(image_bytes: bytes) -> str:
+    result = cloudinary.uploader.upload(
+        image_bytes,
+        resource_type="image",
+        folder="community_post"
+    )
+    return result["secure_url"]
