@@ -14,14 +14,17 @@ async def generate_content(payload: ContentGenerationRequest):
             subtopic_index=payload.subtopic_index
         )
         return ContentResponse(
-            status="success",
-            day_number=payload.day_number,
-            topic_index=payload.topic_index,
-            chapter=result["chapter"],
-            topic=result["topic"],
-            content=result["content"],
-            page_range=result["page_range"],
-            cached=result["cached"],
-        )
+        status="success",
+        day_number=payload.day_number,
+        topic_index=payload.topic_index,
+        chapter=result["chapter"],
+        topic=result["topic"],
+        content=result["content"],
+        page_range=result["page_range"],
+        cached=result["cached"],
+        images=result.get("images") 
+        
+    )
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
