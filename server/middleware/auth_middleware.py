@@ -8,7 +8,17 @@ COOKIE_NAME = "access_token"
 
 
 async def get_current_user(request: Request):
-    token = request.cookies.get(COOKIE_NAME)
+    token = None
+
+    # 1️⃣ Try cookie first
+    if COOKIE_NAME in request.cookies:
+        token = request.cookies.get(COOKIE_NAME)
+
+    # 2️⃣ Fallback to Authorization header
+    if not token:
+        auth_header = request.headers.get("Authorization")
+        if auth_header and auth_header.startswith("Bearer "):
+            token = auth_header.split(" ")[1]
 
     if not token:
         raise HTTPException(
