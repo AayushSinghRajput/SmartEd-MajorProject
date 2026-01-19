@@ -6,6 +6,8 @@ from db.config import db
 import requests
 import tempfile
 import os
+from services.content.image_generator import generate_image_from_content
+
 
 logger = logging.getLogger(__name__)
 
@@ -121,6 +123,23 @@ async def generate_topic_content(
 
     # 4️⃣ If content already exists in schedule → return
     if subtopic.get("content"):
+        images = await generate_image_from_content(
+            pdf_hash=book_id,
+            content=subtopic["content"]
+        )
+
+        return {
+            "chapter": chapter,
+            "topic": subtopic_title,
+            "content": subtopic["content"],
+            "page_range": subtopic.get("page_range", ""),
+            "images": images,
+            "cached": True,
+        }
+
+
+    # 4️⃣ If content already exists in schedule → return
+    if subtopic.get("content"):
         return {
             "chapter": chapter,
             "topic": subtopic_title,
@@ -180,10 +199,20 @@ async def generate_topic_content(
         upsert=True
     )
 
+    # 9️⃣ Generate image from content
+    images = await generate_image_from_content(
+        pdf_hash=book_id,
+        content=content
+    )
+
     return {
         "chapter": chapter,
         "topic": subtopic_title,
         "content": content,
         "page_range": page_range,
+        "images": images,
         "cached": False,
     }
+
+
+ 
