@@ -9,7 +9,9 @@ class Settings(BaseSettings):
     AZURE_OPENAI_ENDPOINT: str | None = None
     AZURE_OPENAI_DEPLOYMENT: str | None = None
     AZURE_OPENAI_API_VERSION: str | None = None
-
+    #Google
+    GOOGLE_SEARCH_API_KEY: str | None = None
+    GOOGLE_SEARCH_ENGINE_ID: str | None = None
     # Database & auth
     MONGO_URI: str
     DB_NAME: str

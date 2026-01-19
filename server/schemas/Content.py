@@ -1,6 +1,7 @@
 from typing import Optional
 from pydantic import BaseModel, Field
 from typing import List, Dict, Any
+from schemas.image import ImageResponse
 
 # Request to generate content for a subtopic
 class ContentGenerationRequest(BaseModel):
@@ -9,7 +10,8 @@ class ContentGenerationRequest(BaseModel):
     topic_index: int = Field(..., ge=0)
     subtopic_index: int = Field(..., ge=0)
 
-# Response after content generation
+
+
 class ContentResponse(BaseModel):
     status: str
     day_number: int
@@ -19,6 +21,7 @@ class ContentResponse(BaseModel):
     content: str
     page_range: str
     cached: bool
+    images: Optional[List[ImageResponse]] = None
 
 # Request to regenerate or modify existing content
 class RegenerateRequest(BaseModel):
