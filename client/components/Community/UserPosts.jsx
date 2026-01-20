@@ -1,6 +1,5 @@
 "use client";
 
-<<<<<<< HEAD
 import PostCard from "./PostCard";
 import { useAuth } from "../../context/AuthContext";
 
@@ -31,25 +30,10 @@ export default function UserPosts({ posts, setPosts }) {
         </svg>
         <div className="text-lg font-medium">No posts yet</div>
         <div className="text-sm mt-1">Be the first to post!</div>
-=======
-
-import PostCard from "./PostCard"; // Existing PostCard component
-
-/**
- * Display all posts by the current user
- */
-export default function UserPosts({ posts }) {
-  if (!posts || posts.length === 0) {
-    // Center message vertically and horizontally
-    return (
-      <div className="flex items-center justify-center h-[60vh] text-gray-500 text-center">
-        No posts yet. Be the first to post!
->>>>>>> 8df90ed (Dev (#50))
       </div>
     );
   }
 
-<<<<<<< HEAD
   // Callbacks for PostCard
   const handlePostUpdate = (updatedPost) => {
     setPosts((prev) =>
@@ -73,12 +57,6 @@ export default function UserPosts({ posts }) {
           onPostUpdate={handlePostUpdate}
           onPostDelete={handlePostDelete}
         />
-=======
-  return (
-    <div className="mt-6 flex flex-col gap-4">
-      {posts.map((post) => (
-        <PostCard key={post.id || post._id} post={post} />
->>>>>>> 8df90ed (Dev (#50))
       ))}
     </div>
   );

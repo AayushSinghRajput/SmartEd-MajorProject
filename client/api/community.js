@@ -103,7 +103,6 @@ export const getMyPosts = async () => {
   });
   return handleResponse(response);
 };
-<<<<<<< HEAD
 
 
 
@@ -138,5 +137,3 @@ export const deleteCommunityPost = async (postId) => {
 
   return handleResponse(response);
 };
-=======
->>>>>>> 8df90ed (Dev (#50))

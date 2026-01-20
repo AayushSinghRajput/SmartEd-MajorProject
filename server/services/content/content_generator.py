@@ -2,6 +2,15 @@ from typing import Dict, Any
 import requests
 import tempfile
 import os
+from services.content.image_generator import generate_image_from_content
+
+
+from langchain_community.document_loaders import PyPDFLoader
+
+from core.llm import get_llm
+from db.config import db
+from services.content.image_generator import generate_image_from_content
+from prompts.content.content import content_prompt
 
 from langchain_community.document_loaders import PyPDFLoader
 
@@ -116,3 +125,6 @@ async def generate_topic_content(
         "images": images,
         "cached": False,
     }
+
+
+ 

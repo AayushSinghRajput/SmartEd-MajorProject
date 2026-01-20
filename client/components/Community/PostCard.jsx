@@ -1,5 +1,4 @@
 import { useState } from "react";
-<<<<<<< HEAD
 import {
   likePost,
   unlikePost,
@@ -11,14 +10,6 @@ import {
 import { FaEdit, FaTrash } from "react-icons/fa";
 
 export default function PostCard({ post, currentUser, onPostUpdate, onPostDelete }) {
-=======
-import { likePost, unlikePost, getComments, addComment } from "../../api/community";
-
-// ---------------------------
-// Single Post Card
-// ---------------------------
-export default function PostCard({ post }) {
->>>>>>> 8df90ed (Dev (#50))
   const postId = post.id || post._id;
 
   const [likesCount, setLikesCount] = useState(post.likes_count);
@@ -26,7 +17,6 @@ export default function PostCard({ post }) {
   const [comments, setComments] = useState([]);
   const [showComments, setShowComments] = useState(false);
   const [commentText, setCommentText] = useState("");
-<<<<<<< HEAD
   const [liked, setLiked] = useState(post.is_liked_by_me || false);
   const [loading, setLoading] = useState(false);
 
@@ -34,11 +24,6 @@ export default function PostCard({ post }) {
   const [editContent, setEditContent] = useState(post.content || "");
   const [newImages, setNewImages] = useState([]); // track new images
 
-=======
-  const [liked, setLiked] = useState(post.is_liked_by_me || false); // Track user like
-  const [loading, setLoading] = useState(false);
-
->>>>>>> 8df90ed (Dev (#50))
   // ---------------------------
   // Toggle comments
   // ---------------------------
@@ -55,19 +40,11 @@ export default function PostCard({ post }) {
   };
 
   // ---------------------------
-<<<<<<< HEAD
   // Like/unlike
-=======
-  // Handle like/unlike
->>>>>>> 8df90ed (Dev (#50))
   // ---------------------------
   const handleLike = async () => {
     if (loading) return;
     setLoading(true);
-<<<<<<< HEAD
-=======
-
->>>>>>> 8df90ed (Dev (#50))
     try {
       if (liked) {
         await unlikePost(postId);
@@ -86,11 +63,7 @@ export default function PostCard({ post }) {
   };
 
   // ---------------------------
-<<<<<<< HEAD
   // Add comment
-=======
-  // Add a new comment
->>>>>>> 8df90ed (Dev (#50))
   // ---------------------------
   const handleAddComment = async () => {
     if (!commentText.trim()) return;
@@ -105,7 +78,6 @@ export default function PostCard({ post }) {
     }
   };
 
-<<<<<<< HEAD
   // ---------------------------
   // Save edited post (content + images)
   // ---------------------------
@@ -250,82 +222,6 @@ export default function PostCard({ post }) {
           </div>
         )}
       </div>
-=======
-  return (
-    <div className="bg-white shadow-md rounded-lg p-4 mb-4 mt-5">
-      {/* Author */}
-      <div className="flex items-center mb-2">
-        <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center font-bold text-gray-700">
-          {post.author.username[0].toUpperCase()}
-        </div>
-        <div className="ml-2 font-semibold">{post.author.username}</div>
-      </div>
-
-      {/* Content */}
-      <div className="mb-2">{post.content}</div>
-
-      {/* Images Section */}
-      {post.images && post.images.length > 0 && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-2">
-          {post.images.map((img, idx) => (
-            <img
-              key={idx}
-              src={img}
-              alt={`Post Image ${idx + 1}`}
-              className="w-full h-48 object-cover rounded-md"
-            />
-          ))}
-        </div>
-      )}
-
-      {/* Like & Comment buttons */}
-      <div className="flex items-center text-gray-600 text-sm mb-2 space-x-4">
-        <button
-          onClick={handleLike}
-          className="hover:text-blue-500 font-semibold"
-        >
-          {liked ? "💙 Liked" : "🤍 Like"} ({likesCount})
-        </button>
-        <button
-          onClick={toggleComments}
-          className="hover:text-blue-500 font-semibold"
-        >
-          💬 Comment ({commentsCount})
-        </button>
-      </div>
-
-      {/* Comments Section */}
-      {showComments && (
-        <div className="mt-2 border-t border-gray-200 pt-2">
-          {comments.map((c) => (
-            <div key={c.id || c._id} className="flex items-start space-x-2 mb-2">
-              <div className="w-10 h-10 p-3 rounded-full bg-gray-300 flex items-center justify-center font-bold text-gray-700">
-                {c.user.username[0].toUpperCase()}
-              </div>
-              <div>
-                <span className="font-semibold">{c.user.username}</span>: {c.text}
-              </div>
-            </div>
-          ))}
-
-          {/* Add Comment */}
-          <div className="flex items-center mt-2 space-x-2">
-            <input
-              value={commentText}
-              onChange={(e) => setCommentText(e.target.value)}
-              placeholder="Write a comment..."
-              className="flex-1 border border-gray-300 rounded-full px-3 py-1 focus:outline-none focus:ring focus:ring-blue-200"
-            />
-            <button
-              onClick={handleAddComment}
-              className="bg-blue-500 text-white px-3 py-1 rounded-full hover:bg-blue-600"
-            >
-              Post
-            </button>
-          </div>
-        </div>
-      )}
->>>>>>> 8df90ed (Dev (#50))
     </div>
   );
 }

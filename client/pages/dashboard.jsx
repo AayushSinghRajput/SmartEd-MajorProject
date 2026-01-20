@@ -96,13 +96,8 @@ export default function Dashboard() {
     }
 
     //Community Tab
-<<<<<<< HEAD
     if (activeTab === "community") {
       return <CommunityPage />;
-=======
-    if(activeTab === "community"){
-      return <CommunityPage />
->>>>>>> 8df90ed (Dev (#50))
     }
 
     // Default: Study Grid
