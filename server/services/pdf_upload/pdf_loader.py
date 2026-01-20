@@ -7,7 +7,7 @@ from langchain_community.document_loaders import PyPDFLoader
 from core.llm import get_llm
 from schemas.Pdf import TableOfContents
 from prompts.pdf_upload.toc import build_toc_extraction_prompt
-
+# from prompts.pdf_upload.toc import toc_prompt
 
 # -------------------------
 # LLM setup
@@ -21,7 +21,9 @@ structured_llm = llm.with_structured_output(TableOfContents)
 # -------------------------
 def extract_toc(file_bytes: bytes) -> Dict[str, Any]:
     """
-    Extract Table of Contents from a PDF file.
+    Extracts TOC from PDF and saves as JSON.
+    output_path MUST be provided (hash-based).
+    Returns: path to saved JSON file.
     """
 
     with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
@@ -36,10 +38,12 @@ def extract_toc(file_bytes: bytes) -> Dict[str, Any]:
         # 2️⃣ Take first ~8% pages for TOC signal
         toc_text = " ".join(
             doc.page_content
-            for doc in docs[: max(1, len(docs) // 12)]
+            # for doc in docs[: max(1, len(docs) // 10)]
+            for doc in docs[:  len(docs) // 12]
         )
-
+      
         # 3️⃣ Build prompt (delegated)
+        # prompt = toc_prompt
         prompt = build_toc_extraction_prompt(toc_text)
 
         # 4️⃣ Invoke structured LLM
@@ -50,18 +54,20 @@ def extract_toc(file_bytes: bytes) -> Dict[str, Any]:
     except Exception:
         # 5️⃣ Graceful fallback (important for robustness)
         return {
-            "toc": [
-                {
-                    "title": "Unstructured Content",
-                    "sections": [
-                        {
-                            "title": "Manual Review Required",
-                            "page": None
-                        }
-                    ],
-                }
-            ]
-        }
+        "table_of_contents": [
+            {
+                "unit": None,
+                "title": "Unstructured Content",
+                "sections": [
+                    {
+                        "title": "Manual Review Required",
+                        "page": 0
+                    }
+                ]
+            }
+        ]
+    }
+
 
     finally:
         os.remove(tmp_path)
