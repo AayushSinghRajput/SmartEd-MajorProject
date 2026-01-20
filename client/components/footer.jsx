@@ -69,7 +69,7 @@ export default function Footer() {
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-yellow-300 transition">
+                <a href="/dashboard" className="hover:text-yellow-300 transition">
                   Study Materials
                 </a>
               </li>
@@ -79,7 +79,7 @@ export default function Footer() {
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-yellow-300 transition">
+                <a href="/community" className="hover:text-yellow-300 transition">
                   Student Community
                 </a>
               </li>

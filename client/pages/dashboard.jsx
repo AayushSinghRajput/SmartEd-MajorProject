@@ -87,12 +87,7 @@ export default function Dashboard() {
   const renderContent = () => {
     // Service View (opened only after click/upload)
     if (showServiceView && aiPlan) {
-      return (
-        <Service
-          planData={aiPlan}
-          activeTab={activeTab}
-        />
-      );
+      return <Service planData={aiPlan} activeTab={activeTab} />;
     }
 
     // Mock Test Tab
@@ -101,28 +96,24 @@ export default function Dashboard() {
     }
 
     //Community Tab
-    if(activeTab === "community"){
-      return <CommunityPage />
+    if (activeTab === "community") {
+      return <CommunityPage />;
     }
 
     // Default: Study Grid
     return (
-      <StudyBooksGrid
-        activeTab={activeTab}
-        onBookClick={handleBookClick}
-      />
+      <StudyBooksGrid activeTab={activeTab} onBookClick={handleBookClick} />
     );
   };
 
-  const showUploadButton =
-    activeTab === "dashboard" && !showServiceView;
+  const showUploadButton = activeTab === "dashboard" && !showServiceView;
 
   // -----------------------------
   // RENDER
   // -----------------------------
   return (
     <ProtectedRoute>
-      <div className="pt-16">
+      <div className="pt-4">
         <div className="flex min-h-[calc(100vh-4rem)]">
           <Sidebar
             user={user}
@@ -152,8 +143,10 @@ export default function Dashboard() {
         {/* Upload Popup */}
         {showUploadPopup && (
           <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center">
-            <div className="bg-white rounded-3xl w-full max-w-3xl
-                            max-h-[90vh] overflow-y-auto p-6 md:p-8">
+            <div
+              className="bg-white rounded-3xl w-full max-w-3xl
+                            max-h-[90vh] overflow-y-auto p-6 md:p-8"
+            >
               <DashboardContent
                 onUploadSuccess={handleUploadSuccess}
                 onClose={() => setShowUploadPopup(false)}
