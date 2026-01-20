@@ -3,36 +3,67 @@ from typing import List, Dict, Any
 
 # ---------------------------
 # Flatten TOC
-# ---------------------------
+# --------------------------
+
 def flatten_toc(data: Dict[str, Any]) -> List[Dict[str, Any]]:
-    """Flatten table of contents into list of subtopics."""
+    """Flatten TOC into list of subtopics with page ranges."""
     for key in ("table_of_contents", "tableOfContents", "toc"):
         if key in data:
             flat_topics = []
+
             for unit in data[key]:
                 chapter_title = unit.get("title")
-                for sec in unit.get("sections", []):
+                sections = unit.get("sections", [])
+
+                for idx, sec in enumerate(sections):
+                    start_page = sec.get("page", 0)
+
+                    # determine end_page from next section
+                    if idx + 1 < len(sections):
+                        next_page = sections[idx + 1].get("page", start_page)
+                        if next_page > start_page:
+                            end_page = next_page - 1
+                        else:
+                            end_page = start_page
+                    else:
+                        # last section in chapter
+                        end_page = start_page
+
                     flat_topics.append(
                         {
                             "chapter": chapter_title,
                             "title": sec.get("title"),
-                            "page": sec.get("page"),
-                            "content": ""  # initialize empty content
+                            "start_page": start_page,
+                            "end_page": end_page,
+                            "content": ""
                         }
                     )
+
             return flat_topics
+
     raise ValueError("Unsupported TOC format")
+
 
 # ---------------------------
 # Group subtopics by chapter
 # ---------------------------
 def group_by_chapter(flat_topics: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     grouped: Dict[str, List[Dict[str, Any]]] = {}
+
     for item in flat_topics:
         grouped.setdefault(item["chapter"], []).append(
-            {"title": item["title"], "page": item["page"], "content": item["content"]}
+            {
+                "title": item["title"],
+                "start_page": item["start_page"],
+                "end_page": item["end_page"],
+                "content": item["content"],
+            }
         )
-    return [{"topic": chapter, "subtopics": subtopics} for chapter, subtopics in grouped.items()]
+
+    return [
+        {"topic": chapter, "subtopics": subtopics}
+        for chapter, subtopics in grouped.items()
+    ]
 
 # ---------------------------
 # Generate study schedule
