@@ -1,15 +1,12 @@
 "use client";
 
-import  { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
-import { getMyPosts } from "../../api/community"; // API to get posts by user
+import { getMyPosts } from "../../api/community";
 import PostButton from "./PostButton";
 import PostPopup from "./PostPopup";
 import UserPosts from "./UserPosts";
 
-/**
- * Main Community Component for the Dashboard tab
- */
 export default function CommunityPage() {
   const { user } = useAuth();
   const [posts, setPosts] = useState([]);
@@ -21,7 +18,7 @@ export default function CommunityPage() {
 
     const fetchPosts = async () => {
       try {
-        const data = await getMyPosts(); // API call to fetch user's posts
+        const data = await getMyPosts();
         setPosts(data);
       } catch (err) {
         console.error("Error fetching posts:", err);
@@ -30,7 +27,7 @@ export default function CommunityPage() {
     fetchPosts();
   }, [user]);
 
-  // After posting successfully, refresh the post list
+  // Add new post
   const handlePostSuccess = (newPost) => {
     setPosts((prev) => [newPost, ...prev]);
   };
@@ -45,10 +42,10 @@ export default function CommunityPage() {
 
   return (
     <div className="relative p-4">
-      {/* Button to create a post */}
+      {/* Create Post Button */}
       <PostButton onClick={() => setShowPopup(true)} />
 
-      {/* Popup to create a post */}
+      {/* Post Popup */}
       {showPopup && (
         <PostPopup
           onClose={() => setShowPopup(false)}
@@ -56,8 +53,8 @@ export default function CommunityPage() {
         />
       )}
 
-      {/* User's posts */}
-      <UserPosts posts={posts} />
+      {/* User Posts */}
+      <UserPosts posts={posts} setPosts={setPosts} />
     </div>
   );
 }

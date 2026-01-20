@@ -17,7 +17,7 @@ export default function SubtopicViewer({
 }) {
   return (
     <div className="max-w-5xl mx-auto py-16 px-8 md:px-12 min-h-[70vh]">
-      
+
       {/* 📘 Subtopic Title */}
       <div className="mb-12">
         <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 leading-tight">
@@ -27,57 +27,83 @@ export default function SubtopicViewer({
       </div>
 
       {/* 📖 Content Card */}
-      <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-10 md:p-14 mb-14 transition-all">
+      <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-10 md:p-14 mb-14">
         {loadingContent ? (
           <Loader />
         ) : mode === "mcq" && Array.isArray(subtopic?.content) ? (
           <MCQViewer mcqs={subtopic.content} pdfHash={pdfHash} day={day} />
         ) : typeof subtopic?.content === "string" ? (
-          <ReactMarkdown
-            remarkPlugins={[remarkMath]}
-            rehypePlugins={[rehypeKatex]}
-            components={{
-              h2: ({ children }) => (
-                <h2 className="text-2xl font-bold mt-12 mb-4 text-gray-900 flex items-center gap-3">
-                  <span className="h-2 w-2 rounded-full bg-indigo-500" />
-                  {children}
+          <>
+            {/* Markdown Content */}
+            <ReactMarkdown
+              remarkPlugins={[remarkMath]}
+              rehypePlugins={[rehypeKatex]}
+              components={{
+                h2: ({ children }) => (
+                  <h2 className="text-2xl font-bold mt-12 mb-4 text-gray-900 flex items-center gap-3">
+                    <span className="h-2 w-2 rounded-full bg-indigo-500" />
+                    {children}
+                  </h2>
+                ),
+                h3: ({ children }) => (
+                  <h3 className="text-xl font-semibold mt-8 mb-3 text-gray-800">
+                    {children}
+                  </h3>
+                ),
+                p: ({ children }) => (
+                  <p className="text-gray-700 leading-relaxed text-[17px] mb-5">
+                    {children}
+                  </p>
+                ),
+                ul: ({ children }) => (
+                  <ul className="list-disc pl-7 mb-6 space-y-2 text-gray-700 text-[17px]">
+                    {children}
+                  </ul>
+                ),
+                li: ({ children }) => (
+                  <li className="leading-relaxed">{children}</li>
+                ),
+                strong: ({ children }) => (
+                  <strong className="font-semibold text-indigo-700">
+                    {children}
+                  </strong>
+                ),
+                blockquote: ({ children }) => (
+                  <blockquote className="border-l-4 border-indigo-500 bg-indigo-50 px-6 py-4 my-6 rounded-r-lg text-gray-800 italic">
+                    {children}
+                  </blockquote>
+                ),
+                hr: () => <hr className="my-12 border-gray-200" />,
+              }}
+            >
+              {subtopic.content}
+            </ReactMarkdown>
+
+            {/* 🖼️ Images Section (Below Content) */}
+            {Array.isArray(subtopic?.images) && subtopic.images.length > 0 && (
+              <div className="mt-14">
+                <h2 className="text-2xl font-bold mb-6 text-gray-900">
+                  Related Images
                 </h2>
-              ),
-              h3: ({ children }) => (
-                <h3 className="text-xl font-semibold mt-8 mb-3 text-gray-800">
-                  {children}
-                </h3>
-              ),
-              p: ({ children }) => (
-                <p className="text-gray-700 leading-relaxed text-[17px] mb-5">
-                  {children}
-                </p>
-              ),
-              ul: ({ children }) => (
-                <ul className="list-disc pl-7 mb-6 space-y-2 text-gray-700 text-[17px]">
-                  {children}
-                </ul>
-              ),
-              li: ({ children }) => (
-                <li className="leading-relaxed">{children}</li>
-              ),
-              strong: ({ children }) => (
-                <strong className="font-semibold text-indigo-700">
-                  {children}
-                </strong>
-              ),
-              blockquote: ({ children }) => (
-                <blockquote className="border-l-4 border-indigo-500 bg-indigo-50 px-6 py-4 my-6 rounded-r-lg text-gray-800 italic">
-                  {children}
-                </blockquote>
-              ),
-              hr: () => (
-                <hr className="my-12 border-gray-200" />
-              ),
-            }}
-          >
-            {subtopic.content}
-          </ReactMarkdown>
+
+                {/* Responsive Image Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {subtopic.images.map((img, index) => (
+                    <div
+                      key={index}
+                      className="overflow-hidden rounded-xl shadow-md border border-gray-100"
+                    >
+                      <img
+                        src={img}
+                        alt={`Subtopic Image ${index + 1}`}
+                        className="w-full h-60 object-cover hover:scale-105 transition-transform duration-300"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </>
         ) : (
           <p>No content available.</p>
         )}
@@ -88,7 +114,7 @@ export default function SubtopicViewer({
         <button
           onClick={onPrevious}
           disabled={!hasPrevious || loadingContent}
-          className={`px-7 py-3 rounded-full font-semibold transition-all shadow-sm
+          className={`px-7 py-3 rounded-full font-semibold transition-all
             ${
               hasPrevious && !loadingContent
                 ? "bg-gray-100 text-gray-800 hover:bg-gray-200"
@@ -101,7 +127,7 @@ export default function SubtopicViewer({
         <button
           onClick={onNext}
           disabled={!hasNext || loadingContent}
-          className={`px-8 py-3 rounded-full font-semibold transition-all shadow-md
+          className={`px-8 py-3 rounded-full font-semibold transition-all
             ${
               hasNext && !loadingContent
                 ? "bg-indigo-600 text-white hover:bg-indigo-700 hover:scale-[1.02]"
