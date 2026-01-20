@@ -34,7 +34,7 @@ export default function CommunityPage() {
   // If no posts, show message centered both vertically & horizontally
   if (posts.length === 0) {
     return (
-      <div className="flex flex-col justify-center items-center h-screen">
+      <div className="flex flex-col justify-center items-center h-screen px-4">
         <p className="text-gray-500 text-lg font-medium text-center">
           No posts yet!
         </p>
@@ -42,13 +42,19 @@ export default function CommunityPage() {
     );
   }
 
-  // Otherwise render posts
+  // Otherwise render posts in responsive grid
   return (
-    <div className="max-w-2xl mx-auto p-4">
+    <div className="max-w-6xl mx-auto p-4">
       <h1 className="text-2xl font-bold mb-6 text-center">Community Feed</h1>
-      {posts.map((post) => (
-        <PostCard key={post.id || post._id} post={post} currentUser={currentUser} />
-      ))}
+      <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+        {posts.map((post) => (
+          <PostCard
+            key={`post-${post.id || post._id}`} // add prefix to make sure key is string and unique
+            post={post}
+            currentUser={currentUser}
+          />
+        ))}
+      </div>
     </div>
   );
 }

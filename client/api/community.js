@@ -103,3 +103,37 @@ export const getMyPosts = async () => {
   });
   return handleResponse(response);
 };
+
+
+
+// ---------------------------
+// Update a community post
+// ---------------------------
+export const updateCommunityPost = async (postId, content, images = []) => {
+  const formData = new FormData();
+  formData.append("content", content);
+
+  images.forEach((file) => {
+    formData.append("images", file); // append each image
+  });
+
+  const response = await fetch(`${API_URL}/community/${postId}`, {
+    method: "PUT",
+    headers: getAuthHeaders(true), // true = multipart
+    body: formData,
+  });
+
+  return handleResponse(response);
+};
+
+// ---------------------------
+// Delete a community post
+// ---------------------------
+export const deleteCommunityPost = async (postId) => {
+  const response = await fetch(`${API_URL}/community/${postId}`, {
+    method: "DELETE",
+    headers: getAuthHeaders(), // normal JSON headers
+  });
+
+  return handleResponse(response);
+};
