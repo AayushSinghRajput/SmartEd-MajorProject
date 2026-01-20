@@ -4,6 +4,7 @@ export const DASHBOARD_TABS = [
   { name: "mcq", label: "Practice MCQs", icon: "✍️" },
   { name: "notes", label: "Study Notes", icon: "📝" },
   { name: "mock", label: "Mock Test", icon: "📋" },
+  { name: "community", label: "Community", icon: "👥" },
 ];
 
 
