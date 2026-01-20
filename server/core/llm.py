@@ -8,7 +8,7 @@ from core.config import settings
 
 # 🔁 Change model/provider ONLY HERE
 def get_llm(
-    provider: str = "azure",   # 👈 switch here: gemini | groq | azure
+    provider: str = "gemini",   # 👈 switch here: gemini | groq | azure
     temperature: float = 0.3,
     structured: bool = False,
     output_schema=None,

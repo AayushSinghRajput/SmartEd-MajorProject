@@ -1,13 +1,17 @@
 import logging
 from typing import Dict, Any
-from langchain_community.document_loaders import PyPDFLoader
-from core.llm import get_llm
-from db.config import db
 import requests
 import tempfile
 import os
 from services.content.image_generator import generate_image_from_content
 
+
+from langchain_community.document_loaders import PyPDFLoader
+
+from core.llm import get_llm
+from db.config import db
+from services.content.image_generator import generate_image_from_content
+from prompts.content.content import content_prompt
 
 logger = logging.getLogger(__name__)
 
@@ -40,6 +44,7 @@ def load_pdf_docs_from_url(pdf_url: str):
     finally:
         os.remove(tmp_path)
 
+
 # ---------------------------
 # Extract content for a topic
 # ---------------------------
@@ -47,11 +52,17 @@ def get_topic_pages(docs, start_page: int, next_start_page: int | None = None):
     text = ""
     end_page = start_page
 
+    # max_page = (
+    #     next_start_page - 1
+    #     if next_start_page is not None
+    #     else len(docs) - 1
+    # )
     max_page = (
-        next_start_page - 1
-        if next_start_page is not None
-        else len(docs) - 1
-    )
+    min(next_start_page - 1, len(docs) - 1)
+    if next_start_page is not None
+    else len(docs) - 1
+  )
+
 
     for page in range(start_page, min(max_page + 1, len(docs))):
         text += docs[page].page_content + "\n"
@@ -59,31 +70,22 @@ def get_topic_pages(docs, start_page: int, next_start_page: int | None = None):
 
     return start_page, end_page, text
 
+
 # ---------------------------
 # Generate content with LLM
 # ---------------------------
-def generate_content_with_llm(chapter: str, topic: str, pdf_content: str) -> str:
-    prompt = f"""
-You are a teacher creating clear, structured study notes.
+def generate_content_with_llm(
+    chapter: str,
+    topic: str,
+    pdf_content: str
+) -> str:
+    prompt = content_prompt(pdf_content)
 
-Chapter: {chapter}
-Topic: {topic}
-
-PDF Content:
-{pdf_content}
-
-Explain simply using:
-- Headings
-- Bullet points
-- Examples
-- Key takeaways
-- Response text content similar to number of words in PDF content
-
-Use markdown formatting.
-"""
     llm = get_llm(temperature=0.5)
     response = llm.invoke(prompt)
+
     return response.text.strip()
+
 
 # ---------------------------
 # Generate topic content & update schedule
@@ -119,9 +121,10 @@ async def generate_topic_content(
         raise ValueError("Invalid day / topic / subtopic index")
 
     subtopic_title = subtopic["title"]
-    start_page = subtopic["page"]
+    # start_page = subtopic["page"]
+    start_page = max(0, (subtopic["page"] or 1) - 1)
 
-    # 4️⃣ If content already exists in schedule → return
+    # 4️⃣ If content already exists → return cached content + images
     if subtopic.get("content"):
         images = await generate_image_from_content(
             pdf_hash=book_id,
@@ -137,24 +140,20 @@ async def generate_topic_content(
             "cached": True,
         }
 
-
-    # 4️⃣ If content already exists in schedule → return
-    if subtopic.get("content"):
-        return {
-            "chapter": chapter,
-            "topic": subtopic_title,
-            "content": subtopic["content"],
-            "page_range": subtopic.get("page_range", ""),
-            "cached": True,
-        }
-
     # 5️⃣ Load PDF pages
     docs = load_pdf_docs_from_url(pdf_url)
 
     # Detect next subtopic page (for page range)
     next_start_page = None
     if subtopic_index + 1 < len(topic_data["subtopics"]):
-        next_start_page = topic_data["subtopics"][subtopic_index + 1]["page"]
+        # next_start_page = topic_data["subtopics"][subtopic_index + 1]["page"]
+        next_page_raw = topic_data["subtopics"][subtopic_index + 1]["page"]
+        next_start_page = (
+            max(0, next_page_raw - 1)
+            if next_page_raw is not None
+            else None
+        )
+
 
     _, end_page, pdf_content = get_topic_pages(
         docs,
@@ -162,9 +161,27 @@ async def generate_topic_content(
         next_start_page=next_start_page
     )
 
-    # 6️⃣ Generate content
-    content = generate_content_with_llm(chapter, subtopic_title, pdf_content)
-    page_range = f"{start_page}-{end_page}"
+    # 6️⃣ Generate content using LLM
+    content = generate_content_with_llm(
+        chapter,
+        subtopic_title,
+        pdf_content
+    )
+
+    # ✅ Improved page_range formatting
+    # page_range = (
+    #     str(start_page)
+    #     if start_page == end_page
+    #     else f"{start_page}-{end_page}"
+    # )
+
+    # Convert back to 1-based for UI
+    page_range = (
+        str(start_page + 1)
+        if start_page == end_page
+        else f"{start_page + 1}-{end_page + 1}"
+    )
+
 
     # 7️⃣ Update schedule.subtopics[].content IN-PLACE
     update_path = (
@@ -182,7 +199,7 @@ async def generate_topic_content(
         }
     )
 
-    # 8️⃣ (Optional but recommended) Save to contents collection
+    # 8️⃣ Save to contents collection (for search / MCQ / chatbot)
     await db.contents.update_one(
         {
             "pdf_hash": book_id,
@@ -199,7 +216,7 @@ async def generate_topic_content(
         upsert=True
     )
 
-    # 9️⃣ Generate image from content
+    # 9️⃣ Generate images from content
     images = await generate_image_from_content(
         pdf_hash=book_id,
         content=content
