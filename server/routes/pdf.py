@@ -7,6 +7,11 @@ from db.cloudinary import upload_pdf_to_cloudinary_bytes, upload_image_to_cloudi
 from db.config import db
 from schemas.Content import UploadScheduleResponse
 from middleware.auth_middleware import get_current_user
+from services.pdf_upload.fallback_scheduler import generate_schedule_from_pages
+from langchain_community.document_loaders import PyPDFLoader
+import tempfile
+import os
+
 
 router = APIRouter(prefix="/api/study", tags=["Study Plan"])
 
@@ -62,21 +67,58 @@ async def upload_pdf_and_generate_schedule(
             "days": days
         })
 
+# ----------------------------------universal fallback for schedule-------------------------------------------
         if schedule_doc:
             schedule = schedule_doc["schedule"]
+            is_fallback = schedule_doc.get("is_fallback", False)
             schedule_cached = True
         else:
-            schedule = generate_study_schedule_from_toc(
-                toc_data=toc_data,
-                total_days=days
-            )
-            await db.schedules.update_one(
-                {"pdf_hash": pdf_hash, "days": days},
-                {"$set": {"schedule": schedule}},
-                upsert=True
-            )
-            schedule_cached = False
+            is_fallback = False
+            # 🔥 FIRST TRY TOC-BASED SCHEDULE
+            try:
+                if toc_data and "table_of_contents" in toc_data:
+                    schedule = generate_study_schedule_from_toc(
+                        toc_data=toc_data,
+                        total_days=days
+                    )
+                else:
+                    raise ValueError("Empty TOC")
 
+            except Exception:
+                # 🔥 PURE PYTHON FALLBACK (NO LLM)
+                with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
+                    tmp.write(pdf_bytes)
+                    tmp_path = tmp.name
+
+                loader = PyPDFLoader(tmp_path)
+                docs = loader.load()
+                total_pages = len(docs)
+
+                schedule = generate_schedule_from_pages(
+                    total_pages=total_pages,
+                    total_days=days
+                )
+                is_fallback = True
+                os.remove(tmp_path)
+                
+
+
+            await db.schedules.update_one(
+            {"pdf_hash": pdf_hash, "days": days},
+            {
+                "$set": {
+                    "schedule": schedule,
+                    "is_fallback": is_fallback
+                }
+            },
+            upsert=True
+        )
+
+
+            schedule_cached = False
+            
+        
+# ========================================================================================
         return UploadScheduleResponse(
             status="success",
             status_code=200,
@@ -86,7 +128,8 @@ async def upload_pdf_and_generate_schedule(
             days=days,
             schedule=schedule,
             cached=pdf_cached and schedule_cached,
-            image_url=pdf_doc.get("image_url") if pdf_doc else None
+            image_url=pdf_doc.get("image_url") if pdf_doc else None,
+            is_fallback=is_fallback,
         )
 
     except HTTPException:

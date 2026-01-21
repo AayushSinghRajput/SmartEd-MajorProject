@@ -50,23 +50,11 @@ def extract_toc(file_bytes: bytes) -> Dict[str, Any]:
         toc_result: TableOfContents = structured_llm.invoke(prompt)
 
         return toc_result.model_dump()
-
+        # return {}  # Temporary stub implementation to check fallback code
+# 
     except Exception:
         # 5️⃣ Graceful fallback (important for robustness)
-        return {
-        "table_of_contents": [
-            {
-                "unit": None,
-                "title": "Unstructured Content",
-                "sections": [
-                    {
-                        "title": "Manual Review Required",
-                        "page": 0
-                    }
-                ]
-            }
-        ]
-    }
+        return {}
 
 
     finally:

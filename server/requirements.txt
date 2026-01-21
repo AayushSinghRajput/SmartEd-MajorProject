@@ -22,3 +22,4 @@ numpy
 pydantic
 pandas
 langchain_openai
+PyPDF2
