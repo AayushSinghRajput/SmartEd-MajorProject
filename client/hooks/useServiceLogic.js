@@ -102,7 +102,8 @@ export function useServiceLogic(planData, mode = "study") {
   };
 
   const isContentEmpty = (subtopic) =>
-    !subtopic?.content || subtopic.content.trim() === "";
+    !subtopic?.content ||
+    (typeof subtopic.content === "string" && subtopic.content.trim() === "");
 
   /* -------------------- FETCH CONTENT -------------------- */
   const fetchSubtopicContent = async (dayNum, topicIdx, subtopicIdx) => {
@@ -117,6 +118,16 @@ export function useServiceLogic(planData, mode = "study") {
     if (!subtopic) return toast.error("Subtopic not found");
 
     fetchingRef.current = { dayNum, topicIdx, subtopicIdx };
+    //set selectedSubtopic First so SubtopicViewer mounts
+    setSelectedSubtopic({
+      ...subtopic,
+      content: null,
+      images: [],
+      currentDay: dayNum,
+      topicIdx,
+      subtopicIdx,
+    });
+
     setLoadingContent(true);
 
     try {
@@ -271,8 +282,14 @@ export function useServiceLogic(planData, mode = "study") {
     if (mode === "mcq") {
       // Load MCQs for the day
       console.log("MCQ mode: clicked day", dayNumber);
+      setSelectedSubtopic({
+        title: `Day ${dayNumber} MCQs`,
+        content: null,
+        currentDay: dayNumber,
+      });
+
+      setLoadingContent(true);
       try {
-        setLoadingContent(true);
         //call the api
         const mcqs = await generateMCQs({
           pdf_hash: metaData.fileHash, //pdf_hash
@@ -295,9 +312,14 @@ export function useServiceLogic(planData, mode = "study") {
         setLoadingContent(false);
       }
     } else if (mode === "notes") {
+      setSelectedSubtopic({
+        title: `Day ${dayNumber} Notes`,
+        content: null, //enables loader
+        currentDay: dayNumber,
+      });
+      setLoadingContent(true);
       // Load Notes for the day
       try {
-        setLoadingContent(true);
         //call the api
         const notesContent = await summarizeDayNotes({
           book_id: metaData.fileHash, //pdf_hash
@@ -320,8 +342,6 @@ export function useServiceLogic(planData, mode = "study") {
         setLoadingContent(false);
       }
     }
-
-    setSelectedDay(dayNumber); // ✅ mark selected day
   };
 
   // ✅ Move to next day and load notes
@@ -330,7 +350,6 @@ export function useServiceLogic(planData, mode = "study") {
     const nextDay = selectedDay + 1;
     if (nextDay > localSchedule.length) return; // no more days
     await handleDayClick(nextDay); // reuse handleDayClick to load notes
-    setSelectedDay(nextDay);
     console.log("Going to next day:", nextDay, "selectedDay:", selectedDay);
   };
 
@@ -340,7 +359,7 @@ export function useServiceLogic(planData, mode = "study") {
     const prevDay = selectedDay - 1;
     //call handleDayclick firs
     await handleDayClick(prevDay); // reuse handleDayClick to load notes
-    setSelectedDay(prevDay);
+    console.log("Going to previous day:", prevDay, "selectedDay:", selectedDay);
   };
 
   return {
