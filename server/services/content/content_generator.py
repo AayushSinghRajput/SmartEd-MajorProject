@@ -1,7 +1,7 @@
 from typing import Dict, Any
 from core.llm import get_llm
 from db.config import db
-from services.content.image_generator import generate_image_from_content
+from services.content.image_generator import generate_image_from_content,generate_image_from_topic
 from services.content.content_fetcher import fetch_subtopic_pdf_content
 from prompts.content.content import content_prompt
 from services.content.pdf_page_loader import load_pdf_pages_content
@@ -101,7 +101,7 @@ async def generate_topic_content(
         # docs = get_relevant_docs(book_id, subtopic["title"])
         raw_content = "\n".join([doc.page_content for doc in docs])
             ## ----- DEBUGGING -----
-        # print(f" subtopic title: {subtopic['title']}")
+        # print(f" subtopic title: {sub topic['title']}")
         # print(f"raw_content after RAG: {raw_content[:500]}...")
  
 
@@ -124,10 +124,21 @@ async def generate_topic_content(
     # -------------------------------------------------
     # 5️⃣ GENERATE IMAGES (COMMON)
     # -------------------------------------------------
-    images = await generate_image_from_content(
+    if is_fallback:
+        print("⚠️ FALLBACK mode - Using key word extraction method....")
+        images = await generate_image_from_content(
         pdf_hash=book_id,
         content=final_content
     )
+    
+    else:
+        print("🚀 NORMAL mode - Using topic + subtopic for images")
+        images = await generate_image_from_topic(
+            pdf_hash=book_id,
+            topic=chapter_title,
+            subtopic=subtopic_title
+        )
+
 
     # -------------------------------------------------
     # 6️⃣ SAVE TO DB (COMMON)
