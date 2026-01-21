@@ -3,7 +3,7 @@ from bson import ObjectId
 from utils.file_hash import compute_md5
 from services.pdf_upload.study_scheduler import generate_study_schedule_from_toc
 from services.pdf_upload.pdf_loader import extract_toc
-from db.cloudinary import upload_pdf_to_cloudinary_bytes, upload_image_to_cloudinary_bytes
+from db.cloudinary import upload_pdf_to_cloudinary_bytes, upload_image_to_cloudinary_bytes,delete_file_from_cloudinary
 from db.config import db
 from schemas.Content import UploadScheduleResponse
 from middleware.auth_middleware import get_current_user
@@ -136,6 +136,57 @@ async def upload_pdf_and_generate_schedule(
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+# ===================== DELETE PDF AND ALL RELATED DATA =====================
+@router.delete(
+    "/delete-pdf/{pdf_hash}",
+    summary="Delete PDF and all related data"
+)
+async def delete_pdf(
+    pdf_hash: str,
+    current_user=Depends(get_current_user)
+):
+    """
+    Deletes:
+    - PDF from Cloudinary
+    - pdf metadata
+    - schedules
+    - contents
+    - mcqs
+    - day notes
+    - study progress
+    - performance data
+    """
+
+    # ---------- VERIFY OWNERSHIP ----------
+    pdf_doc = await db.pdfs.find_one({
+        "pdf_hash": pdf_hash,
+        "user_id": current_user["id"]
+    })
+
+    if not pdf_doc:
+        raise HTTPException(status_code=404, detail="PDF not found")
+
+    # ---------- DELETE FROM CLOUDINARY ----------
+    pdf_url = pdf_doc.get("pdf_url")
+    if pdf_url:
+        delete_file_from_cloudinary(pdf_url)
+
+    # ---------- DELETE DATABASE RECORDS ----------
+    await db.pdfs.delete_one({"pdf_hash": pdf_hash})
+    await db.schedules.delete_many({"pdf_hash": pdf_hash})
+    await db.contents.delete_many({"pdf_hash": pdf_hash})
+    await db.mcqs.delete_many({"pdf_hash": pdf_hash})
+    await db.day_notes.delete_many({"pdf_hash": pdf_hash})
+    await db.study_progress.delete_many({"pdf_hash": pdf_hash})
+    await db.performance.delete_many({"pdf_hash": pdf_hash})
+
+    return {
+        "status": "success",
+        "message": "PDF and all related data deleted successfully"
+    }
+
 
 
 # ===================== UPDATE BOOK IMAGE =====================

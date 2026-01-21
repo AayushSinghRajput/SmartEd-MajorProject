@@ -12,7 +12,7 @@ interface StudyBook {
   name: string;
   image?: string;
   performance_progress?: number;
-  study_progress?:number;
+  study_progress?: number;
   pdf_url: string;
 }
 
@@ -46,7 +46,12 @@ export default function StudyBooksGrid({
       .finally(() => setLoading(false));
   }, []);
 
-  const { heading, subheading, icon } = TAB_HEADERS[activeTab] || TAB_HEADERS.dashboard;
+  const handleDeleteBook = (pdf_hash: string) => {
+    setBooks((prev) => prev.filter((b) => b.pdf_hash !== pdf_hash));
+  };
+
+  const { heading, subheading, icon } =
+    TAB_HEADERS[activeTab] || TAB_HEADERS.dashboard;
   const cardVariant = activeTab === "performance" ? "performance" : "dashboard";
 
   // hide edit for mcq / notes
@@ -55,7 +60,7 @@ export default function StudyBooksGrid({
   if (loading) return <Loader />;
 
   return (
-    <div className="mt-20 mb-6">
+    <div className="min-h-screen bg-indigo-50  p-4">
       <div className="mb-4">
         <h2 className="text-2xl font-black text-gray-800 flex items-center gap-2">
           {icon} {heading}
@@ -73,6 +78,7 @@ export default function StudyBooksGrid({
               book={book}
               variant={cardVariant}
               allowImageEdit={allowImageEdit} // ✅ pass this prop
+              onDelete={handleDeleteBook}
               onClick={() => onBookClick?.(book)}
             />
           ))}
