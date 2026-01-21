@@ -122,7 +122,7 @@ export default function Dashboard() {
             setShowServiceView={setShowServiceView}
           />
 
-          <div className="flex-1 px-6 py-6 relative mt-10">
+          <div className="flex-1 px-6 py-6 relative mt-20">
             {/* Upload Button */}
             {showUploadButton && (
               <button

@@ -10,8 +10,8 @@ async def fetch_search_image(
     num_images: int = 3
 ) -> List[Dict[str, str]]:
     """
-    Fetch a relevant study image using Google Custom Search API.
-    Uses only keywords + 'diagram' for relevance.
+    Fetch HD study images suitable for full-screen display using Google Custom Search API.
+    Adds 'diagram' to keywords for relevance and requests extra-large high-quality images.
     """
 
     API_KEY = settings.GOOGLE_SEARCH_API_KEY
@@ -28,7 +28,9 @@ async def fetch_search_image(
         "searchType": "image",
         "num": num_images,
         "safe": "active",
-        "imgSize": "medium",
+        "imgSize": "xlarge",       # ✅ Extra-large images for HD
+        "imgType": "photo",         # ✅ Ensures high-quality photos
+        "imgColorType": "color",    # ✅ Only color images
     }
 
     try:
@@ -42,18 +44,18 @@ async def fetch_search_image(
         images = []
         for item in items[:num_images]:
             images.append({
-                "url": item.get("link"),
-                "photographerName": item.get("displayLink"),
-                "photographerUrl": item.get("image", {}).get("contextLink"),
+                "url": item.get("link"),                     # Full image URL
+                "photographerName": item.get("displayLink"), # Source site
+                "photographerUrl": item.get("image", {}).get("contextLink"), # Context
             })
 
         if images:
             return images
 
-        # Fallback if no image found
+        # Fallback: high-res placeholder for full-screen
         return [{
             "url": (
-                "https://placehold.co/600x400/4f46e5/ffffff"
+                "https://placehold.co/1920x1080/4f46e5/ffffff"
                 f"?text={urllib.parse.quote(keywords[0])}"
             ),
             "photographerName": "System Generated",
@@ -62,8 +64,9 @@ async def fetch_search_image(
 
     except Exception as e:
         print("Google Search Error:", str(e))
+        # Fallback for error: high-res placeholder
         return [{
-            "url": "https://placehold.co/600x400/eeeeee/999999?text=Image+Not+Found",
+            "url": "https://placehold.co/1920x1080/eeeeee/999999?text=Image+Not+Found",
             "photographerName": "N/A",
             "photographerUrl": "#",
         }]
