@@ -22,28 +22,31 @@ def get_llm(
     # Google Gemini (default)
     # -------------------------------
     if provider == "gemini":
+        print("Using Google Gemini LLM")
         llm = ChatGoogleGenerativeAI(
             model="gemini-2.5-flash",
             google_api_key=settings.GOOGLE_API_KEY,
             temperature=temperature,
         )
-        print("Using Google Gemini LLM")
+       
 
     # -------------------------------
     # Groq (comment preserved)
     # -------------------------------
     elif provider == "groq":
+        print("Using Groq LLM")
         llm = ChatGroq(
             model_name="llama-3.3-70b-versatile",
             temperature=temperature,
             groq_api_key=settings.GROQ_API_KEY,
         )
-        print("Using Groq LLM")
+        
 
     # -------------------------------
     # Azure OpenAI (NEW)
     # -------------------------------
     elif provider == "azure":
+        print("Using Azure OpenAI LLM")
         llm = AzureChatOpenAI(
             azure_deployment=settings.AZURE_OPENAI_DEPLOYMENT,  # e.g. "gpt-5"
             azure_endpoint=settings.AZURE_OPENAI_ENDPOINT,
@@ -51,7 +54,7 @@ def get_llm(
             api_version=settings.AZURE_OPENAI_API_VERSION,
             # temperature=temperature,
         )
-        print("Using Azure OpenAI LLM")
+        
 
     else:
         raise ValueError(f"Unsupported LLM provider: {provider}")

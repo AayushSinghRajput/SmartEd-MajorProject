@@ -78,3 +78,51 @@ async def generate_image_from_content(
         image_docs.append(doc)
 
     return image_docs
+
+
+# same as above but using topic + subtopic directly
+async def generate_image_from_topic(
+    pdf_hash: str,
+    topic: str,
+    subtopic: str,
+    num_images: int = 3
+) -> List[Dict[str, str]]:
+    """
+    Generate images using topic + subtopic directly (no keyword extraction).
+    """
+
+    keywords = [subtopic, topic]
+
+    # 1️⃣ Check cache
+    cached_images = await study_images_collection.find({
+        "pdf_hash": pdf_hash,
+        "keywords": {"$all": keywords}
+    }).to_list(length=num_images)
+
+    if cached_images:
+        return [
+            {
+                "url": img["url"],
+                "photographerName": img["photographerName"],
+                "photographerUrl": img["photographerUrl"],
+            }
+            for img in cached_images
+        ]
+
+    # 2️⃣ Fetch images
+    images = await fetch_search_image(
+        keywords=keywords,
+        num_images=num_images
+    )
+
+    # 3️⃣ Save
+    for img in images:
+        await study_images_collection.insert_one({
+            "pdf_hash": pdf_hash,
+            "keywords": keywords,
+            "url": img["url"],
+            "photographerName": img["photographerName"],
+            "photographerUrl": img["photographerUrl"],
+        })
+
+    return images
