@@ -5,7 +5,7 @@ from services.content.image_generator import generate_image_from_content
 from services.content.content_fetcher import fetch_subtopic_pdf_content
 from prompts.content.content import content_prompt
 from services.content.pdf_page_loader import load_pdf_pages_content
-
+from services.rag.retriever import get_relevant_docs
 
 async def generate_topic_content(
     book_id: str,
@@ -66,11 +66,17 @@ async def generate_topic_content(
             start_page=start_page,
             end_page=end_page,
         )
-        
-
+    
         # page_range = f"{start_page}-{end_page}"
         chapter_title = topic["topic"]
         subtopic_title = subtopic["title"]
+
+        if not raw_content.strip():
+            print("⚠️ No content extracted in FALLBACK mode from specified pages. if in future this happen then just incomment below code ... ")
+            # raw_content = """ Content not available.
+            #                   please message the student to move to next subtopic.
+            #                   Note : Do not write anything more than this.
+            #              """
 
     else:
         # 🔥 NORMAL MODE → existing logic
@@ -87,9 +93,25 @@ async def generate_topic_content(
         chapter_title = pdf_data["chapter"]
         subtopic_title = pdf_data["topic"]
 
-    # raw_content = pdf_data["raw_content"]
+
     if not raw_content.strip():
-        raise ValueError("No content extracted from PDF")
+        print("✅ Used RAG to supplement content extraction.")
+        rag_query = f"{chapter_title} - {subtopic_title}"
+        docs = get_relevant_docs(book_id, rag_query)
+        # docs = get_relevant_docs(book_id, subtopic["title"])
+        raw_content = "\n".join([doc.page_content for doc in docs])
+            ## ----- DEBUGGING -----
+        # print(f" subtopic title: {subtopic['title']}")
+        # print(f"raw_content after RAG: {raw_content[:500]}...")
+ 
+
+    if not raw_content.strip():
+        print("⚠️ No content extracted from PDF.")
+        # raise ValueError("No content extracted from PDF")
+        raw_content = """ Content not available.
+                         please message the student to move to next subtopic.
+                         Note : Do not write anything more than this.
+                      """
 
     # -------------------------------------------------
     # 4️⃣ RUN LLM (COMMON)

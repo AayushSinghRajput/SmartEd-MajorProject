@@ -22,4 +22,7 @@ numpy
 pydantic
 pandas
 langchain_openai
-PyPDF2
+langchain_huggingface
+sentence-transformers
+faiss-cpu
+faiss-gpu
