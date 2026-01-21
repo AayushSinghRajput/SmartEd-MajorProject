@@ -8,7 +8,7 @@ from core.config import settings
 
 # 🔁 Change model/provider ONLY HERE
 def get_llm(
-    provider: str = "gemini",   # 👈 switch here: gemini | groq | azure
+    provider: str = "azure",   # 👈 switch here: gemini | groq | azure
     temperature: float = 0.3,
     structured: bool = False,
     output_schema=None,
@@ -27,6 +27,7 @@ def get_llm(
             google_api_key=settings.GOOGLE_API_KEY,
             temperature=temperature,
         )
+        print("Using Google Gemini LLM")
 
     # -------------------------------
     # Groq (comment preserved)
@@ -37,6 +38,7 @@ def get_llm(
             temperature=temperature,
             groq_api_key=settings.GROQ_API_KEY,
         )
+        print("Using Groq LLM")
 
     # -------------------------------
     # Azure OpenAI (NEW)
@@ -49,6 +51,7 @@ def get_llm(
             api_version=settings.AZURE_OPENAI_API_VERSION,
             # temperature=temperature,
         )
+        print("Using Azure OpenAI LLM")
 
     else:
         raise ValueError(f"Unsupported LLM provider: {provider}")
