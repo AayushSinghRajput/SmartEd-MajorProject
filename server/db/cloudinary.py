@@ -41,3 +41,21 @@ async def upload_post_image_to_cloudinary_bytes(image_bytes: bytes) -> str:
         folder="community_post"
     )
     return result["secure_url"]
+
+# ---------------- PDF DELETE ----------------
+def delete_file_from_cloudinary(pdf_url: str):
+    """
+    Delete PDF from Cloudinary using URL
+    """
+    try:
+        # Extract public_id (pdfs/filename)
+        public_id = pdf_url.split("/upload/")[1].rsplit(".", 1)[0]
+
+        cloudinary.uploader.destroy(
+            public_id,
+            resource_type="raw"
+        )
+
+    except Exception as e:
+        # Do not break main deletion flow
+        print("Cloudinary delete failed:", str(e))

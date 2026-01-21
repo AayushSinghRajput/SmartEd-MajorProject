@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
@@ -17,44 +17,57 @@ export default function SubtopicViewer({
   pdfHash,
   day,
 }) {
-  /* -------------------- Image Viewer State -------------------- */
+  /* -------------------- Image State -------------------- */
+
+  // Store only images that successfully load
+  const [validImages, setValidImages] = useState([]);
   const [activeImageIndex, setActiveImageIndex] = useState(null);
-  const images = Array.isArray(subtopic?.images) ? subtopic.images : [];
+
+  /* -------------------- Sync Images -------------------- */
+
+  // Reset images when subtopic changes
+  useEffect(() => {
+    setValidImages(Array.isArray(subtopic?.images) ? subtopic.images : []);
+    setActiveImageIndex(null);
+  }, [subtopic]);
 
   /* -------------------- Helpers -------------------- */
 
-  // ✅ Remove markdown symbols like ##, -, *, etc. from MCQ text
+  // Remove markdown artifacts from MCQs
   const cleanText = (text = "") =>
     text
-      .replace(/^#+\s*/g, "") // remove headings (##, ###)
-      .replace(/^-\s*/g, "") // remove bullet points (- )
-      .replace(/\*\*/g, "") // remove bold (**)
+      .replace(/^#+\s*/g, "")
+      .replace(/^-\s*/g, "")
+      .replace(/\*\*/g, "")
       .trim();
 
-  // ✅ Sanitize MCQs before rendering
+  // Sanitize MCQs
   const sanitizedMCQs = Array.isArray(subtopic?.content)
     ? subtopic.content.map((mcq) => ({
         ...mcq,
         question: cleanText(mcq.question),
         options: Array.isArray(mcq.options)
-          ? mcq.options.map((opt) => cleanText(opt))
+          ? mcq.options.map(cleanText)
           : mcq.options,
       }))
     : [];
 
+  // Remove image if it fails to load
+  const handleImageError = (index) => {
+    setValidImages((prev) => prev.filter((_, i) => i !== index));
+  };
+
   const closeViewer = () => setActiveImageIndex(null);
-
   const showNextImage = () =>
-    setActiveImageIndex((prev) =>
-      prev < images.length - 1 ? prev + 1 : prev
-    );
-
+    setActiveImageIndex((i) => (i < validImages.length - 1 ? i + 1 : i));
   const showPrevImage = () =>
-    setActiveImageIndex((prev) => (prev > 0 ? prev - 1 : prev));
+    setActiveImageIndex((i) => (i > 0 ? i - 1 : i));
+
+  /* -------------------- UI -------------------- */
 
   return (
     <div className="max-w-5xl mx-auto py-16 px-8 md:px-12 min-h-[70vh]">
-      {/* 📘 Title */}
+      {/* Title */}
       <div className="mb-12">
         <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900">
           {subtopic?.title || "Select a subtopic"}
@@ -62,20 +75,15 @@ export default function SubtopicViewer({
         <div className="mt-4 h-1 w-24 bg-indigo-600 rounded-full" />
       </div>
 
-      {/* 📖 Content */}
+      {/* Content */}
       <div className="bg-white rounded-2xl shadow-lg border p-10 md:p-14 mb-14">
         {loadingContent ? (
           <Loader />
         ) : mode === "mcq" ? (
-          // ✅ MCQ Viewer with cleaned questions
-          <MCQViewer
-            mcqs={sanitizedMCQs}
-            pdfHash={pdfHash}
-            day={day}
-          />
+          <MCQViewer mcqs={sanitizedMCQs} pdfHash={pdfHash} day={day} />
         ) : typeof subtopic?.content === "string" ? (
           <>
-            {/* Markdown Content */}
+            {/* Markdown */}
             <ReactMarkdown
               remarkPlugins={[remarkMath]}
               rehypePlugins={[rehypeKatex]}
@@ -96,13 +104,13 @@ export default function SubtopicViewer({
               {subtopic.content}
             </ReactMarkdown>
 
-            {/* 🖼️ Images Grid */}
-            {images.length > 0 && (
+            {/* Image Grid (only valid images) */}
+            {validImages.length > 0 && (
               <div className="mt-14">
                 <h2 className="text-2xl font-bold mb-6">Related Images</h2>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {images.map((img, index) => (
+                  {validImages.map((img, index) => (
                     <div
                       key={index}
                       onClick={() => setActiveImageIndex(index)}
@@ -112,6 +120,7 @@ export default function SubtopicViewer({
                         src={img.url}
                         alt={`Image ${index + 1}`}
                         className="w-full h-60 object-cover hover:scale-105 transition-transform"
+                        onError={() => handleImageError(index)} // 🚫 hide broken image
                       />
                     </div>
                   ))}
@@ -124,7 +133,7 @@ export default function SubtopicViewer({
         )}
       </div>
 
-      {/* ⏮️ Navigation */}
+      {/* Navigation */}
       <div className="flex justify-between items-center">
         <button
           onClick={onPrevious}
@@ -143,40 +152,36 @@ export default function SubtopicViewer({
         </button>
       </div>
 
-      {/* ================= FULLSCREEN IMAGE VIEWER ================= */}
-      {activeImageIndex !== null && (
+      {/* Fullscreen Viewer */}
+      {activeImageIndex !== null && validImages[activeImageIndex] && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-4">
-          {/* ❌ Close */}
           <button
             onClick={closeViewer}
-            className="absolute top-6 right-6 text-white text-3xl hover:scale-110 transition"
+            className="absolute top-6 right-6 text-white text-3xl"
           >
             <FiX />
           </button>
 
-          {/* ⬅️ Previous */}
           {activeImageIndex > 0 && (
             <button
               onClick={showPrevImage}
-              className="absolute left-6 text-white text-4xl hover:scale-110 transition"
+              className="absolute left-6 text-white text-4xl"
             >
               <FiChevronLeft />
             </button>
           )}
 
-          {/* ➡️ Next */}
-          {activeImageIndex < images.length - 1 && (
+          {activeImageIndex < validImages.length - 1 && (
             <button
               onClick={showNextImage}
-              className="absolute right-6 text-white text-4xl hover:scale-110 transition"
+              className="absolute right-6 text-white text-4xl"
             >
               <FiChevronRight />
             </button>
           )}
 
-          {/* ✅ Fullscreen Image */}
           <img
-            src={images[activeImageIndex].url}
+            src={validImages[activeImageIndex].url}
             alt="Fullscreen"
             className="max-h-[95vh] max-w-[95vw] rounded-xl shadow-2xl object-contain"
           />
