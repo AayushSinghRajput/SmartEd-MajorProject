@@ -20,14 +20,16 @@ export default function SubtopicViewer({
 
       {/* 📘 Subtopic Title */}
       <div className="mb-12">
-        <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 leading-tight">
+        <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900">
           {subtopic?.title || "Select a subtopic"}
         </h1>
         <div className="mt-4 h-1 w-24 bg-indigo-600 rounded-full" />
       </div>
 
       {/* 📖 Content Card */}
-      <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-10 md:p-14 mb-14">
+      <div className="bg-white rounded-2xl shadow-lg border p-10 md:p-14 mb-14">
+
+        {/* Loader */}
         {loadingContent ? (
           <Loader />
         ) : mode === "mcq" && Array.isArray(subtopic?.content) ? (
@@ -40,13 +42,13 @@ export default function SubtopicViewer({
               rehypePlugins={[rehypeKatex]}
               components={{
                 h2: ({ children }) => (
-                  <h2 className="text-2xl font-bold mt-12 mb-4 text-gray-900 flex items-center gap-3">
+                  <h2 className="text-2xl font-bold mt-12 mb-4 flex items-center gap-3">
                     <span className="h-2 w-2 rounded-full bg-indigo-500" />
                     {children}
                   </h2>
                 ),
                 h3: ({ children }) => (
-                  <h3 className="text-xl font-semibold mt-8 mb-3 text-gray-800">
+                  <h3 className="text-xl font-semibold mt-8 mb-3">
                     {children}
                   </h3>
                 ),
@@ -56,7 +58,7 @@ export default function SubtopicViewer({
                   </p>
                 ),
                 ul: ({ children }) => (
-                  <ul className="list-disc pl-7 mb-6 space-y-2 text-gray-700 text-[17px]">
+                  <ul className="list-disc pl-7 mb-6 space-y-2">
                     {children}
                   </ul>
                 ),
@@ -69,7 +71,7 @@ export default function SubtopicViewer({
                   </strong>
                 ),
                 blockquote: ({ children }) => (
-                  <blockquote className="border-l-4 border-indigo-500 bg-indigo-50 px-6 py-4 my-6 rounded-r-lg text-gray-800 italic">
+                  <blockquote className="border-l-4 border-indigo-500 bg-indigo-50 px-6 py-4 my-6 rounded-r-lg italic">
                     {children}
                   </blockquote>
                 ),
@@ -79,25 +81,41 @@ export default function SubtopicViewer({
               {subtopic.content}
             </ReactMarkdown>
 
-            {/* 🖼️ Images Section (Below Content) */}
+            {/* 🖼️ Images Section */}
             {Array.isArray(subtopic?.images) && subtopic.images.length > 0 && (
               <div className="mt-14">
-                <h2 className="text-2xl font-bold mb-6 text-gray-900">
+                <h2 className="text-2xl font-bold mb-6">
                   Related Images
                 </h2>
 
-                {/* Responsive Image Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                   {subtopic.images.map((img, index) => (
                     <div
                       key={index}
-                      className="overflow-hidden rounded-xl shadow-md border border-gray-100"
+                      className="rounded-xl overflow-hidden shadow-md border"
                     >
+                      {/* ✅ FIX: use img.url */}
                       <img
-                        src={img}
+                        src={img.url}
                         alt={`Subtopic Image ${index + 1}`}
-                        className="w-full h-60 object-cover hover:scale-105 transition-transform duration-300"
+                        className="w-full h-60 object-cover hover:scale-105 transition-transform"
+                        loading="lazy"
                       />
+
+                      {/* Optional photographer credit */}
+                      {/* {img.photographerName && (
+                        <div className="text-xs text-gray-500 px-3 py-2 bg-gray-50">
+                          Image:{" "}
+                          <a
+                            href={img.photographerUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="underline"
+                          >
+                            {img.photographerName}
+                          </a>
+                        </div>
+                      )} */}
                     </div>
                   ))}
                 </div>
@@ -114,11 +132,11 @@ export default function SubtopicViewer({
         <button
           onClick={onPrevious}
           disabled={!hasPrevious || loadingContent}
-          className={`px-7 py-3 rounded-full font-semibold transition-all
+          className={`px-7 py-3 rounded-full font-semibold
             ${
               hasPrevious && !loadingContent
-                ? "bg-gray-100 text-gray-800 hover:bg-gray-200"
-                : "bg-gray-100 text-gray-400 opacity-60 cursor-not-allowed"
+                ? "bg-gray-100 hover:bg-gray-200"
+                : "bg-gray-100 text-gray-400 cursor-not-allowed"
             }`}
         >
           ← Previous
@@ -127,11 +145,11 @@ export default function SubtopicViewer({
         <button
           onClick={onNext}
           disabled={!hasNext || loadingContent}
-          className={`px-8 py-3 rounded-full font-semibold transition-all
+          className={`px-8 py-3 rounded-full font-semibold
             ${
               hasNext && !loadingContent
-                ? "bg-indigo-600 text-white hover:bg-indigo-700 hover:scale-[1.02]"
-                : "bg-gray-200 text-gray-500 opacity-60 cursor-not-allowed"
+                ? "bg-indigo-600 text-white hover:bg-indigo-700"
+                : "bg-gray-200 text-gray-500 cursor-not-allowed"
             }`}
         >
           Next →

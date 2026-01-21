@@ -130,6 +130,7 @@ export function useServiceLogic(planData, mode = "study") {
       const updatedSubtopic = {
         ...subtopic,
         content: res?.content || "No content available.",
+        images: Array.isArray(res?.images) ? res.images : [], //for images
         currentDay: dayNum,
         topicIdx,
         subtopicIdx,
