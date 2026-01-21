@@ -33,25 +33,3 @@ Example:
 
 
 
-
-
-# from langchain_core.prompts import ChatPromptTemplate
-
-# toc_prompt = ChatPromptTemplate.from_messages([
-#     (
-#         "system",
-#         """You are an expert at extracting a structured table of contents from documents.
-
-# IMPORTANT RULES:
-# 1. Extract ALL content including front matter
-# 2. Use unit=null for non-numbered sections
-# 3. Use correct unit numbers for chapters
-# 4. Include accurate page numbers
-# 5. Preserve document order
-# """
-#     ),
-#     (
-#         "human",
-#         "Extract the complete table of contents from this document:\n\n{document_content}"
-#     )
-# ])

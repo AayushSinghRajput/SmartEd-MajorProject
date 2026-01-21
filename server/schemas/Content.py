@@ -43,3 +43,4 @@ class UploadScheduleResponse(BaseModel):
     schedule: List[Dict[str, Any]]  # schedule with topics and subtopics
     cached: bool
     image_url: Optional[str] = None
+    is_fallback: bool = False
