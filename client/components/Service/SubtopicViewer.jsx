@@ -21,6 +21,27 @@ export default function SubtopicViewer({
   const [activeImageIndex, setActiveImageIndex] = useState(null);
   const images = Array.isArray(subtopic?.images) ? subtopic.images : [];
 
+  /* -------------------- Helpers -------------------- */
+
+  // ✅ Remove markdown symbols like ##, -, *, etc. from MCQ text
+  const cleanText = (text = "") =>
+    text
+      .replace(/^#+\s*/g, "") // remove headings (##, ###)
+      .replace(/^-\s*/g, "") // remove bullet points (- )
+      .replace(/\*\*/g, "") // remove bold (**)
+      .trim();
+
+  // ✅ Sanitize MCQs before rendering
+  const sanitizedMCQs = Array.isArray(subtopic?.content)
+    ? subtopic.content.map((mcq) => ({
+        ...mcq,
+        question: cleanText(mcq.question),
+        options: Array.isArray(mcq.options)
+          ? mcq.options.map((opt) => cleanText(opt))
+          : mcq.options,
+      }))
+    : [];
+
   const closeViewer = () => setActiveImageIndex(null);
 
   const showNextImage = () =>
@@ -33,7 +54,6 @@ export default function SubtopicViewer({
 
   return (
     <div className="max-w-5xl mx-auto py-16 px-8 md:px-12 min-h-[70vh]">
-
       {/* 📘 Title */}
       <div className="mb-12">
         <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900">
@@ -44,14 +64,18 @@ export default function SubtopicViewer({
 
       {/* 📖 Content */}
       <div className="bg-white rounded-2xl shadow-lg border p-10 md:p-14 mb-14">
-
         {loadingContent ? (
           <Loader />
-        ) : mode === "mcq" && Array.isArray(subtopic?.content) ? (
-          <MCQViewer mcqs={subtopic.content} pdfHash={pdfHash} day={day} />
+        ) : mode === "mcq" ? (
+          // ✅ MCQ Viewer with cleaned questions
+          <MCQViewer
+            mcqs={sanitizedMCQs}
+            pdfHash={pdfHash}
+            day={day}
+          />
         ) : typeof subtopic?.content === "string" ? (
           <>
-            {/* Markdown */}
+            {/* Markdown Content */}
             <ReactMarkdown
               remarkPlugins={[remarkMath]}
               rehypePlugins={[rehypeKatex]}
@@ -122,7 +146,6 @@ export default function SubtopicViewer({
       {/* ================= FULLSCREEN IMAGE VIEWER ================= */}
       {activeImageIndex !== null && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-4">
-
           {/* ❌ Close */}
           <button
             onClick={closeViewer}
@@ -155,7 +178,7 @@ export default function SubtopicViewer({
           <img
             src={images[activeImageIndex].url}
             alt="Fullscreen"
-            className="max-h-[95vh] max-w-[95vw] rounded-xl shadow-2xl object-contain transition-transform"
+            className="max-h-[95vh] max-w-[95vw] rounded-xl shadow-2xl object-contain"
           />
         </div>
       )}
