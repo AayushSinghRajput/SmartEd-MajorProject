@@ -1,9 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import { FiEdit } from "react-icons/fi";
+import { FiEdit, FiTrash2 } from "react-icons/fi";
 import { useState } from "react";
-import { updateBookImage } from "../../api/pdf";
+import { updateBookImage, deletePdfAndData } from "../../api/pdf";
 import CylindricalProgress from "./CylindricalProgress";
 
 interface StudyBookCardProps {
@@ -18,6 +18,7 @@ interface StudyBookCardProps {
   variant?: "dashboard" | "performance";
   onClick?: () => void;
   allowImageEdit?: boolean; // controls whether the edit icon is shown
+  onDelete?: (pdf_hash: string) => void; // callback for delete
 }
 
 export default function StudyBookCard({
@@ -25,6 +26,7 @@ export default function StudyBookCard({
   variant = "dashboard",
   onClick,
   allowImageEdit = true, // default: allow editing
+  onDelete, // callback for delete
 }: StudyBookCardProps) {
   const fallbackImage = "/images/Company_Logo.png";
 
@@ -63,6 +65,24 @@ export default function StudyBookCard({
       alert("Error updating image");
     } finally {
       setUploading(false);
+    }
+  };
+
+  const handleDelete = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!pdf_hash) return;
+
+    const confirmed = confirm("Are you sure you want to delete this book?");
+    if (!confirmed) return;
+
+    try {
+      await deletePdfAndData(pdf_hash);
+      onDelete?.(pdf_hash); // 🔥 update UI from parent
+    } catch (error) {
+      console.error(error);
+      alert("Failed to delete book");
     }
   };
 
@@ -140,6 +160,7 @@ export default function StudyBookCard({
         {/* Only show edit if allowed */}
         {allowImageEdit && (
           <>
+            {/* Image upload input */}
             <input
               type="file"
               id={`file-input-${pdf_hash}`}
@@ -149,19 +170,33 @@ export default function StudyBookCard({
               onChange={handleFileChange}
             />
 
-            <button
-              type="button"
-              title="Change book image"
-              className="absolute top-2 right-2 bg-white/90 p-2 rounded-full
-                         shadow hover:bg-indigo-600 hover:text-white transition"
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation(); // prevent card click
-                document.getElementById(`file-input-${pdf_hash}`)?.click();
-              }}
-            >
-              {uploading ? "..." : <FiEdit size={14} />}
-            </button>
+            <div className="absolute top-2 right-2 flex gap-2">
+              {/* EDIT ICON */}
+              <button
+                type="button"
+                title="Change book image"
+                className="bg-white/90 p-2 rounded-full shadow
+                   hover:bg-indigo-600 hover:text-white transition"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  document.getElementById(`file-input-${pdf_hash}`)?.click();
+                }}
+              >
+                {uploading ? "..." : <FiEdit size={14} />}
+              </button>
+
+              {/* DELETE ICON */}
+              <button
+                type="button"
+                title="Delete book"
+                className="bg-white/90 p-2 rounded-full shadow
+                   hover:bg-red-600 hover:text-white transition"
+                onClick={handleDelete}
+              >
+                <FiTrash2 size={14} />
+              </button>
+            </div>
           </>
         )}
       </div>

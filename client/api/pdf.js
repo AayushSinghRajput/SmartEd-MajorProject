@@ -119,3 +119,25 @@ export const getBookSchedule = async (pdf_hash, days) => {
     return { success: false, message: error || "Failed to fetch book schedule" };
   }
 };
+
+
+// ---------------------------
+// Delete PDF and all related data
+// ---------------------------
+export const deletePdfAndData = async (pdfHash) => {
+  try {
+    const response = await fetch(
+      `${API_URL}/study/delete-pdf/${pdfHash}`,
+      {
+        method: "DELETE",
+        headers: getAuthHeaders(),
+        credentials: "include", // 🔐 send auth cookies
+      }
+    );
+
+    return await handleResponse(response);
+  } catch (error) {
+    console.error("[deletePdfAndData] Error:", error);
+    throw error;
+  }
+};

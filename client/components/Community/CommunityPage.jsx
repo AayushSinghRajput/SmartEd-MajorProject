@@ -41,7 +41,7 @@ export default function CommunityPage() {
   }
 
   return (
-    <div className="relative p-4">
+    <div className="min-h-screen bg-indigo-50 p-4">
       {/* Create Post Button */}
       <PostButton onClick={() => setShowPopup(true)} />
 
