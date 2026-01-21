@@ -11,6 +11,9 @@ from services.pdf_upload.fallback_scheduler import generate_schedule_from_pages
 from langchain_community.document_loaders import PyPDFLoader
 import tempfile
 import os
+from services.rag.ingest import ingest_pdf_for_rag
+from fastapi import BackgroundTasks
+
 
 
 router = APIRouter(prefix="/api/study", tags=["Study Plan"])
@@ -25,6 +28,7 @@ router = APIRouter(prefix="/api/study", tags=["Study Plan"])
 )
 async def upload_pdf_and_generate_schedule(
     response: Response,
+    background_tasks: BackgroundTasks,
     file: UploadFile = File(..., description="PDF file to upload"),
     book_name: str = Form(..., description="Book name from frontend"),
     days: int = Query(..., gt=0, description="Number of study days"),
@@ -60,7 +64,21 @@ async def upload_pdf_and_generate_schedule(
                 "image_url": image_url,
                 "user_id": current_user["id"]
             })
+
+               # ✅ NEW LINE (THIS IS THE ONLY CHANGE)
+            # await ingest_pdf_for_rag(
+            #     pdf_hash=pdf_hash,
+            #     pdf_bytes=pdf_bytes
+            # )
+            background_tasks.add_task(
+            ingest_pdf_for_rag,
+            pdf_hash,
+            pdf_bytes
+           )
+            print("Rag is being running in the background...")
+
             pdf_cached = False
+
 
         schedule_doc = await db.schedules.find_one({
             "pdf_hash": pdf_hash,
