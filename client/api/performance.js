@@ -1,17 +1,12 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
 
 // ---------------------------
-// Helper: Get Auth headers
+// Helper: Get headers
 // ---------------------------
 const getAuthHeaders = (isMultipart = false) => {
-  const token = localStorage.getItem("token");
   const headers = {};
-  if (token) {
-    headers["Authorization"] = `Bearer ${token}`;
-  }
-  if (!isMultipart) {
-    headers["Content-Type"] = "application/json";
-  }
+  // For JSON requests, set Content-Type; skip for multipart
+  if (!isMultipart) headers["Content-Type"] = "application/json";
   return headers;
 };
 
@@ -22,16 +17,16 @@ const handleResponse = async (response) => {
   try {
     const data = await response.json();
     if (!response.ok) {
-      const error = (data && data.detail) || response.statusText || "Request failed";
+      const error =
+        (data && data.detail) || response.statusText || "Request failed";
       return Promise.reject(error);
     }
     return data;
   } catch (error) {
-    console.error("Fetch response error:", error);
+    console.error("[handleResponse] Error:", error);
     throw error;
   }
 };
-
 
 // ---------------------------
 // Submit MCQ Score
@@ -42,20 +37,23 @@ export const submitMCQScore = async ({
   score,
   totalQuestions,
 }) => {
-  const response = await fetch(
-    `${API_URL}/performance/submit-mcq`,
-    {
+  try {
+    const response = await fetch(`${API_URL}/performance/submit-mcq`, {
       method: "POST",
       headers: getAuthHeaders(),
-      credentials: "include",
+      credentials: "include", // ensures HttpOnly cookie is sent
       body: JSON.stringify({
-        pdf_hash: pdfHash, //  MATCHES BACKEND
+        pdf_hash: pdfHash, // matches backend field
         day,
         score,
         total_questions: totalQuestions,
       }),
-    }
-  );
+    });
 
-  return handleResponse(response);
+    const data = await handleResponse(response);
+    return data;
+  } catch (error) {
+    console.error("[submitMCQScore] Error:", error);
+    throw error;
+  }
 };

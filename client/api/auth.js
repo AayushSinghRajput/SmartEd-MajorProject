@@ -1,6 +1,5 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
 
-
 //auth routes
 export const loginUser = async (credentials) => {
   const response = await fetch(`${API_URL}/auth/login`, {
@@ -35,35 +34,10 @@ export const getCurrentUser = async () => {
 };
 
 export const logoutUser = async () => {
-  // Clear client storage immediately
-  clearClientStorage();
-
-  try {
-    const response = await fetch(`${API_URL}/auth/logout`, {
-      method: "POST",
-      credentials: "include",
-    });
-    return {
-      success: true,
-      message: "Logged out successfully",
-    };
-  } catch (error) {
-    return {
-      success: true,
-      message: "Logged out successfully",
-    };
-  }
+  await fetch(`${API_URL}/auth/logout`, {
+    method: "POST",
+    credentials: "include",
+  });
 };
 
-const clearClientStorage = () => {
-  // Clear cookies
-  document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
 
-  // Clear localStorage
-  localStorage.removeItem("token");
-  localStorage.removeItem("user");
-
-  // Clear sessionStorage
-  sessionStorage.removeItem("token");
-  sessionStorage.removeItem("user");
-};

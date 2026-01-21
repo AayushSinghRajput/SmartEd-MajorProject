@@ -4,9 +4,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
 // Auth headers helper
 // ---------------------------
 const getAuthHeaders = (isMultipart = false) => {
-  const token = localStorage.getItem("token");
   const headers = {};
-  if (token) headers["Authorization"] = `Bearer ${token}`;
   if (!isMultipart) headers["Content-Type"] = "application/json";
   return headers;
 };
@@ -50,6 +48,7 @@ export const getAllPosts = async () => {
   const response = await fetch(`${API_URL}/community/`, {
     method: "GET",
     headers: getAuthHeaders(),
+    credentials: "include",
   });
   return handleResponse(response);
 };
@@ -90,6 +89,7 @@ export const getComments = async (postId) => {
   const response = await fetch(`${API_URL}/community/${postId}/comments`, {
     method: "GET",
     headers: getAuthHeaders(),
+    credentials: "include",
   });
   return handleResponse(response);
 };
@@ -112,7 +112,6 @@ export const getMyPosts = async () => {
 export const updateCommunityPost = async (postId, content, images = []) => {
   const formData = new FormData();
   formData.append("content", content);
-
   images.forEach((file) => {
     formData.append("images", file); // append each image
   });
@@ -120,6 +119,7 @@ export const updateCommunityPost = async (postId, content, images = []) => {
   const response = await fetch(`${API_URL}/community/${postId}`, {
     method: "PUT",
     headers: getAuthHeaders(true), // true = multipart
+    credentials: "include",
     body: formData,
   });
 
@@ -133,6 +133,7 @@ export const deleteCommunityPost = async (postId) => {
   const response = await fetch(`${API_URL}/community/${postId}`, {
     method: "DELETE",
     headers: getAuthHeaders(), // normal JSON headers
+    credentials: "include",
   });
 
   return handleResponse(response);
