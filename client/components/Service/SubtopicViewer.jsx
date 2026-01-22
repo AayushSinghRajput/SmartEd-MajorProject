@@ -1,10 +1,17 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
-import { FiX, FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import {
+  FiX,
+  FiChevronLeft,
+  FiChevronRight,
+  FiVolume2,
+  FiPause,
+} from "react-icons/fi";
 import Loader from "../ui/Loader";
 import MCQViewer from "../MCQViewer";
+import { cleanTextForSpeech, cleanText } from "../../utils/cleanTextForSpeech";
 
 export default function SubtopicViewer({
   loadingContent,
@@ -19,29 +26,25 @@ export default function SubtopicViewer({
 }) {
   /* -------------------- Image State -------------------- */
 
-  // Store only images that successfully load
   const [validImages, setValidImages] = useState([]);
   const [activeImageIndex, setActiveImageIndex] = useState(null);
 
-  /* -------------------- Sync Images -------------------- */
+  /* -------------------- Voice State -------------------- */
 
-  // Reset images when subtopic changes
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const utteranceRef = useRef(null);
+
+  /* -------------------- Sync Images & Voice -------------------- */
+
   useEffect(() => {
     setValidImages(Array.isArray(subtopic?.images) ? subtopic.images : []);
     setActiveImageIndex(null);
+
+    // Stop voice when subtopic changes
+    window.speechSynthesis.cancel();
+    setIsSpeaking(false);
   }, [subtopic]);
 
-  /* -------------------- Helpers -------------------- */
-
-  // Remove markdown artifacts from MCQs
-  const cleanText = (text = "") =>
-    text
-      .replace(/^#+\s*/g, "")
-      .replace(/^-\s*/g, "")
-      .replace(/\*\*/g, "")
-      .trim();
-
-  // Sanitize MCQs
   const sanitizedMCQs = Array.isArray(subtopic?.content)
     ? subtopic.content.map((mcq) => ({
         ...mcq,
@@ -52,16 +55,61 @@ export default function SubtopicViewer({
       }))
     : [];
 
-  // Remove image if it fails to load
   const handleImageError = (index) => {
     setValidImages((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const closeViewer = () => setActiveImageIndex(null);
-  const showNextImage = () =>
-    setActiveImageIndex((i) => (i < validImages.length - 1 ? i + 1 : i));
-  const showPrevImage = () =>
-    setActiveImageIndex((i) => (i > 0 ? i - 1 : i));
+  /* -------------------- Text To Speech -------------------- */
+
+  const handleVoiceToggle = () => {
+    const synth = window.speechSynthesis;
+
+    // Pause only if actively speaking
+    if (synth.speaking && isSpeaking) {
+      synth.pause();
+      setIsSpeaking(false);
+      return;
+    }
+
+    // Resume ONLY if utterance still exists
+    if (synth.paused && utteranceRef.current) {
+      synth.resume();
+      setIsSpeaking(true);
+      return;
+    }
+
+    // Clear broken paused state (THIS WAS MISSING)
+    if (synth.paused && !utteranceRef.current) {
+      synth.cancel();
+    }
+
+    // Start fresh speech
+    if (typeof subtopic?.content === "string") {
+      const text = cleanTextForSpeech(subtopic.content);
+
+      synth.cancel(); // ensure clean queue
+
+      setTimeout(() => {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = 1;
+        utterance.pitch = 1;
+
+        utterance.onend = () => {
+          utteranceRef.current = null;
+          setIsSpeaking(false);
+        };
+
+        utterance.onerror = () => {
+          utteranceRef.current = null;
+          setIsSpeaking(false);
+        };
+
+        utteranceRef.current = utterance;
+        synth.speak(utterance);
+        setIsSpeaking(true);
+      }, 0);
+    }
+  };
 
   /* -------------------- UI -------------------- */
 
@@ -76,7 +124,22 @@ export default function SubtopicViewer({
       </div>
 
       {/* Content */}
-      <div className="bg-white rounded-2xl shadow-lg border p-10 md:p-14 mb-14">
+      <div className="relative bg-white rounded-2xl shadow-lg border p-10 md:p-14 mb-14">
+        {/* 🔊 Voice Button */}
+        {typeof subtopic?.content === "string" && (
+          <button
+            onClick={handleVoiceToggle}
+            className="absolute top-6 right-6 p-3 rounded-full bg-indigo-100 hover:bg-indigo-200"
+            title={isSpeaking ? "Pause reading" : "Read content"}
+          >
+            {isSpeaking ? (
+              <FiPause className="text-indigo-700 text-xl" />
+            ) : (
+              <FiVolume2 className="text-indigo-700 text-xl" />
+            )}
+          </button>
+        )}
+
         {loadingContent ? (
           <Loader />
         ) : mode === "mcq" ? (
@@ -104,7 +167,7 @@ export default function SubtopicViewer({
               {subtopic.content}
             </ReactMarkdown>
 
-            {/* Image Grid (only valid images) */}
+            {/* Image Grid */}
             {validImages.length > 0 && (
               <div className="mt-14">
                 <h2 className="text-2xl font-bold mb-6">Related Images</h2>
@@ -120,7 +183,7 @@ export default function SubtopicViewer({
                         src={img.url}
                         alt={`Image ${index + 1}`}
                         className="w-full h-60 object-cover hover:scale-105 transition-transform"
-                        onError={() => handleImageError(index)} // 🚫 hide broken image
+                        onError={() => handleImageError(index)}
                       />
                     </div>
                   ))}
@@ -152,11 +215,11 @@ export default function SubtopicViewer({
         </button>
       </div>
 
-      {/* Fullscreen Viewer */}
+      {/* Fullscreen Image Viewer */}
       {activeImageIndex !== null && validImages[activeImageIndex] && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-4">
           <button
-            onClick={closeViewer}
+            onClick={() => setActiveImageIndex(null)}
             className="absolute top-6 right-6 text-white text-3xl"
           >
             <FiX />
@@ -164,7 +227,7 @@ export default function SubtopicViewer({
 
           {activeImageIndex > 0 && (
             <button
-              onClick={showPrevImage}
+              onClick={() => setActiveImageIndex((i) => i - 1)}
               className="absolute left-6 text-white text-4xl"
             >
               <FiChevronLeft />
@@ -173,7 +236,7 @@ export default function SubtopicViewer({
 
           {activeImageIndex < validImages.length - 1 && (
             <button
-              onClick={showNextImage}
+              onClick={() => setActiveImageIndex((i) => i + 1)}
               className="absolute right-6 text-white text-4xl"
             >
               <FiChevronRight />
