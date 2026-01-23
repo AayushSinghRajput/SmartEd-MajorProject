@@ -23,6 +23,11 @@ class Settings(BaseSettings):
     CLOUDINARY_API_KEY : str
     CLOUDINARY_API_SECRET : str
 
+    # ---------------- OCR ----------------
+    POPPLER_PATH: str | None = None
+    TESSERACT_PATH: str | None = None
+
+
     ENV: str = "development"
 
     model_config = SettingsConfigDict(
