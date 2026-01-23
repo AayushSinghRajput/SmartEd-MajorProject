@@ -13,7 +13,10 @@ import tempfile
 import os
 from services.rag.ingest import ingest_pdf_for_rag
 from fastapi import BackgroundTasks
-
+from services.pdf_upload_ocr.ocr_service import (
+            is_scanned_pdf,
+            make_searchable_pdf,
+        )
 
 
 router = APIRouter(prefix="/api/study", tags=["Study Plan"])
@@ -42,9 +45,10 @@ async def upload_pdf_and_generate_schedule(
         if not pdf_bytes:
             raise HTTPException(status_code=400, detail="Uploaded file is empty")
 
-        pdf_hash = compute_md5(pdf_bytes)
+        original_hash = compute_md5(pdf_bytes)
 
-        pdf_doc = await db.pdfs.find_one({"pdf_hash": pdf_hash})
+        # 🔥 CHECK IF SAME FILE WAS UPLOADED BEFORE (SKIP OCR)
+        pdf_doc = await db.pdfs.find_one({"original_hash": original_hash})
 
         if pdf_doc:
             toc_data = pdf_doc["toc"]
@@ -53,19 +57,46 @@ async def upload_pdf_and_generate_schedule(
             image_url = pdf_doc.get("image_url")
             pdf_cached = True
         else:
+            # -------------------------------------------------
+            # 2️⃣ DETECT SCANNED PDF + OCR ONLY IF NEEDED
+            # -------------------------------------------------
+
+            was_scanned = is_scanned_pdf(pdf_bytes)
+
+            if was_scanned:
+                print("📸 Scanned PDF detected — running OCR once")
+                # searchable_pdf_bytes = make_searchable_pdf(pdf_bytes)
+                pdf_bytes = make_searchable_pdf(pdf_bytes)
+            else:
+                print("📄 Text-based PDF detected")
+                pdf_bytes = pdf_bytes
+
+            # -------------------------------------------------
+            # 3️⃣ COMPUTE CANONICAL HASH (POST-OCR)
+            # -------------------------------------------------
+            pdf_hash = compute_md5(pdf_bytes)
+
+            # -------------------------------------------------
+            # 4️⃣ UPLOAD + EXTRACT TOC (NORMAL PIPELINE)
+            # -------------------------------------------------
             pdf_url = await upload_pdf_to_cloudinary_bytes(pdf_bytes)
             toc_data = extract_toc(pdf_bytes)
             image_url = None
-            await db.pdfs.insert_one({
-                "pdf_hash": pdf_hash,
-                "toc": toc_data,
-                "pdf_url": pdf_url,
-                "book_name": book_name,
-                "image_url": image_url,
-                "user_id": current_user["id"]
-            })
 
-               # ✅ NEW LINE (THIS IS THE ONLY CHANGE)
+            await db.pdfs.insert_one({
+            "original_hash": original_hash,   # 🔥 prevents re-OCR
+            "pdf_hash": pdf_hash,              # 🔥 system-wide hash
+            "was_scanned": was_scanned,        # optional but useful
+            "toc": toc_data,
+            "pdf_url": pdf_url,
+            "book_name": book_name,
+            "image_url": image_url,
+            "user_id": current_user["id"],
+        })
+
+
+
+               # ✅ NEW LINE calcualte rag ingestion in background
             # await ingest_pdf_for_rag(
             #     pdf_hash=pdf_hash,
             #     pdf_bytes=pdf_bytes

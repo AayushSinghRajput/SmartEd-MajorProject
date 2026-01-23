@@ -25,4 +25,8 @@ langchain_openai
 langchain_huggingface
 sentence-transformers
 faiss-cpu
-faiss-gpu
+python-multipart
+pytesseract
+pdf2image
+pillow
+reportlab
