@@ -7,6 +7,7 @@ export default function MCQViewer({ mcqs, pdfHash, day }) {
     answers,
     showScore,
     score,
+    performanceLevel,
     isComplete,
     loading,
     error,
@@ -61,6 +62,11 @@ export default function MCQViewer({ mcqs, pdfHash, day }) {
       {showScore && (
         <p className="text-xl font-bold text-green-700">
           Your Score: {score} / {mcqs.length}
+        </p>
+      )}
+      {performanceLevel && (
+        <p className="text-lg font-semibold text-indigo-600">
+          Performance Level: {performanceLevel}
         </p>
       )}
     </div>

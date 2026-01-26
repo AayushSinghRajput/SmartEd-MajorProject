@@ -23,6 +23,7 @@ export default function SubtopicViewer({
   mode,
   pdfHash,
   day,
+  actions,
 }) {
   /* -------------------- Image State -------------------- */
 
@@ -143,7 +144,12 @@ export default function SubtopicViewer({
         {loadingContent ? (
           <Loader />
         ) : mode === "mcq" ? (
-          <MCQViewer mcqs={sanitizedMCQs} pdfHash={pdfHash} day={day} />
+          <MCQViewer
+            mcqs={sanitizedMCQs}
+            pdfHash={pdfHash}
+            day={day}
+            onPerformanceUpdate={actions.updateDayPerformance}
+          />
         ) : typeof subtopic?.content === "string" ? (
           <>
             {/* Markdown */}
