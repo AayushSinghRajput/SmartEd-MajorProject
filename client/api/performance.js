@@ -29,6 +29,23 @@ const handleResponse = async (response) => {
 };
 
 // ---------------------------
+// Fetch performance for PDF
+// ---------------------------
+export const fetchPerformance = async (pdfHash) => {
+  try {
+    const response = await fetch(`${API_URL}/performance/get?pdf_hash=${pdfHash}`, {
+      method: "GET",
+      headers: getAuthHeaders(),
+      credentials: "include",
+    });
+    return await handleResponse(response);
+  } catch (error) {
+    console.error("[fetchPerformance] Error:", error);
+    return null;
+  }
+};
+
+// ---------------------------
 // Submit MCQ Score
 // ---------------------------
 export const submitMCQScore = async ({
