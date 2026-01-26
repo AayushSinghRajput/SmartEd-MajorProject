@@ -9,8 +9,8 @@ export default function Sidebar({
   loadingContent = false,
   metaData = {},
   actions = {},
-  mode = "study", //  new: "study" | "mcq" | "notes"
-  selectedDay = null, //  new: selected day in mcq/notes mode
+  mode = "study", // "study" | "mcq" | "notes"
+  selectedDay = null,
 }) {
   const {
     toggleDayExpand,
@@ -18,7 +18,37 @@ export default function Sidebar({
     handleSubtopicClick,
     handleDayClick,
   } = actions;
-  // ✅ handleDayClick will be used for mcq / notes
+
+  // 🎨 badge color based on performance level
+  const getPerformanceBadge = (level) => {
+    if (!level) return null;
+
+    // Normalize level to match badge keys
+    const normalizedLevel = level.toLowerCase(); // e.g., Good -> good
+
+    const styles = {
+      bad: "bg-red-100 text-red-600",
+      medium: "bg-yellow-100 text-yellow-700",
+      good: "bg-green-100 text-green-600",
+    };
+
+    return (
+      <span
+        className={`text-[10px] px-2 py-0.5 rounded-full font-semibold capitalize ${styles[normalizedLevel]}`}
+      >
+        {normalizedLevel}
+      </span>
+    );
+  };
+
+  // 🔎 Debug: show correct field mapping
+  console.log(
+    "Sidebar performance levels:",
+    localSchedule.map((d) => ({
+      day: d.day,
+      level: d.performance_level, // ✅ corrected field
+    })),
+  );
 
   return (
     <div className="w-1/4 border-r p-4 overflow-y-auto bg-slate-50">
@@ -47,9 +77,9 @@ export default function Sidebar({
               <button
                 onClick={() => {
                   if (mode === "mcq" || mode === "notes") {
-                    handleDayClick(dayItem.day); // ✅ mcq/notes: only select day
+                    handleDayClick(dayItem.day);
                   } else {
-                    toggleDayExpand(dayIndex); // ✅ study: expand/collapse topics
+                    toggleDayExpand(dayIndex);
                   }
                 }}
                 className={`w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all ${
@@ -59,6 +89,7 @@ export default function Sidebar({
                 }`}
                 disabled={loadingContent}
               >
+                {/* Left section */}
                 <div className="flex items-center gap-3">
                   <div
                     className={`w-2 h-2 rounded-full ${
@@ -79,14 +110,22 @@ export default function Sidebar({
                     )}
                   </div>
                 </div>
-                {dayExpanded ? (
-                  <ChevronDown size={16} />
-                ) : (
-                  <ChevronRight size={16} />
-                )}
+
+                {/* Right section */}
+                <div className="flex items-center gap-2">
+                  {/* ✅ Performance badge (mcq + study only) */}
+                  {(mode === "mcq" || mode === "study") &&
+                    getPerformanceBadge(dayItem.performance_level)}
+
+                  {dayExpanded ? (
+                    <ChevronDown size={16} />
+                  ) : (
+                    <ChevronRight size={16} />
+                  )}
+                </div>
               </button>
 
-              {/* Topics & Subtopics - Only show if day is expanded */}
+              {/* Topics & Subtopics (study only) */}
               {mode === "study" &&
                 dayExpanded &&
                 dayItem.topics?.map((topic, topicIndex) => {
@@ -97,7 +136,7 @@ export default function Sidebar({
                       key={topicIndex}
                       className="mt-2 ml-4 space-y-1 border-l-2 border-indigo-100 pl-2"
                     >
-                      {/* Topic Button */}
+                      {/* Topic */}
                       <button
                         onClick={() => toggleTopicExpand(dayIndex, topicIndex)}
                         className={`w-full text-left px-3 py-2 text-sm font-semibold flex justify-between items-center ${
@@ -112,13 +151,11 @@ export default function Sidebar({
                         </span>
                         <ChevronRight
                           size={14}
-                          className={`transition-transform ${
-                            topicExpanded ? "rotate-90" : ""
-                          }`}
+                          className={`transition-transform ${topicExpanded ? "rotate-90" : ""}`}
                         />
                       </button>
 
-                      {/* Subtopics - Only show if topic is expanded */}
+                      {/* Subtopics */}
                       {topicExpanded &&
                         topic.subtopics?.map((subtopic, subtopicIndex) => {
                           const isSelected =
@@ -132,7 +169,7 @@ export default function Sidebar({
                                 handleSubtopicClick(
                                   dayItem.day,
                                   topicIndex,
-                                  subtopicIndex
+                                  subtopicIndex,
                                 )
                               }
                               className={`w-full text-left px-3 py-2 text-xs transition-all rounded-lg flex items-center justify-between ${

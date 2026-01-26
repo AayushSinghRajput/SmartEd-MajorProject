@@ -28,10 +28,10 @@ export default function Service({
 
   // Notify parent of schedule updates
   useEffect(() => {
-    if (planData?.schedule) {
-      onScheduleUpdate?.(planData.schedule);
+    if (state.localSchedule && state.localSchedule.length > 0) {
+      onScheduleUpdate?.(state.localSchedule);
     }
-  }, [planData, onScheduleUpdate]);
+  }, [state.localSchedule, onScheduleUpdate]);
 
   // Empty state
   if (!planData || !planData.schedule || planData.schedule.length === 0) {
@@ -67,6 +67,7 @@ export default function Service({
         metaData={state.metaData}
         actions={actions}
         mode={mode}
+        selectedDay={state.selectedDay}
       />
 
       {/* Main Content Area */}
@@ -106,6 +107,7 @@ export default function Service({
                 mode={mode} //pass the variable
                 pdfHash={state.metaData.fileHash}
                 day={state.selectedDay}
+                actions={actions}
               />
             );
           })()

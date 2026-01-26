@@ -7,6 +7,8 @@ class DayPerformance(BaseModel):
     day: int
     score: int
     total_questions: int
+    percentage:float
+    performance_level:str  # bad | medium | good
     submitted_at: datetime = Field(default_factory=datetime.utcnow)
 
 
@@ -28,3 +30,5 @@ class SubmitMCQScoreRequest(BaseModel):
 class SubmitMCQScoreResponse(BaseModel):
     message: str
     total_score: int
+    performance_level: str
+    day: int

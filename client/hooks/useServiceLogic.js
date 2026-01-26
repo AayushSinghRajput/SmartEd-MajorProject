@@ -4,6 +4,7 @@ import { generateContent } from "../api/content";
 import { summarizeDayNotes } from "../api/note";
 import { generateMCQs } from "../api/mcq";
 import { updateProgress } from "../api/progress";
+import { fetchPerformance } from "../api/performance";
 
 //  Add `mode` to distinguish "study" vs "mcq" / "notes"
 export function useServiceLogic(planData, mode = "study") {
@@ -33,11 +34,29 @@ export function useServiceLogic(planData, mode = "study") {
 
   /* -------------------- INIT -------------------- */
   useEffect(() => {
-    if (planData?.schedule) {
-      setLocalSchedule(planData.schedule);
-    } else {
-      setLocalSchedule([]);
-    }
+    const loadPerformance = async () => {
+      if (!planData?.schedule) {
+        setLocalSchedule([]);
+        return;
+      }
+
+      const pdfHash = planData.pdf_hash; // assuming you have pdf_hash in planData
+      const performanceData = await fetchPerformance(pdfHash);
+
+      const updatedSchedule = planData.schedule.map((d) => {
+        const perfDay = performanceData?.day_wise_scores?.find(
+          (p) => p.day === d.day,
+        );
+        return {
+          ...d,
+          performance_level: perfDay ? perfDay.performance_level : null,
+        };
+      });
+
+      setLocalSchedule(updatedSchedule);
+    };
+
+    loadPerformance();
   }, [planData]);
 
   /* -------------------- HELPERS -------------------- */
@@ -362,6 +381,18 @@ export function useServiceLogic(planData, mode = "study") {
     console.log("Going to previous day:", prevDay, "selectedDay:", selectedDay);
   };
 
+  // -------------------- Update MCQ performance in localSchedule --------------------
+  const updateDayPerformance = ({ day, level }) => {
+    console.log("Updating day performance:", day, level);
+
+    // ✅ allow falsy but valid levels
+    if (level === undefined || level === null) return;
+
+    setLocalSchedule((prev) =>
+      prev.map((d) => (d.day === day ? { ...d, performance_level: level } : d)),
+    );
+  };
+
   return {
     state: {
       localSchedule,
@@ -384,6 +415,7 @@ export function useServiceLogic(planData, mode = "study") {
       handleDayClick, // ✅ for MCQ / Notes
       goToNextDay, // ✅ for MCQ / Notes
       goToPreviousDay, // ✅ for MCQ / Notes
+      updateDayPerformance, // ✅ for MCQ / study
     },
   };
 }
