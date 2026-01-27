@@ -30,3 +30,6 @@ pytesseract
 pdf2image
 pillow
 reportlab
+requests
+beautifulsoup4
+apscheduler
