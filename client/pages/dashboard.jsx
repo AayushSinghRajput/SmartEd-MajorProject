@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { act, useState } from "react";
 import { FiPlus } from "react-icons/fi";
 import { toast } from "react-hot-toast";
 
@@ -13,6 +13,7 @@ import MockTest from "../components/MockTest";
 import { useAuth } from "../context/AuthContext";
 import { getBookSchedule } from "../api/pdf";
 import CommunityPage from "../components/Community/CommunityPage";
+import EntranceNews from "../components/EntranceNews/EntranceNews";
 
 export default function Dashboard() {
   // -----------------------------
@@ -98,6 +99,11 @@ export default function Dashboard() {
     //Community Tab
     if (activeTab === "community") {
       return <CommunityPage />;
+    }
+
+    //entrance news
+    if (activeTab === "entranceNews") {
+      return <EntranceNews />;
     }
 
     // Default: Study Grid
