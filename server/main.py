@@ -12,6 +12,8 @@ from routes import contact
 from routes import performance
 from routes import progress
 from routes import community
+from routes import entrance_news
+
 
 
 app = FastAPI(
@@ -41,6 +43,7 @@ app.include_router(chat_api.router)
 app.include_router(performance.router)
 app.include_router(progress.router)
 app.include_router(community.router)
+app.include_router(entrance_news.router)
 
 @app.get("/")
 def root():

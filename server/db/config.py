@@ -14,6 +14,7 @@ schedule_collection = db.schedules
 subtopic_collection = db.subtopics
 contacts_collection = db.contacts
 study_images_collection = db.study_images
+entrance_news_collection = db.entrance_news
 
 
 print("MongoDB connected!")

@@ -5,7 +5,9 @@ export const DASHBOARD_TABS = [
   { name: "notes", label: "Study Notes", icon: "📝" },
   { name: "mock", label: "Mock Test", icon: "📋" },
   { name: "community", label: "Community", icon: "👥" },
+  { name: "entranceNews", label: "Entrance News", icon: "📰" }, 
 ];
+
 
 
 export const TEST_DURATION = 120 * 60; 
