@@ -33,3 +33,5 @@ reportlab
 requests
 beautifulsoup4
 apscheduler
+pydub 
+imageio-ffmpeg

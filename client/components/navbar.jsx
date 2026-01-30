@@ -72,13 +72,13 @@ export default function Navbar() {
           {/* LOGO */}
           <motion.div whileHover={{ scale: 1.05 }} className="flex items-center gap-2">
             <div className="relative h-10 w-10 rounded-lg overflow-hidden shadow bg-white p-1.5">
-              <Image src={Company_Logo} alt="SmartED Logo" fill className="object-contain" />
+              <Image src={Company_Logo} alt="SmartPrep Logo" fill className="object-contain" />
             </div>
             <Link
               href="/"
               className="text-xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent"
             >
-              SmartED AI
+              SmartPrep AI
             </Link>
           </motion.div>
 
@@ -140,9 +140,9 @@ export default function Navbar() {
         <div className="flex md:hidden justify-between items-center h-16">
           <Link href="/" className="flex items-center gap-2">
             <div className="relative h-9 w-9">
-              <Image src={Company_Logo} alt="SmartED Logo" fill className="object-contain" />
+              <Image src={Company_Logo} alt="SmartPrep Logo" fill className="object-contain" />
             </div>
-            <span className="font-bold text-indigo-700">SmartED AI</span>
+            <span className="font-bold text-indigo-700">SmartPrep AI</span>
           </Link>
 
           <button
