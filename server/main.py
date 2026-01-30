@@ -13,7 +13,7 @@ from routes import performance
 from routes import progress
 from routes import community
 from routes import entrance_news
-
+from routes import voice_chat
 
 
 app = FastAPI(
@@ -44,6 +44,7 @@ app.include_router(performance.router)
 app.include_router(progress.router)
 app.include_router(community.router)
 app.include_router(entrance_news.router)
+app.include_router(voice_chat.router)
 
 @app.get("/")
 def root():

@@ -145,6 +145,35 @@ graph.add_edge("chat_node", END)
 chatbot = graph.compile()
 
 
+# -------------------------
+# Public helper (TEXT / VOICE)
+# -------------------------
+async def chat_with_context(
+    user_id: str,
+    pdf_hash: str,
+    message: str,
+    day: int | None = None,
+    topic: int | None = None,
+    subtopic: int | None = None,
+) -> str:
+    """
+    Unified entry point for:
+    - text chat
+    - voice chat
+    """
+
+    result = await chatbot.ainvoke({
+        "user_id": user_id,
+        "pdf_hash": pdf_hash,
+        "day": day,
+        "topic": topic,
+        "subtopic": subtopic,
+        "messages": [HumanMessage(content=message)],
+    })
+
+    return result["messages"][-1].content
+
+
 
 # if __name__ == "__main__":
     # while True:
