@@ -5,7 +5,13 @@ import { FiEdit, FiTrash2 } from "react-icons/fi";
 import { useState } from "react";
 import { updateBookImage, deletePdfAndData } from "../../api/pdf";
 import CylindricalProgress from "./CylindricalProgress";
+import DayPerformaceBar from "./DayPerformanceBar";
 
+interface DayWiseScore {
+  day: number;
+  score: number;
+  total_questions: number;
+}
 interface StudyBookCardProps {
   book?: {
     id?: number;
@@ -14,6 +20,7 @@ interface StudyBookCardProps {
     image?: string;
     performance_progress?: number; // performance progress
     study_progress?: number; //for dashboard progress
+    day_wise_scores?: DayWiseScore[];
   };
   variant?: "dashboard" | "performance";
   onClick?: () => void;
@@ -137,6 +144,7 @@ export default function StudyBookCard({
         </div>
 
         <h3 className="text-lg font-bold text-gray-800 text-center">{name}</h3>
+        <DayPerformaceBar data={book?.day_wise_scores || []} />
       </div>
     );
   }
