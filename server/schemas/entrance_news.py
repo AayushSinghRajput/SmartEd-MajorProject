@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from datetime import datetime
-from typing import List
+from typing import List, Optional
 
 
 class EntranceNewsItem(BaseModel):
@@ -8,6 +8,7 @@ class EntranceNewsItem(BaseModel):
     title: str
     link: str
     source: str
+    content: Optional[str] = ""
     published_at: datetime
 
 

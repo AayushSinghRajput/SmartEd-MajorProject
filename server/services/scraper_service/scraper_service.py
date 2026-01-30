@@ -1,73 +1,122 @@
 import requests
 from bs4 import BeautifulSoup
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
+from datetime import datetime
+from utils.extract_notice_content import extract_notice_content
 
+
+# -------------------------
+# Common Headers
+# -------------------------
 HEADERS = {
-    "User-Agent": "Mozilla/5.0"
+    "User-Agent": (
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+        "AppleWebKit/537.36 (KHTML, like Gecko) "
+        "Chrome/120.0.0.0 Safari/537.36"
+    ),
+    "Accept-Language": "en-US,en;q=0.9",
 }
+
+# -------------------------
+# Requests Session with Retry
+# -------------------------
+def get_session():
+    session = requests.Session()
+    retries = Retry(
+        total=3,
+        backoff_factor=2,
+        status_forcelist=[429, 500, 502, 503, 504],
+        allowed_methods=["GET"],
+    )
+    adapter = HTTPAdapter(max_retries=retries)
+    session.mount("http://", adapter)
+    session.mount("https://", adapter)
+    return session
 
 # -------------------------
 # Scrape IOE Notices
 # -------------------------
 def scrape_ioe():
     url = "http://entrance.ioe.edu.np/Notice"
-    res = requests.get(url, headers=HEADERS, timeout=15)
+    session = get_session()
+
+    res = session.get(url, headers=HEADERS, timeout=15)
     res.raise_for_status()
 
     soup = BeautifulSoup(res.text, "html.parser")
     notices = []
 
-    # Each notice is inside <a> tag
-    for a in soup.select("a"):
+    for a in soup.find_all("a", href=True):
         title = a.get_text(strip=True)
-        link = a.get("href")
-
-        if title and link and "Notice" in title:
-            # Full absolute URL
+        if title and "notice" in title.lower():
+            link = a["href"]
             full_link = link if link.startswith("http") else f"http://entrance.ioe.edu.np{link}"
-            # Clean title
-            clean_title = title.replace("\r\n", " ").strip()
-            notices.append({
-                "title": clean_title,
-                "link": full_link
-            })
-
-    return notices
-
-
-# -------------------------
-# Scrape IOM Notices
-# -------------------------
-def scrape_iom():
-    url = "https://iom.edu.np/notices/"
-    res = requests.get(url, headers=HEADERS, timeout=15)
-    res.raise_for_status()
-
-    soup = BeautifulSoup(res.text, "html.parser")
-    notices = []
-
-    # IOM notices are inside ul > li > a
-    for a in soup.select("ul li a"):
-        title = a.get_text(strip=True)
-        link = a.get("href")
-        if title and link:
-            # Full absolute URL if needed
-            full_link = link if link.startswith("http") else f"https://iom.edu.np{link}"
+            notices.append({"title": title, "link": full_link})
+            content = extract_notice_content(full_link,session)
             notices.append({
                 "title": title,
-                "link": full_link
+                "link": full_link,
+                "content": content,
+                "source": "IOE",
+                "published_at":datetime.utcnow()
             })
 
     return notices
 
+# -------------------------
+# Scrape IOM Notices (FIXED)
+# -------------------------
+def scrape_iom():
+    session = get_session()
+    urls = [
+        "http://iom.edu.np/notices/",   # HTTP works better
+        "https://iom.edu.np/notices/"  # fallback
+    ]
+
+    for url in urls:
+        try:
+            res = session.get(
+                url,
+                headers=HEADERS,
+                timeout=20,
+                verify=False  # important for iom.edu.np
+            )
+            res.raise_for_status()
+
+            soup = BeautifulSoup(res.text, "html.parser")
+            notices = []
+
+            for a in soup.find_all("a", href=True):
+                title = a.get_text(strip=True)
+                link = a["href"]
+
+                if title and "/notices/" in link:
+                    full_link = link if link.startswith("http") else f"{url.rstrip('/')}{link}"
+                    notices.append({"title": title, "link": full_link})
+                    content = extract_notice_content(full_link,session)
+                    notices.append({
+                        "title": title,
+                        "link": full_link,
+                        "content": content,
+                        "source": "IOM",
+                        "published_at":datetime.utcnow()
+                    })
+
+
+            return notices
+
+        except requests.RequestException:
+            continue
+
+    # If both fail
+    return []
 
 # -------------------------
-# Scrape all notices
+# Scrape All Notices
 # -------------------------
 def scrape_all_news():
-    """
-    Returns all notices from IOE and IOM
-    """
     return {
         "IOE": scrape_ioe(),
-        "IOM": scrape_iom()
+        "IOM": scrape_iom(),
     }
