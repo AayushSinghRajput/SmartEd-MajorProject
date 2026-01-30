@@ -1,7 +1,7 @@
-from fastapi import APIRouter , HTTPException
+from fastapi import APIRouter, HTTPException
 from schemas.entrance_news import EntranceNewsResponse
-from db.entrance_news_repo import get_news
-from services.scraper_service.scraper_service import scrape_ioe , scrape_iom
+from db.entrance_news_repo import get_news, save_news
+from services.scraper_service.scraper_service import scrape_ioe, scrape_iom
 from services.scheduler_service.scheduler_service import start_scheduler
 
 router = APIRouter(
@@ -9,38 +9,30 @@ router = APIRouter(
     tags=["Entrance News"]
 )
 
-
-# Start scheduler when route is loaded
 start_scheduler()
-
 
 @router.post("/scrape")
 async def scrape_news():
     try:
-        # Scrape the news
         ioe_news = scrape_ioe()
         iom_news = scrape_iom()
 
-        # Add exam field to each news item
         ioe_news = [{"exam": "IOE", **item} for item in ioe_news]
         iom_news = [{"exam": "IOM", **item} for item in iom_news]
 
-        # Save to MongoDB
-        from db.entrance_news_repo import save_news
         await save_news("IOE", ioe_news)
         await save_news("IOM", iom_news)
 
         return {
             "message": "Scraping completed and saved to DB",
             "result": {
-                "IOE": ioe_news,
-                "IOM": iom_news
+                "IOE": len(ioe_news),
+                "IOM": len(iom_news)
             }
         }
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
 
 
 @router.get("/ioe", response_model=EntranceNewsResponse)
