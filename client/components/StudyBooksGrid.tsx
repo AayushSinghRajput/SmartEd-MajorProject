@@ -5,7 +5,7 @@ import StudyBookCard from "../components/ui/Card";
 import { getUserBooks } from "../api/pdf";
 import Loader from "../components/ui/Loader";
 import { TAB_HEADERS } from "../lib/studygridconstants";
-
+import { fetchPerformance } from "../api/performance";
 interface StudyBook {
   id: number;
   pdf_hash: string;
@@ -14,6 +14,11 @@ interface StudyBook {
   performance_progress?: number;
   study_progress?: number;
   pdf_url: string;
+  day_wise_scores?: {
+    day: number;
+    score: number;
+    total_questions: number;
+  }[];
 }
 
 interface StudyBooksGridProps {
@@ -29,21 +34,44 @@ export default function StudyBooksGrid({
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getUserBooks()
-      .then((data) => {
-        const mappedBooks = (data.books || []).map((book: StudyBook) => ({
-          id: book.id,
-          pdf_hash: book.pdf_hash,
-          name: book.name || "Untitled Book",
-          image: book.image || "/images/Company_Logo.png",
-          performance_progress: book.performance_progress ?? 0,
-          study_progress: book.study_progress ?? 0,
-          pdf_url: book.pdf_url || "#",
-        }));
-        setBooks(mappedBooks);
-      })
-      .catch(console.error)
-      .finally(() => setLoading(false));
+    const loadBooks = async () => {
+      try {
+        const data = await getUserBooks();
+
+        const booksWithPerformance = await Promise.all(
+          (data.books || []).map(async (book: StudyBook) => {
+            let dayWiseScores: {
+              day: number;
+              score: number;
+              total_questions: number;
+            }[] = [];
+
+            try {
+              const perf = await fetchPerformance(book.pdf_hash);
+              dayWiseScores = perf?.day_wise_scores || [];
+            } catch (err) {
+              console.error("Performance fetch failed", err);
+            }
+
+            return {
+              ...book,
+              image: book.image || "/images/Company_Logo.png",
+              performance_progress: book.performance_progress ?? 0,
+              study_progress: book.study_progress ?? 0,
+              day_wise_scores: dayWiseScores, // ✅ PASS IT
+            };
+          }),
+        );
+
+        setBooks(booksWithPerformance);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadBooks();
   }, []);
 
   const handleDeleteBook = (pdf_hash: string) => {
