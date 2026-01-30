@@ -13,6 +13,9 @@ async def save_news(exam: str, news: list):
     # Remove old news
     await entrance_news_collection.delete_many({"exam": exam})
 
+    if not news:
+        return
+
     if news:
         news_to_insert = []
         for item in news:
@@ -35,6 +38,7 @@ async def save_news(exam: str, news: list):
             news_to_insert.append({
                 "exam": exam,
                 "title": item.get("title", ""),
+                "content":item.get("content",""),
                 "link": item.get("link", ""),
                 "source": source,
                 "published_at": published_at,
