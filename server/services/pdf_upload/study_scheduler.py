@@ -71,12 +71,19 @@ def group_by_chapter(flat_topics: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
 def generate_study_schedule_from_toc(toc_data: Dict[str, Any], total_days: int) -> List[Dict[str, Any]]:
     """Distribute topics evenly across days and group by chapter."""
     flat_topics = flatten_toc(toc_data)
-    topics_per_day = max(1, math.ceil(len(flat_topics) / total_days))
+    total_topics = len(flat_topics)
+    
     schedule = []
-    day = 1
-    for i in range(0, len(flat_topics), topics_per_day):
-        day_slice = flat_topics[i:i + topics_per_day]
-        grouped_topics = group_by_chapter(day_slice)
-        schedule.append({"day": day, "topics": grouped_topics})
-        day += 1
+    
+    for day in range(1, total_days + 1):
+        # Calculate start/end indices to distribute topics evenly
+        start_idx = (day - 1) * total_topics // total_days
+        end_idx = day * total_topics // total_days
+        
+        day_slice = flat_topics[start_idx:end_idx]
+        
+        if day_slice:  # Only add day if it has topics
+            grouped_topics = group_by_chapter(day_slice)
+            schedule.append({"day": day, "topics": grouped_topics})
+    
     return schedule
