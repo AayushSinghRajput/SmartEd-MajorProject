@@ -111,10 +111,10 @@ export default function ContactPage() {
             <p>
               📧 Email:{" "}
               <a
-                href="mailto:smarted.ai@gmail.com"
+                href="mailto:smartprep.ai@gmail.com"
                 className="text-blue-400 hover:underline"
               >
-                smarted.ai@gmail.com
+                smartprep.ai@gmail.com
               </a>
             </p>
             <p>

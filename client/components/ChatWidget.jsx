@@ -1,7 +1,13 @@
 "use client";
 
-import { useState } from "react";
-import { FaPaperPlane, FaTimes, FaRobot } from "react-icons/fa";
+import { useState, useRef } from "react";
+import {
+  FaPaperPlane,
+  FaTimes,
+  FaRobot,
+  FaMicrophone,
+  FaStop,
+} from "react-icons/fa";
 import ReactMarkdown from "react-markdown";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
@@ -18,8 +24,15 @@ export default function ChatWidget({ metaData, selectedSubtopic }) {
   const [isOpen, setIsOpen] = useState(false);
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
+  const [isRecording, setIsRecording] = useState(false);
 
-  const { askChatbot, loading } = useChatbot({ metaData, selectedSubtopic });
+  const mediaRecorderRef = useRef(null);
+  const audioChunksRef = useRef([]);
+
+  const { askChatbot, askChatbotWithVoice, loading } = useChatbot({
+    metaData,
+    selectedSubtopic,
+  });
 
   const toggleChat = () => setIsOpen((prev) => !prev);
 
@@ -50,6 +63,62 @@ export default function ChatWidget({ metaData, selectedSubtopic }) {
     }
   };
 
+  // ---------------------------
+  // 🎤 VOICE RECORDING
+  // ---------------------------
+  const toggleRecording = async () => {
+    if (isRecording) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+      return;
+    }
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+      const mediaRecorder = new MediaRecorder(stream, {
+        mimeType: "audio/webm;codecs=opus",
+      }); // ✅ WebM/Opus for API
+      mediaRecorderRef.current = mediaRecorder;
+      audioChunksRef.current = [];
+
+      mediaRecorder.ondataavailable = (e) => {
+        if (e.data.size > 0) audioChunksRef.current.push(e.data);
+      };
+
+      mediaRecorder.onstop = async () => {
+        const audioBlob = new Blob(audioChunksRef.current, {
+          type: "audio/webm",
+        });
+        stream.getTracks().forEach((t) => t.stop());
+
+        setMessages((prev) => [
+          ...prev,
+          { role: "user", text: "🎙️ Voice message sent" },
+        ]);
+
+        try {
+          const botReply = await askChatbotWithVoice(audioBlob);
+          setMessages((prev) => [
+            ...prev,
+            { role: "bot", text: botReply.text || "⚠️ Empty response." },
+          ]);
+        } catch {
+          setMessages((prev) => [
+            ...prev,
+            { role: "bot", text: "⚠️ Voice processing failed. Try again." },
+          ]);
+        }
+      };
+
+      mediaRecorder.start();
+      setIsRecording(true);
+    } catch (err) {
+      console.error("Microphone access denied:", err);
+      alert("Microphone permission is required for voice chat.");
+    }
+  };
+
   const clearChat = () => setMessages([]);
 
   return (
@@ -75,7 +144,6 @@ export default function ChatWidget({ metaData, selectedSubtopic }) {
       {/* Chat Overlay */}
       {isOpen && (
         <div className="fixed bottom-24 right-6 w-96 h-[520px] bg-white rounded-2xl shadow-2xl flex flex-col z-50 border border-gray-200 overflow-hidden">
-          
           {/* Header */}
           <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-4 flex justify-between items-center">
             <div>
@@ -83,7 +151,9 @@ export default function ChatWidget({ metaData, selectedSubtopic }) {
                 <FaRobot /> Study Assistant
               </h2>
               <p className="text-xs opacity-90">
-                {selectedSubtopic?.title || selectedSubtopic?.name || "General Topic"}
+                {selectedSubtopic?.title ||
+                  selectedSubtopic?.name ||
+                  "General Topic"}
               </p>
             </div>
             <div className="flex gap-2">
@@ -106,7 +176,6 @@ export default function ChatWidget({ metaData, selectedSubtopic }) {
 
           {/* Messages Container */}
           <div className="flex-1 p-4 overflow-y-auto bg-gradient-to-b from-gray-50 to-white space-y-4">
-            
             {messages.length === 0 ? (
               <div className="h-full flex flex-col items-center justify-center text-center p-8">
                 <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
@@ -116,7 +185,8 @@ export default function ChatWidget({ metaData, selectedSubtopic }) {
                   Study Chat Assistant
                 </h3>
                 <p className="text-sm text-gray-500 mb-4">
-                  Ask questions about the current topic to get instant explanations and help.
+                  Ask questions about the current topic to get instant
+                  explanations and help.
                 </p>
                 <div className="text-xs text-gray-400 bg-gray-100 px-3 py-2 rounded-lg">
                   Try: "Can you explain this concept?" or "Give me an example"
@@ -130,13 +200,15 @@ export default function ChatWidget({ metaData, selectedSubtopic }) {
                 >
                   <div
                     className={`max-w-[85%] rounded-2xl px-4 py-3 transition-all
-                      ${msg.role === "user"
-                        ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-br-none"
-                        : "bg-gray-100 text-gray-800 rounded-bl-none border border-gray-200"
+                      ${
+                        msg.role === "user"
+                          ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-br-none"
+                          : "bg-gray-100 text-gray-800 rounded-bl-none border border-gray-200"
                       }`}
                   >
                     {msg.role === "bot" ? (
-                      <div className="prose prose-sm max-w-none 
+                      <div
+                        className="prose prose-sm max-w-none 
                                       prose-headings:text-base prose-headings:font-bold 
                                       prose-p:my-1.5 prose-li:my-0.5 
                                       prose-ol:list-decimal prose-ul:list-disc 
@@ -144,7 +216,8 @@ export default function ChatWidget({ metaData, selectedSubtopic }) {
                                       prose-em:text-gray-600 
                                       prose-blockquote:border-l-4 prose-blockquote:border-indigo-400 
                                       prose-blockquote:bg-indigo-50 prose-blockquote:px-3 
-                                      prose-code:bg-gray-200 prose-code:px-1 rounded-md">
+                                      prose-code:bg-gray-200 prose-code:px-1 rounded-md"
+                      >
                         <ReactMarkdown
                           remarkPlugins={[remarkMath]}
                           rehypePlugins={[rehypeKatex]}
@@ -170,12 +243,27 @@ export default function ChatWidget({ metaData, selectedSubtopic }) {
               <input
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && sendMessage()}
+                onKeyDown={(e) =>
+                  e.key === "Enter" && !e.shiftKey && sendMessage()
+                }
                 placeholder="Ask a question about this topic..."
                 className="flex-1 border border-gray-300 rounded-xl px-4 py-3 text-sm
                            focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                disabled={!selectedSubtopic}
+                disabled={!selectedSubtopic && isRecording}
               />
+              {/* 🎤 Voice Button */}
+              <button
+                onClick={toggleRecording}
+                disabled={!selectedSubtopic || loading}
+                className={`p-3 rounded-xl transition
+                ${
+                  isRecording
+                    ? "bg-red-500 text-white animate-pulse"
+                    : "bg-gray-200 hover:bg-gray-300"
+                }`}
+              >
+                {isRecording ? <FaStop /> : <FaMicrophone />}
+              </button>
               <button
                 onClick={sendMessage}
                 disabled={loading || !message.trim() || !selectedSubtopic}

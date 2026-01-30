@@ -51,3 +51,53 @@ export const sendChatMessage = async (payload) => {
     throw error;
   }
 };
+
+
+// ---------------------------
+// Send voice chat (audio -> text -> chatbot)
+// ---------------------------
+export const sendVoiceChatMessage = async ({
+  audioFile,     // File or Blob
+  user_id,
+  pdf_hash,
+  day = null,
+  topic = null,
+  subtopic = null,
+}) => {
+  console.log("[VoiceChatAPI] Sending voice message");
+
+  const formData = new FormData();
+  formData.append("audio", audioFile);
+  formData.append("user_id", user_id);
+  formData.append("pdf_hash", pdf_hash);
+
+  if (day !== null) formData.append("day", day);
+  if (topic !== null) formData.append("topic", topic);
+  if (subtopic !== null) formData.append("subtopic", subtopic);
+
+  try {
+    const response = await fetch(`${API_URL}/voice/chat`, {
+      method: "POST",
+      headers: getAuthHeaders(true), // ❗ multipart → no Content-Type
+      credentials: "include",        // keep cookie auth consistent
+      body: formData,
+    });
+
+    const data = await handleResponse(response);
+    console.log("[VoiceChatAPI] Raw API response:", data);
+
+    /*
+      Expected backend response:
+      {
+        input_text: "...",
+        response: "...",
+        mode: "voice"
+      }
+    */
+
+    return data;
+  } catch (error) {
+    console.error("[VoiceChatAPI] Error:", error);
+    throw error;
+  }
+};

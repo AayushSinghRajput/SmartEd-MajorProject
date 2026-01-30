@@ -26,11 +26,11 @@ export default function Footer() {
           >
             <div className="flex items-center gap-2 mb-3">
               <FaBookOpen className="text-3xl text-yellow-300" />
-              <h2 className="text-2xl font-bold">SmartED AI</h2>
+              <h2 className="text-2xl font-bold">SmartPrep AI</h2>
             </div>
             <p className="text-gray-200">
               Personalized AI-powered learning platform for +2 Science students.
-              Learn smarter, revise faster, and succeed with SmartED AI.
+              Learn smarter, revise faster, and succeed with SmartPrep AI.
             </p>
           </motion.div>
 
