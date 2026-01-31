@@ -1,8 +1,8 @@
-# 🎓 SmartEd - AI-Powered Learning Platform
+# 🎓 SmartPrep - AI-Powered Learning Platform
 
 <div align="center">
 
-![SmartEd Banner](https://img.shields.io/badge/SmartEd-AI%20Learning%20Platform-blue?style=for-the-badge)
+![SmartPrep Banner](https://img.shields.io/badge/SmartPrep-AI%20Learning%20Platform-blue?style=for-the-badge)
 [![Next.js](https://img.shields.io/badge/Next.js-15.5.3-black?style=flat-square&logo=next.js)](https://nextjs.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-Latest-009688?style=flat-square&logo=fastapi)](https://fastapi.tiangolo.com/)
 [![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
@@ -18,7 +18,7 @@
 
 ## 📖 Overview
 
-**SmartEd** is an AI-powered educational platform designed specifically for **+2 science students** preparing for board exams and entrance tests. It acts as a virtual teacher that converts PDFs/textbooks into structured daily lessons, generates intelligent assessments, and adapts to each student's learning capability using advanced AI algorithms.
+**SmartPrep** is an AI-powered educational platform designed specifically for **+2 science students** preparing for board exams and entrance tests. It acts as a virtual teacher that converts PDFs/textbooks into structured daily lessons, generates intelligent assessments, and adapts to each student's learning capability using advanced AI algorithms.
 
 ### 🎯 Problem Statement
 
@@ -31,7 +31,7 @@ Students often struggle with:
 
 ### 💡 Solution
 
-SmartEd addresses these challenges by providing:
+SmartPrep addresses these challenges by providing:
 - **Automated Schedule Generation**: AI creates personalized day-wise study plans from uploaded PDFs
 - **Intelligent Content Delivery**: Breaks down complex topics into digestible subtopics
 - **Dynamic Assessment**: Generates contextual MCQs and mock tests
@@ -306,37 +306,39 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-Create a `.env` file in the `server` directory:
+Create a `.env` file in the `server` directory with the following variables:
 
 ```env
 # LLM API Keys (Choose at least one)
-GOOGLE_API_KEY=your_google_api_key_here
-GROQ_API_KEY=your_groq_api_key_here
-AZURE_OPENAI_API_KEY=your_azure_api_key_here
-AZURE_OPENAI_ENDPOINT=your_azure_endpoint_here
-AZURE_OPENAI_DEPLOYMENT=your_deployment_name_here
+GOOGLE_API_KEY=<your_google_api_key>
+GROQ_API_KEY=<your_groq_api_key>
+AZURE_OPENAI_API_KEY=<your_azure_openai_key>
+AZURE_OPENAI_ENDPOINT=<your_azure_endpoint>
+AZURE_OPENAI_DEPLOYMENT=<your_deployment_name>
 AZURE_OPENAI_API_VERSION=2024-02-15-preview
 
 # Google Search (for entrance news scraping)
-GOOGLE_SEARCH_API_KEY=your_google_search_api_key_here
-GOOGLE_SEARCH_ENGINE_ID=your_search_engine_id_here
+GOOGLE_SEARCH_API_KEY=<your_google_search_key>
+GOOGLE_SEARCH_ENGINE_ID=<your_search_engine_id>
 
 # Database Configuration
 MONGO_URI=mongodb://localhost:27017/
-DB_NAME=smarted_db
+DB_NAME=smartprep_db
 
 # JWT Configuration
-JWT_SECRET=your_secure_random_string_here
+JWT_SECRET=<your_secure_random_string>
 JWT_ALGORITHM=HS256
 
 # Cloudinary Configuration
-CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
-CLOUDINARY_API_KEY=your_cloudinary_api_key
-CLOUDINARY_API_SECRET=your_cloudinary_api_secret
+CLOUDINARY_CLOUD_NAME=<your_cloud_name>
+CLOUDINARY_API_KEY=<your_api_key>
+CLOUDINARY_API_SECRET=<your_api_secret>
 
-# OCR Paths (Windows example)
+# OCR Paths
+# Windows:
 POPPLER_PATH=C:/Program Files/poppler/Library/bin
 TESSERACT_PATH=C:/Program Files/Tesseract-OCR/tesseract.exe
+# Linux/Mac: Update with your installation paths
 
 # Environment
 ENV=development
@@ -351,12 +353,12 @@ cd ../client
 npm install
 ```
 
-Create a `.env.local` file in the `client` directory:
+Create a `.env.local` file in the `client` directory with the following variables:
 
 ```env
-# Clerk Authentication (Get from clerk.com)
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
-CLERK_SECRET_KEY=your_clerk_secret_key
+# Clerk Authentication
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=<your_clerk_publishable_key>
+CLERK_SECRET_KEY=<your_clerk_secret_key>
 
 # Backend API URL
 NEXT_PUBLIC_API_URL=http://localhost:8000
@@ -760,8 +762,14 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 👥 Team
 
-**Developer**: Aayush Singh Rajput
-- GitHub: [@AayushSinghRajput](https://github.com/AayushSinghRajput)
+SmartPrep is developed by a dedicated team of passionate engineers:
+
+| Name | Role |
+|------|------|
+| **Aayush Kumar Singh** | Full-Stack Developer |
+| **Bhanu Prasad Chaudhary** | Backend Developer & ML Engineer |
+| **Bibisha Basnet** | Frontend Developer & UI/UX Designer |
+| **Bishal Sharma** | Database & DevOps Engineer |
 
 ---
 
@@ -779,7 +787,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 Support
 
-For support, email aayushsinghrajput3003@gmail.com or open an issue in the GitHub repository.
+For support, please open an issue in the GitHub repository and our team will respond as soon as possible.
 
 ---
 
