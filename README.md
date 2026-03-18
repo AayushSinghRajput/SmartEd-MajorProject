@@ -172,7 +172,6 @@ SmartPrep addresses these challenges by providing:
 ┌─────────────────────────────────────────────────────────────────┐
 │                    External Services                            │
 │  • Google Gemini / Groq / Azure OpenAI (LLM)                   │
-│  • Clerk Authentication                                         │
 │  • Google Custom Search API                                     │
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -233,7 +232,6 @@ User requests MCQs → Check cache
 ### Frontend
 - **Framework**: Next.js 15.5.3 with React 19
 - **Styling**: Tailwind CSS 4.0
-- **Authentication**: Clerk (@clerk/nextjs)
 - **Animations**: Framer Motion, Lottie React, AOS
 - **Charts**: Chart.js with react-chartjs-2
 - **Markdown**: React Markdown with KaTeX support
@@ -260,8 +258,8 @@ User requests MCQs → Check cache
 - **PDF Processing**: PyMuPDF, PyPDF, ReportLab
 - **Web Scraping**: BeautifulSoup4, Requests
 - **Task Scheduling**: APScheduler
-- **Authentication**: JWT (PyJWT)
-- **Security**: Passlib with Argon2
+- **Authentication**: JWT (PyJWT) with Argon2 password hashing
+- **Security**: Passlib with Argon2, HttpOnly Cookies, CORS protection
 
 ### AI/ML Models
 - **Embeddings**: sentence-transformers/all-MiniLM-L6-v2
@@ -398,8 +396,9 @@ The frontend will be available at: `http://localhost:3000`
 #### For Students:
 
 1. **Sign Up / Login**
-   - Create an account using email
-   - Secured with Clerk authentication
+   - Create an account with email and password
+   - Passwords secured with Argon2 hashing
+   - JWT tokens stored in HttpOnly cookies
 
 2. **Upload Study Material**
    - Go to Dashboard → Click "Upload PDF"
@@ -554,12 +553,23 @@ SmartEd-MajorProject/
 
 ## 🔒 Security Features
 
-- **JWT Authentication**: Secure token-based authentication
-- **Password Hashing**: Argon2 algorithm for password security
-- **CORS Protection**: Configured CORS middleware
-- **Input Validation**: Pydantic schemas for request validation
-- **Protected Routes**: Middleware-based route protection
-- **Environment Variables**: Sensitive data in .env files
+### Authentication & Authorization
+- **JWT (JSON Web Tokens)**: Custom token-based authentication with PyJWT
+  - Uses HS256 algorithm
+  - 7-day expiration
+  - Tokens stored in HttpOnly cookies (secure from XSS attacks)
+- **Password Security**: Argon2 algorithm via Passlib for robust password hashing
+- **Custom Auth Middleware**: Route protection with `get_current_user()` dependency injection
+- **Token Validation**: Automatic verification on protected endpoints
+
+### Data Protection
+- **CORS Protection**: Configured CORS middleware for safe cross-origin requests
+- **Input Validation**: Pydantic schemas for strict request validation
+- **Environment Variables**: Sensitive credentials stored in `.env` files (not in code)
+- **Cookie Security**:
+  - HttpOnly flag (prevents JavaScript access)
+  - SameSite=Lax (CSRF protection)
+  - Secure flag in production (HTTPS only)
 
 ---
 
@@ -585,9 +595,8 @@ SmartEd-MajorProject/
   _id: ObjectId,
   username: String,
   email: String,
-  password: String (hashed),
-  created_at: DateTime,
-  clerk_id: String (optional)
+  password: String (Argon2 hashed),
+  created_at: DateTime
 }
 ```
 
@@ -766,10 +775,10 @@ SmartPrep is developed by a dedicated team of passionate engineers:
 
 | Name | Role |
 |------|------|
-| **Aayush Kumar Singh** | Full-Stack Developer |
-| **Bhanu Prasad Chaudhary** | Backend Developer & ML Engineer |
+| **Aayush Kumar Singh** | Full-Stack Developer & Database |
+| **Bhanu Prasad Chaudhary** | Backend Developer  |
 | **Bibisha Basnet** | Frontend Developer & UI/UX Designer |
-| **Bishal Sharma** | Database & DevOps Engineer |
+| **Bishal Sharma** | ML Engineer |
 
 ---
 
