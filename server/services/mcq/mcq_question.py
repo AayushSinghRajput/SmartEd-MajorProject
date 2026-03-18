@@ -1,6 +1,6 @@
 import random
 from concurrent.futures import ThreadPoolExecutor, as_completed
-
+from services.mcq.check_question import validate_and_fix_mcqs
 from services.mcq.keyword_extractor import extract_keywords
 from services.mcq.question import generate_question
 from services.mcq.distractor_generator import generate_distractors
@@ -55,6 +55,9 @@ def mcq_generator(context: str, num_questions: int = 5):
         for future in as_completed(futures):
             mcqs.append(future.result())
 
+    print("validated mcq is called and returned")
+    mcqs = validate_and_fix_mcqs(context, mcqs)
+    
     return mcqs
 
 
