@@ -354,6 +354,10 @@ npm install
 Create a `.env.local` file in the `client` directory with the following variables:
 
 ```env
+# Clerk Authentication
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=<your_clerk_publishable_key>
+CLERK_SECRET_KEY=<your_clerk_secret_key>
+
 # Backend API URL
 NEXT_PUBLIC_API_URL=http://localhost:8000
 ```
