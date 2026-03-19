@@ -22,14 +22,13 @@ export const useMockTest = () => {
     setIsLoading(true);
     try {
       const data = await getMockTest(mockType);
-
-      if (!data?.data || data.data.length === 0) {
+      console.log(data);
+      if (!data?.data) {
         toast.error("No mock test found");
         return;
       }
-
       // Set initial states
-      setExamData(data.data[0]);
+      setExamData(data.data);
       setCurrentQuestion(0);
       setAnswers({});
       setScore(0);

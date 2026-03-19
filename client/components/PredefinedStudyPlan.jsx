@@ -7,6 +7,7 @@ import { getGlobalPlan } from "../api/predefined";
 import StudyPlanModal from "./PredefinedPlan/StudyPlanModal";
 import toast from "react-hot-toast";
 import { colors } from "../constants/colors";
+import { FaBookOpen, FaStar } from "react-icons/fa";
 
 export default function PredefinedStudyPlan() {
   const [showAll, setShowAll] = useState(false);
@@ -67,10 +68,8 @@ export default function PredefinedStudyPlan() {
     },
   };
 
-
-
   return (
-    <motion.div 
+    <motion.div
       className="p-6 md:p-8 lg:p-12"
       style={{ background: colors.gradients.subtle }}
       initial={{ opacity: 0 }}
@@ -79,30 +78,44 @@ export default function PredefinedStudyPlan() {
     >
       <div className="max-w-7xl mx-auto">
         {/* Header Section */}
-        <motion.div 
+        <motion.div
           className="text-center mb-12 md:mb-16"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full mb-6"
-               style={{ background: colors.gradients.primary }}>
-            <span className="text-2xl text-white">📚</span>
+          <div
+            className="inline-flex items-center justify-center w-16 h-16 rounded-full mb-6
+                        shadow-lg transition-transform duration-300 "
+            style={{
+              background: "linear-gradient(145deg, #6b73ff, #000dff)",
+              boxShadow:
+                "8px 8px 15px rgba(0,0,0,0.2), -8px -8px 15px rgba(255,255,255,0.3)",
+            }}
+          >
+            <span className="text-2xl text-white">
+              <FaBookOpen />
+            </span>
           </div>
-          
-          <h2 className="text-4xl md:text-5xl font-bold mb-4"
-              style={{ color: colors.primary[900] }}>
+
+          <h2
+            className="text-4xl md:text-5xl font-bold mb-4"
+            style={{ color: colors.primary[900] }}
+          >
             30-Day Smart Study Plans
           </h2>
-          
-          <p className="text-lg md:text-xl mb-8 max-w-3xl mx-auto"
-             style={{ color: colors.primary[600] }}>
-            AI-curated daily roadmaps designed to maximize your entrance exam preparation efficiency
+
+          <p
+            className="text-lg md:text-xl mb-8 max-w-3xl mx-auto"
+            style={{ color: colors.primary[600] }}
+          >
+            AI-curated daily roadmaps designed to maximize your entrance exam
+            preparation efficiency
           </p>
         </motion.div>
 
         {/* Cards Grid */}
-        <motion.div 
+        <motion.div
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8"
           variants={containerVariants}
           initial="hidden"
@@ -118,15 +131,15 @@ export default function PredefinedStudyPlan() {
                   layout
                   className="group relative"
                 >
-                  <div className="h-full bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 flex flex-col transform hover:scale-[1.02]">
+                  <div className="h-full bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col transform hover:scale-[1.02]">
                     {/* Level Badge */}
                     {book.level && (
                       <div className="absolute top-4 left-4 z-10">
-                        <span 
+                        <span
                           className="px-3 py-1 rounded-full text-xs font-semibold"
-                          style={{ 
+                          style={{
                             background: colors.accent.amber[100],
-                            color: colors.accent.amber[500]
+                            color: colors.accent.amber[500],
                           }}
                         >
                           {book.level}
@@ -137,9 +150,13 @@ export default function PredefinedStudyPlan() {
                     {/* Rating & Views */}
                     <div className="absolute top-4 right-4 z-10 flex items-center gap-2">
                       <div className="flex items-center gap-1 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-lg shadow-sm">
-                        <span className="text-amber-500">⭐</span>
-                        <span className="text-sm font-bold"
-                              style={{ color: colors.neutral[800] }}>
+                        <span className="text-amber-500 text-2xl">
+                          <FaStar />
+                        </span>
+                        <span
+                          className="text-sm font-bold"
+                          style={{ color: colors.neutral[800] }}
+                        >
                           {book.rating || "N/A"}
                         </span>
                       </div>
@@ -150,19 +167,23 @@ export default function PredefinedStudyPlan() {
                       <img
                         src={book.img}
                         alt={book.subject}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                        className="w-full h-full object-cover "
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
-                      
+
                       {/* Progress Bar - if completion exists */}
                       {book.completion && (
                         <div className="absolute bottom-4 left-4 right-4">
                           <div className="mb-1 flex justify-between">
-                            <span className="text-xs font-medium text-white">Progress</span>
-                            <span className="text-xs font-bold text-white">{book.completion}%</span>
+                            <span className="text-xs font-medium text-white">
+                              Progress
+                            </span>
+                            <span className="text-xs font-bold text-white">
+                              {book.completion}%
+                            </span>
                           </div>
                           <div className="h-1.5 bg-white/30 rounded-full overflow-hidden">
-                            <motion.div 
+                            <motion.div
                               className="h-full rounded-full"
                               style={{ background: colors.gradients.primary }}
                               initial={{ width: 0 }}
@@ -177,13 +198,18 @@ export default function PredefinedStudyPlan() {
                     {/* Card Content */}
                     <div className="p-6 flex-grow flex flex-col">
                       <div className="mb-4">
-                        <h3 className="text-xl font-bold mb-2"
-                            style={{ color: colors.neutral[900] }}>
+                        <h3
+                          className="text-xl font-bold mb-2"
+                          style={{ color: colors.neutral[900] }}
+                        >
                           {book.subject}
                         </h3>
-                        <p className="text-sm mb-4"
-                           style={{ color: colors.neutral[600] }}>
-                          Complete {book.duration || "30 Days"} roadmap with daily targets and practice sessions
+                        <p
+                          className="text-sm mb-4"
+                          style={{ color: colors.neutral[600] }}
+                        >
+                          Complete {book.duration || "30 Days"} roadmap with
+                          daily targets and practice sessions
                         </p>
                       </div>
 
@@ -192,33 +218,46 @@ export default function PredefinedStudyPlan() {
                         <div className="flex items-center justify-between mb-4">
                           <div className="flex items-center gap-2">
                             <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-white shadow-sm">
-                              <div className="w-full h-full flex items-center justify-center text-xs font-bold"
-                                   style={{ 
-                                     background: colors.primary[100],
-                                     color: colors.primary[700]
-                                   }}>
-                                {book.author?.split(' ').map(n => n[0]).join('') || "?"}
+                              <div
+                                className="w-full h-full flex items-center justify-center text-xs font-bold"
+                                style={{
+                                  background: colors.primary[100],
+                                  color: colors.primary[700],
+                                }}
+                              >
+                                {book.author
+                                  ?.split(" ")
+                                  .map((n) => n[0])
+                                  .join("") || "?"}
                               </div>
                             </div>
                             <div>
-                              <p className="text-xs"
-                                 style={{ color: colors.neutral[500] }}>
+                              <p
+                                className="text-xs"
+                                style={{ color: colors.neutral[500] }}
+                              >
                                 Author
                               </p>
-                              <p className="text-sm font-medium"
-                                 style={{ color: colors.neutral[800] }}>
+                              <p
+                                className="text-sm font-medium"
+                                style={{ color: colors.neutral[800] }}
+                              >
                                 {book.author || "Unknown"}
                               </p>
                             </div>
                           </div>
-                          
+
                           <div className="text-right">
-                            <p className="text-xs"
-                               style={{ color: colors.neutral[500] }}>
+                            <p
+                              className="text-xs"
+                              style={{ color: colors.neutral[500] }}
+                            >
                               Duration
                             </p>
-                            <p className="text-sm font-semibold"
-                               style={{ color: colors.primary[600] }}>
+                            <p
+                              className="text-sm font-semibold"
+                              style={{ color: colors.primary[600] }}
+                            >
                               {book.duration || "30 Days"}
                             </p>
                           </div>
@@ -226,25 +265,40 @@ export default function PredefinedStudyPlan() {
 
                         {/* Action Button */}
                         <button
-                          onClick={() => handleViewDetails(book.subject, book.id)}
+                          onClick={() =>
+                            handleViewDetails(book.subject, book.id)
+                          }
                           disabled={loading && loadingCardId === book.id}
-                          className="w-full py-3 px-4 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-2 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
-                          style={{ 
-                            background: colors.gradients.primary,
-                            color: 'white'
-                          }}
+                          className="w-full bg-indigo-600 text-white px-8 py-3 rounded-lg shadow-[3px_3px_6.4px_1px_#9E9999] transition-shadow duration-300 hover:shadow-[5px_5px_8px_2px_rgba(139,92,246,0.75)] flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           {loading && loadingCardId === book.id ? (
                             <>
-                              <svg className="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
-                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+                              <svg
+                                className="animate-spin h-4 w-4 text-white"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                              >
+                                <circle
+                                  className="opacity-25"
+                                  cx="12"
+                                  cy="12"
+                                  r="10"
+                                  stroke="currentColor"
+                                  strokeWidth="4"
+                                />
+                                <path
+                                  className="opacity-75"
+                                  fill="currentColor"
+                                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                />
                               </svg>
                               Loading...
                             </>
                           ) : (
                             <>
-                              <span>📖</span>
+                              <span className="text-2xl text-white">
+                                <FaBookOpen />
+                              </span>
                               View 30-Day Plan
                               <span className="ml-auto">→</span>
                             </>
@@ -260,7 +314,7 @@ export default function PredefinedStudyPlan() {
         </motion.div>
 
         {/* View More Button */}
-        <motion.div 
+        <motion.div
           className="mt-12 text-center"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -269,65 +323,70 @@ export default function PredefinedStudyPlan() {
           <button
             onClick={() => setShowAll(!showAll)}
             className="px-8 py-3.5 rounded-xl font-bold transition-all duration-300 flex items-center justify-center gap-2 mx-auto shadow-lg hover:shadow-xl active:scale-95"
-            style={{ 
+            style={{
               background: showAll ? colors.neutral[100] : colors.primary[50],
               color: showAll ? colors.neutral[700] : colors.primary[700],
-              border: `2px solid ${showAll ? colors.neutral[200] : colors.primary[200]}`
+              border: `2px solid ${showAll ? colors.neutral[200] : colors.primary[200]}`,
             }}
           >
             {showAll ? (
-              <>
-                <span>👆</span>
-                Show Less Plans
-              </>
+              <>Show Less Plans</>
             ) : (
               <>
-                <span>👇</span>
                 View More Plans ({books.length - 3})
-                <span className="ml-2 px-2 py-1 text-xs rounded-full"
-                      style={{ 
-                        background: colors.primary[100],
-                        color: colors.primary[700]
-                      }}>
+                <span
+                  className="ml-2 px-2 py-1 text-xs rounded-full"
+                  style={{
+                    background: colors.primary[100],
+                    color: colors.primary[700],
+                  }}
+                >
                   +{books.length - 3}
                 </span>
               </>
             )}
           </button>
-          
+
           {/* Stats */}
           <div className="mt-8 flex flex-wrap items-center justify-center gap-6">
             <div className="text-center">
-              <div className="text-2xl font-bold"
-                   style={{ color: colors.primary[700] }}>
+              <div
+                className="text-2xl font-bold"
+                style={{ color: colors.primary[700] }}
+              >
                 {books.length}+
               </div>
-              <div className="text-sm"
-                   style={{ color: colors.neutral[600] }}>
+              <div className="text-sm" style={{ color: colors.neutral[600] }}>
                 Study Plans
               </div>
             </div>
-            <div className="w-px h-8"
-                 style={{ background: colors.neutral[200] }}></div>
+            <div
+              className="w-px h-8"
+              style={{ background: colors.neutral[200] }}
+            ></div>
             <div className="text-center">
-              <div className="text-2xl font-bold"
-                   style={{ color: colors.primary[700] }}>
+              <div
+                className="text-2xl font-bold"
+                style={{ color: colors.primary[700] }}
+              >
                 4.7
               </div>
-              <div className="text-sm"
-                   style={{ color: colors.neutral[600] }}>
+              <div className="text-sm" style={{ color: colors.neutral[600] }}>
                 Avg Rating
               </div>
             </div>
-            <div className="w-px h-8"
-                 style={{ background: colors.neutral[200] }}></div>
+            <div
+              className="w-px h-8"
+              style={{ background: colors.neutral[200] }}
+            ></div>
             <div className="text-center">
-              <div className="text-2xl font-bold"
-                   style={{ color: colors.primary[700] }}>
+              <div
+                className="text-2xl font-bold"
+                style={{ color: colors.primary[700] }}
+              >
                 75%
               </div>
-              <div className="text-sm"
-                   style={{ color: colors.neutral[600] }}>
+              <div className="text-sm" style={{ color: colors.neutral[600] }}>
                 Success Rate
               </div>
             </div>
