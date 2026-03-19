@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { sendChatMessage } from "../api/chat";
+import { sendChatMessage, sendVoiceChatMessage } from "../api/chat";
 import { useAuth } from "../context/AuthContext";
 
 /**
@@ -113,8 +113,59 @@ export function useChatbot({ metaData, selectedSubtopic }) {
     }
   };
 
+  // ---------------------------
+  // 🎤 VOICE CHAT
+  // ---------------------------
+  const askChatbotWithVoice = async (audioFile) => {
+    if (!user) throw new Error("User not authenticated");
+    if (!selectedSubtopic) throw new Error("No subtopic selected for chat");
+    if (!audioFile) throw new Error("No audio file provided");
+
+    const userId = user?.id ?? user?._id;
+    if (!userId) throw new Error("User not authenticated");
+
+    console.log("[useChatbot] Voice message →", audioFile);
+
+    setLoading(true);
+    try {
+      const response = await sendVoiceChatMessage({
+        audioFile,
+        user_id: userId,
+        pdf_hash: metaData?.fileHash,
+        day: selectedSubtopic.currentDay,
+        topic: selectedSubtopic.topicIdx,
+        subtopic: selectedSubtopic.subtopicIdx,
+      });
+
+      console.log("[useChatbot] Voice response →", response);
+
+      /**
+       * Expected:
+       * {
+       *   input_text: "...",
+       *   response: "...",
+       *   mode: "voice"
+       * }
+       */
+
+      return {
+        text:
+          typeof response?.response === "string"
+            ? response.response
+            : "⚠️ Empty response from voice chatbot.",
+
+        // Optional: expose transcript if UI wants it
+        transcript:
+          typeof response?.input_text === "string" ? response.input_text : null,
+      };
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return {
     askChatbot,
+    askChatbotWithVoice,
     loading,
   };
 }

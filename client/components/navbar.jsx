@@ -82,7 +82,7 @@ export default function Navbar() {
           {/* LOGO */}
           <motion.div  className="flex items-center gap-2">
             <div className="relative h-10 w-10 rounded-lg overflow-hidden shadow bg-white p-1.5">
-              <Image src={Company_Logo} alt="SmartED Logo" fill className="object-contain" />
+              <Image src={Company_Logo} alt="SmartPrep Logo" fill className="object-contain" />
             </div>
             <Link
               href="/"
@@ -165,7 +165,7 @@ export default function Navbar() {
         <div className="flex md:hidden justify-between items-center h-16">
           <Link href="/" className="flex items-center gap-2">
             <div className="relative h-9 w-9">
-              <Image src={Company_Logo} alt="SmartED Logo" fill className="object-contain" />
+              <Image src={Company_Logo} alt="SmartPrep Logo" fill className="object-contain" />
             </div>
             <span className="font-bold text-indigo-700">SmartPrep AI</span>
           </Link>
