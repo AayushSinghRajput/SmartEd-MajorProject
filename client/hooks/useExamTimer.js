@@ -1,9 +1,14 @@
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { TEST_DURATION } from "../lib/constants";
 
-export const useExamTimer = (isRunning, onTimeOver) => {
-  const [timeLeft, setTimeLeft] = useState(TEST_DURATION);
+export const useExamTimer = (isRunning, onTimeOver, initialDuration) => {
+  const [timeLeft, setTimeLeft] = useState(initialDuration);
+
+  useEffect(() => {
+    if (!isRunning) {
+      setTimeLeft(initialDuration);
+    }
+  }, [initialDuration, isRunning]);
 
   useEffect(() => {
     if (!isRunning) return;
@@ -21,7 +26,7 @@ export const useExamTimer = (isRunning, onTimeOver) => {
     return () => clearInterval(timer);
   }, [isRunning, timeLeft, onTimeOver]);
 
-  const resetTimer = () => setTimeLeft(TEST_DURATION);
+  const resetTimer = () => setTimeLeft(initialDuration);
 
   return { timeLeft, resetTimer };
 };

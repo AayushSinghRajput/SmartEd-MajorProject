@@ -152,21 +152,89 @@ export default function SubtopicViewer({
           />
         ) : typeof subtopic?.content === "string" ? (
           <>
-            {/* Markdown */}
+            {/* Markdown with Flashcard Styling */}
             <ReactMarkdown
               remarkPlugins={[remarkMath]}
               rehypePlugins={[rehypeKatex]}
               components={{
+                // H2 headers with emoji support (main sections like 📝 Quick Summary)
                 h2: ({ children }) => (
-                  <h2 className="text-2xl font-bold mt-12 mb-4 flex items-center gap-3">
-                    <span className="h-2 w-2 rounded-full bg-indigo-500" />
+                  <h2 className="text-3xl font-bold mt-10 mb-6 pb-3 border-b-2 border-indigo-200 flex items-center gap-3 text-gray-900">
                     {children}
                   </h2>
                 ),
+
+                // H3 subheaders (subsections)
+                h3: ({ children }) => (
+                  <h3 className="text-xl font-semibold mt-6 mb-3 text-indigo-700 flex items-center gap-2">
+                    <span className="h-2 w-2 rounded-full bg-indigo-500" />
+                    {children}
+                  </h3>
+                ),
+
+                // Paragraphs with better spacing
                 p: ({ children }) => (
-                  <p className="text-gray-700 leading-relaxed text-[17px] mb-5">
+                  <p className="text-gray-700 leading-relaxed text-[17px] mb-4">
                     {children}
                   </p>
+                ),
+
+                // Bullet lists (unordered)
+                ul: ({ children }) => (
+                  <ul className="space-y-3 mb-6 ml-6">{children}</ul>
+                ),
+
+                // List items with custom bullets
+                li: ({ children }) => (
+                  <li className="text-gray-700 leading-relaxed text-[17px] flex items-start gap-3">
+                    <span className="text-indigo-500 font-bold mt-1">•</span>
+                    <span className="flex-1">{children}</span>
+                  </li>
+                ),
+
+                // Numbered lists (ordered)
+                ol: ({ children }) => (
+                  <ol className="space-y-3 mb-6 ml-6 list-decimal list-inside">
+                    {children}
+                  </ol>
+                ),
+
+                // Blockquotes (for "Remember This!" sections)
+                blockquote: ({ children }) => (
+                  <blockquote className="border-l-4 border-indigo-500 bg-indigo-50 pl-6 pr-4 py-4 my-6 rounded-r-lg">
+                    <div className="text-gray-800 font-medium text-lg">
+                      {children}
+                    </div>
+                  </blockquote>
+                ),
+
+                // Horizontal rules (section separators)
+                hr: () => <hr className="my-8 border-t-2 border-gray-200" />,
+
+                // Strong/Bold text (key terms)
+                strong: ({ children }) => (
+                  <strong className="font-bold text-gray-900 bg-yellow-100 px-1 rounded">
+                    {children}
+                  </strong>
+                ),
+
+                // Emphasis/Italic text
+                em: ({ children }) => (
+                  <em className="italic text-indigo-600">{children}</em>
+                ),
+
+                // Code/inline code (formulas, technical terms)
+                code: ({ children }) => (
+                  <code className="bg-gray-100 px-2 py-1 rounded text-sm font-mono text-pink-600">
+                    {children}
+                  </code>
+                ),
+
+                // Code blocks
+                pre: ({ children }) => (
+                  <pre className="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto my-4">
+                    {children}
+                  </pre>
                 ),
               }}
             >

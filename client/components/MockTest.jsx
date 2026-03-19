@@ -5,10 +5,11 @@ import ReactMarkdown from "react-markdown";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import { Toaster } from "react-hot-toast";
-
 import { useMockTest } from "../hooks/useMockTest";
 import { useExamTimer } from "../hooks/useExamTimer";
 import { formatTime } from "../utils/formatTime";
+import { FaBrain, FaCog, FaStethoscope } from "react-icons/fa";
+import { ENGINEERING_TEST_DURATION, MEDICAL_TEST_DURATION } from "../lib/constants";
 
 export default function MockTest() {
   const {
@@ -25,13 +26,15 @@ export default function MockTest() {
     resetMockTest, // Add reset from hook (we’ll define it)
   } = useMockTest();
 
+  const [countdown, setCountdown] = useState(null);
+  const [selectedExam, setSelectedExam] = useState(null);
+
+  const initialDuration = selectedExam === "Medical" ? MEDICAL_TEST_DURATION : ENGINEERING_TEST_DURATION;
+
   const { timeLeft, resetTimer } = useExamTimer(Boolean(examData), () => {
     submitTest();
     resetTimer();
-  });
-
-  const [countdown, setCountdown] = useState(null);
-  const [selectedExam, setSelectedExam] = useState(null);
+  }, initialDuration);
 
   // ------------------------- EFFECT FOR COUNTDOWN -------------------------
   useEffect(() => {
@@ -54,7 +57,7 @@ export default function MockTest() {
 
   const handleManualSubmit = () => {
     const confirmSubmit = window.confirm(
-      "Are you sure you want to submit the test?"
+      "Are you sure you want to submit the test?",
     );
     if (confirmSubmit) {
       submitTest();
@@ -87,8 +90,8 @@ export default function MockTest() {
       key: "Medical",
       title: "Medical",
       subtitle: "MBBS Entrance Preparation",
-      questions: 100,
-      duration: 120,
+      questions: 200,
+      duration: 180,
     },
   ];
 
@@ -120,8 +123,9 @@ export default function MockTest() {
         {!examData ? (
           <>
             {/* INITIAL EXAM SELECT CARDS */}
-            <h1 className="text-3xl font-bold text-indigo-600 mb-4 text-center">
-              🧠 Mock Test
+            <h1 className="text-3xl font-bold text-indigo-600 mb-4 text-center flex items-center justify-center gap-2">
+              <FaBrain className="w-8 h-8" />
+              Mock Test
             </h1>
             <p className="text-gray-600 mb-8 text-center">
               Select your exam type and start practicing with full-length mock
@@ -136,8 +140,12 @@ export default function MockTest() {
                     onClick={() => handleExamSelect(exam.key)}
                     className="cursor-pointer border rounded-xl p-6 hover:shadow-lg transition text-center"
                   >
-                    <div className="text-3xl mb-2">
-                      {exam.key === "Engineering" ? "⚙️" : "❤️"}
+                    <div className="text-3xl mb-2 flex items-center justify-center gap-2">
+                      {exam.key === "Engineering" ? (
+                        <FaCog className="w-8 h-8 text-gray-700" />
+                      ) : exam.key === "Medical" ? (
+                        <FaStethoscope className="w-8 h-8 text-red-500" />
+                      ) : null}
                     </div>
                     <h2 className="font-semibold text-lg">{exam.title}</h2>
                     <p className="text-sm text-gray-500">{exam.subtitle}</p>

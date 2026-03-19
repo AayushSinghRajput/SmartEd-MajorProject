@@ -777,7 +777,7 @@ SmartPrep is developed by a dedicated team of passionate engineers:
 |------|------|
 | **Aayush Kumar Singh** | Full-Stack Developer & Database |
 | **Bhanu Prasad Chaudhary** | Backend Developer  |
-| **Bibisha Basnet** | Frontend Developer & UI/UX Designer |
+| **Ashmita Karki** | Frontend Developer & UI/UX Designer |
 | **Bishal Sharma** | ML Engineer |
 
 ---

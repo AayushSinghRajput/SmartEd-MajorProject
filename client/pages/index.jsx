@@ -75,19 +75,27 @@ export default function Home() {
             variants={textVariants}
             transition={{ delay: 0.2 }}
           >
-            SmartPrep AI empowers students with AI tools to study smarter, not
-            harder. From flashcards to note-taking, we simplify learning using
-            modern AI.
+            SmartPrep AI empowers students to study smarter, not harder. 
+            <br />Upload PDFs to instantly extract notes, master concepts, practice with AI-generated quizzes, and get doubts answered all designed to help you excel in +2 Science and prepare for IOM/IOE entrance exams.
           </motion.p>
           <motion.button
             onClick={handleGetStarted}
-            className="mt-8 bg-indigo-600 text-white px-6 py-3 rounded-full hover:bg-indigo-700 transition"
+            className="
+              mt-8
+              bg-indigo-600 text-white
+              px-12 py-3 rounded-full
+              text-lg font-semibold
+              shadow-[3px_3px_6.4px_1px_#9E9999]
+              transition-shadow duration-300
+              hover:shadow-[5px_5px_8px_2px_rgba(139,92,246,0.75)]
+            "
             variants={buttonVariants}
-            whileHover="hover"
+            
             whileTap="tap"
           >
             Get Started
           </motion.button>
+
         </motion.div>
 
         <motion.div

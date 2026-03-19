@@ -47,22 +47,64 @@ def scrape_ioe():
     soup = BeautifulSoup(res.text, "html.parser")
     notices = []
 
-    for a in soup.find_all("a", href=True):
-        title = a.get_text(strip=True)
-        if title and "notice" in title.lower():
-            link = a["href"]
-            full_link = link if link.startswith("http") else f"http://entrance.ioe.edu.np{link}"
-            notices.append({"title": title, "link": full_link})
-            content = extract_notice_content(full_link,session)
-            notices.append({
-                "title": title,
-                "link": full_link,
-                "content": content,
-                "source": "IOE",
-                "published_at":datetime.utcnow()
-            })
+    table = soup.find("table")
+    if not table:
+        return notices
+
+    rows = table.find_all("tr")[1:]  # skip header row
+
+    for row in rows:
+        cols = row.find_all("td")
+        if len(cols) < 4:
+            continue
+
+        title = cols[1].get_text(strip=True)
+
+        # "View Full Notice" link
+        view_a = cols[3].find("a", href=True)
+        if not view_a:
+            continue
+
+        detail_link = view_a["href"]
+        detail_url = (
+            detail_link if detail_link.startswith("http")
+            else f"http://entrance.ioe.edu.np{detail_link}"
+        )
+
+        # STEP 2: open notice detail page
+        try:
+            detail_res = session.get(detail_url, headers=HEADERS, timeout=15)
+            detail_res.raise_for_status()
+        except Exception:
+            continue
+
+        detail_soup = BeautifulSoup(detail_res.text, "html.parser")
+
+        # STEP 3: find PDF link
+        pdf_a = detail_soup.find("a", href=True)
+        if not pdf_a:
+            continue
+
+        pdf_link = pdf_a["href"]
+        pdf_url = (
+            pdf_link if pdf_link.startswith("http")
+            else f"http://entrance.ioe.edu.np{pdf_link}"
+        )
+
+        # STEP 4: extract PDF content
+        content = extract_notice_content(pdf_url, session)
+
+        notices.append({
+            "title": title,
+            "link": pdf_url,
+            "content": content,
+            "source": "IOE",
+            "published_at": datetime.utcnow()
+        })
 
     return notices
+
+
 
 # -------------------------
 # Scrape IOM Notices (FIXED)

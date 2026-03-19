@@ -55,24 +55,34 @@ export default function Navbar() {
   if (user) centerLinks.push("/community", "/dashboard");
 
   return (
-    <motion.nav
-      initial={{ y: -100 }}
-      animate={{ y: 0 }}
-      transition={{ duration: 0.5, ease: "easeOut" }}
-      className={`
-        fixed top-0 w-full z-50 transition-all duration-300
-        bg-white border-b border-indigo-100
-        ${scrolled ? "shadow-lg" : "shadow-sm"}
-      `}
-    >
+      <motion.nav
+    initial={{ y: -100 }}
+    animate={{ y: 0 }}
+    transition={{ duration: 0.5, ease: "easeOut" }}
+    className={`
+      fixed top-0 w-full z-50
+      bg-white border-b border-indigo-100
+
+      shadow-[0_4px_10px_-3px_rgba(99,102,241,0.12)]
+
+      transition-all duration-300 ease-out
+
+      hover:-translate-y-[1px]
+      hover:shadow-[0_8px_18px_-6px_rgba(15,14,14,0.22)]
+
+      ${scrolled ? "shadow-[0_10px_22px_-8px_rgba(15,14,14,0.28)]" : ""}
+    `}
+  >
+
+    
       <div className="max-w-7xl mx-auto pl-0 pr-6">
         {/* ======================= DESKTOP ======================= */}
         <div className="hidden md:grid grid-cols-[auto_1fr_auto] items-center h-16">
           
           {/* LOGO */}
-          <motion.div whileHover={{ scale: 1.05 }} className="flex items-center gap-2">
+          <motion.div  className="flex items-center gap-2">
             <div className="relative h-10 w-10 rounded-lg overflow-hidden shadow bg-white p-1.5">
-              <Image src={Company_Logo} alt="SmartPrep Logo" fill className="object-contain" />
+              <Image src={Company_Logo} alt="SmartED Logo" fill className="object-contain" />
             </div>
             <Link
               href="/"
@@ -95,52 +105,67 @@ export default function Navbar() {
                 <Link
                   key={link}
                   href={link}
-                  className={`px-4 py-2 rounded-md text-sm font-medium transition ${
-                    pathname === link
-                      ? "text-indigo-700 bg-indigo-50"
-                      : "text-gray-600 hover:text-indigo-600 hover:bg-indigo-50"
-                  }`}
+                  className={`
+                    px-4 py-2 rounded-md text-sm font-medium
+
+                    transition-all duration-200 ease-out
+
+                    ${
+                      pathname === link
+                        ? "text-indigo-700 bg-indigo-50 shadow-[0_2px_6px_-2px_rgba(99,102,241,0.35)]"
+                        : "text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 hover:-translate-y-[1px] hover:shadow-[0_4px_10px_-3px_rgba(99,102,241,0.35)]"
+                    }
+                  `}
                 >
                   {label}
                 </Link>
+
               );
             })}
           </div>
 
           {/* AUTH BUTTONS */}
-          <div className="flex justify-end items-center gap-2">
-            {!user ? (
-              <>
-                <button
-                  onClick={handleLoginClick}
-                  className="flex items-center border border-indigo-200 text-indigo-600 px-4 py-2 rounded-full text-sm hover:bg-indigo-50"
-                >
-                  <FiUser className="mr-1.5" /> Login
-                </button>
-
-                <button
-                  onClick={handleSignupClick}
-                  className="flex items-center bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-4 py-2 rounded-full text-sm"
-                >
-                  <FiAward className="mr-1.5" /> Sign Up
-                </button>
-              </>
-            ) : (
+        <div className="flex justify-end items-center gap-4">
+          {!user ? (
+            <>
               <button
-                onClick={handleSignOut}
-                className="flex items-center bg-red-600 text-white px-4 py-2 rounded-full text-sm hover:bg-red-700"
+                onClick={handleLoginClick}
+                className="flex items-center border border-indigo-200 text-indigo-600 px-4 py-2 rounded-full text-sm 
+                          shadow-[3px_3px_6.4px_1px_#9E9999] 
+                          transition-shadow duration-300 hover:shadow-[5px_5px_8px_2px_rgba(99,102,241,0.45)] 
+                          hover:bg-indigo-50"
               >
-                <FiLogOut className="mr-1.5" /> Sign Out
+                <FiUser className="mr-1.5" /> Login
               </button>
-            )}
-          </div>
+
+              <button
+                onClick={handleSignupClick}
+                className="flex items-center bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-4 py-2 rounded-full text-sm 
+                          shadow-[3px_3px_6.4px_1px_#9E9999] 
+                          transition-shadow duration-300 hover:shadow-[5px_5px_8px_2px_rgba(139,92,246,0.75)]"
+              >
+                <FiAward className="mr-1.5" /> Sign Up
+              </button>
+            </>
+          ) : (
+            <button
+              onClick={handleSignOut}
+              className="flex items-center bg-red-600 text-white px-4 py-2 rounded-full text-sm 
+                        shadow-[3px_3px_6.4px_1px_#9E9999] 
+                        transition-shadow duration-300 hover:shadow-[5px_5px_8px_2px_rgba(139,92,246,0.75)] 
+                        hover:bg-red-700"
+            >
+              <FiLogOut className="mr-1.5" /> Sign Out
+            </button>
+          )}
+        </div>
         </div>
 
         {/* ======================= MOBILE HEADER ======================= */}
         <div className="flex md:hidden justify-between items-center h-16">
           <Link href="/" className="flex items-center gap-2">
             <div className="relative h-9 w-9">
-              <Image src={Company_Logo} alt="SmartPrep Logo" fill className="object-contain" />
+              <Image src={Company_Logo} alt="SmartED Logo" fill className="object-contain" />
             </div>
             <span className="font-bold text-indigo-700">SmartPrep AI</span>
           </Link>

@@ -5,11 +5,22 @@ import {
   getComments,
   addComment,
   updateCommunityPost,
-  deleteCommunityPost
+  deleteCommunityPost,
 } from "../../api/community";
-import { FaEdit, FaTrash } from "react-icons/fa";
+import {
+  FaEdit,
+  FaTrash,
+  FaHeart,
+  FaRegHeart,
+  FaComment,
+} from "react-icons/fa";
 
-export default function PostCard({ post, currentUser, onPostUpdate, onPostDelete }) {
+export default function PostCard({
+  post,
+  currentUser,
+  onPostUpdate,
+  onPostDelete,
+}) {
   const postId = post.id || post._id;
 
   const [likesCount, setLikesCount] = useState(post.likes_count);
@@ -83,7 +94,11 @@ export default function PostCard({ post, currentUser, onPostUpdate, onPostDelete
   // ---------------------------
   const handleEditSave = async () => {
     try {
-      const updatedPost = await updateCommunityPost(postId, editContent, newImages);
+      const updatedPost = await updateCommunityPost(
+        postId,
+        editContent,
+        newImages,
+      );
       onPostUpdate?.(updatedPost);
       setEditing(false);
       setNewImages([]);
@@ -119,17 +134,29 @@ export default function PostCard({ post, currentUser, onPostUpdate, onPostDelete
             {post.author.username[0].toUpperCase()}
           </div>
           <div className="ml-3">
-            <div className="font-semibold text-gray-800">{post.author.username}</div>
-            <div className="text-xs text-gray-500">{post.created_at?.split("T")[0] || "Just now"}</div>
+            <div className="font-semibold text-gray-800">
+              {post.author.username}
+            </div>
+            <div className="text-xs text-gray-500">
+              {post.created_at?.split("T")[0] || "Just now"}
+            </div>
           </div>
         </div>
 
         {isAuthor && !editing && (
           <div className="flex space-x-2 text-gray-500">
-            <button onClick={() => setEditing(true)} className="hover:text-blue-600" title="Edit Post">
+            <button
+              onClick={() => setEditing(true)}
+              className="hover:text-blue-600"
+              title="Edit Post"
+            >
               <FaEdit />
             </button>
-            <button onClick={handleDelete} className="hover:text-red-600" title="Delete Post">
+            <button
+              onClick={handleDelete}
+              className="hover:text-red-600"
+              title="Delete Post"
+            >
               <FaTrash />
             </button>
           </div>
@@ -154,10 +181,16 @@ export default function PostCard({ post, currentUser, onPostUpdate, onPostDelete
               className="border border-gray-300 rounded-lg p-1"
             />
             <div className="flex space-x-2">
-              <button onClick={handleEditSave} className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 font-semibold">
+              <button
+                onClick={handleEditSave}
+                className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 font-semibold"
+              >
                 Save
               </button>
-              <button onClick={() => setEditing(false)} className="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400 font-semibold">
+              <button
+                onClick={() => setEditing(false)}
+                className="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400 font-semibold"
+              >
                 Cancel
               </button>
             </div>
@@ -171,11 +204,20 @@ export default function PostCard({ post, currentUser, onPostUpdate, onPostDelete
       <div className="mb-3 min-h-[200px]">
         {post.images && post.images.length > 0 ? (
           post.images.length === 1 ? (
-            <img src={post.images[0]} alt="Post Image" className="w-full max-h-[350px] object-cover rounded-lg shadow-sm hover:scale-105 transition-transform duration-200" />
+            <img
+              src={post.images[0]}
+              alt="Post Image"
+              className="w-full max-h-[350px] object-cover rounded-lg shadow-sm hover:scale-105 transition-transform duration-200"
+            />
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {post.images.map((img, idx) => (
-                <img key={idx} src={img} alt={`Post Image ${idx + 1}`} className="w-full h-60 object-cover rounded-lg hover:scale-105 transition-transform duration-200" />
+                <img
+                  key={idx}
+                  src={img}
+                  alt={`Post Image ${idx + 1}`}
+                  className="w-full h-60 object-cover rounded-lg hover:scale-105 transition-transform duration-200"
+                />
               ))}
             </div>
           )
@@ -187,23 +229,48 @@ export default function PostCard({ post, currentUser, onPostUpdate, onPostDelete
       {/* Like & Comment */}
       <div className="flex flex-col mt-2">
         <div className="flex items-center text-gray-600 text-sm mb-2 border-t border-b border-gray-200 py-2">
-          <button onClick={handleLike} className={`flex-1 flex items-center justify-center space-x-1 font-semibold hover:text-blue-600 ${liked ? "text-blue-600" : ""}`}>
-            {liked ? "💙 Liked" : "🤍 Like"} <span>({likesCount})</span>
+          {/* Like Button */}
+          <button
+            onClick={handleLike}
+            className={`flex-1 flex items-center justify-center space-x-1 font-semibold hover:text-blue-600 ${
+              liked ? "text-blue-600" : ""
+            }`}
+          >
+            {liked ? (
+              <FaHeart className="w-4 h-4" />
+            ) : (
+              <FaRegHeart className="w-4 h-4" />
+            )}
+            <span>{liked ? "Liked" : "Like"}</span>
+            <span>({likesCount})</span>
           </button>
-          <button onClick={toggleComments} className="flex-1 flex items-center justify-center space-x-1 font-semibold hover:text-blue-600">
-            💬 Comment <span>({commentsCount})</span>
+
+          {/* Comment Button */}
+          <button
+            onClick={toggleComments}
+            className="flex-1 flex items-center justify-center space-x-1 font-semibold hover:text-blue-600"
+          >
+            <FaComment className="w-4 h-4" />
+            <span>Comment</span>
+            <span>({commentsCount})</span>
           </button>
         </div>
 
         {showComments && (
           <div className="mt-3">
             {comments.map((c) => (
-              <div key={c.id || c._id} className="flex items-start space-x-2 mb-2 bg-gray-50 p-2 rounded-lg">
+              <div
+                key={c.id || c._id}
+                className="flex items-start space-x-2 mb-2 bg-gray-50 p-2 rounded-lg"
+              >
                 <div className="w-9 h-9 p-2 rounded-full bg-gray-300 flex items-center justify-center font-semibold text-gray-700 text-sm">
                   {c.user.username[0].toUpperCase()}
                 </div>
                 <div>
-                  <span className="font-semibold text-gray-800">{c.user.username}</span>: <span className="text-gray-700">{c.text}</span>
+                  <span className="font-semibold text-gray-800">
+                    {c.user.username}
+                  </span>
+                  : <span className="text-gray-700">{c.text}</span>
                 </div>
               </div>
             ))}
@@ -215,7 +282,10 @@ export default function PostCard({ post, currentUser, onPostUpdate, onPostDelete
                 placeholder="Write a comment..."
                 className="flex-1 border border-gray-300 rounded-full px-3 py-2 focus:outline-none focus:ring focus:ring-blue-200"
               />
-              <button onClick={handleAddComment} className="bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-600 font-semibold">
+              <button
+                onClick={handleAddComment}
+                className="bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-600 font-semibold"
+              >
                 Post
               </button>
             </div>

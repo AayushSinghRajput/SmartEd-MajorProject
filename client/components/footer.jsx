@@ -6,9 +6,9 @@ import {
   FaInstagram,
   FaTwitter,
   FaLinkedin,
-  FaBookOpen,
 } from "react-icons/fa";
-
+import Company_Logo from "../assets/images/Company_Logo.png";
+import Image from "next/image";
 export default function Footer() {
   return (
     <footer className="relative bg-gradient-to-r from-indigo-700 via-purple-700 to-indigo-800 text-white py-12 mt-0">
@@ -25,7 +25,9 @@ export default function Footer() {
             transition={{ duration: 0.6 }}
           >
             <div className="flex items-center gap-2 mb-3">
-              <FaBookOpen className="text-3xl text-yellow-300" />
+              <div className="relative h-10 w-10 rounded-lg overflow-hidden shadow bg-white p-1.5">
+              <Image src={Company_Logo} alt="SmartED Logo" fill className="object-contain" />
+            </div>
               <h2 className="text-2xl font-bold">SmartPrep AI</h2>
             </div>
             <p className="text-gray-200">
@@ -117,8 +119,8 @@ export default function Footer() {
           transition={{ delay: 0.8, duration: 0.8 }}
           className="mt-12 border-t border-gray-600 pt-6 text-center text-sm text-gray-300"
         >
-          © {new Date().getFullYear()} SmartPrep AI. All rights reserved. |
-          Built with ❤️ for learners.
+          © {new Date().getFullYear()} SmartPrep AI. All rights reserved.
+        
         </motion.div>
       </div>
     </footer>
