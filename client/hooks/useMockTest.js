@@ -23,12 +23,16 @@ export const useMockTest = () => {
     try {
       const data = await getMockTest(mockType);
       console.log(data);
-      if (!data?.data) {
+      if (!data?.data || data.data.length === 0) {
         toast.error("No mock test found");
         return;
       }
+      
+      // Select a random mock test from the array of mock tests
+      const randomExam = data.data[Math.floor(Math.random() * data.data.length)];
+
       // Set initial states
-      setExamData(data.data);
+      setExamData(randomExam);
       setCurrentQuestion(0);
       setAnswers({});
       setScore(0);
