@@ -84,11 +84,10 @@ function ProgressCard({ course }) {
           </span>
         </div>
         <div className="text-right">
-            <span className={`text-xs font-black px-2 py-1 rounded-md ${
-                course.progress === 100 ? "bg-emerald-100 text-emerald-700" : "bg-indigo-50 text-indigo-700"
+          <span className={`text-xs font-black px-2 py-1 rounded-md ${course.progress === 100 ? "bg-emerald-100 text-emerald-700" : "bg-indigo-50 text-indigo-700"
             }`}>
-                {course.progress === 100 ? "COMPLETED" : "IN PROGRESS"}
-            </span>
+            {course.progress === 100 ? "COMPLETED" : "IN PROGRESS"}
+          </span>
         </div>
       </div>
     </div>
@@ -148,8 +147,8 @@ export default function ProgressTracker() {
     fetchProgress();
 
     // Add this: Refetch when the user refocuses the tab
-  window.addEventListener("focus", fetchProgress);
-  return () => window.removeEventListener("focus", fetchProgress);
+    window.addEventListener("focus", fetchProgress);
+    return () => window.removeEventListener("focus", fetchProgress);
   }, []);
 
   if (loading)
@@ -157,8 +156,8 @@ export default function ProgressTracker() {
       <div className="flex flex-col items-center justify-center min-h-[500px]">
         <Loader2 className="w-12 h-12 text-indigo-600 animate-spin mb-6" />
         <div className="text-center">
-            <h3 className="text-lg font-bold text-slate-800 tracking-tight">Syncing Progress</h3>
-            <p className="text-slate-400 text-sm">Calculating your study metrics...</p>
+          <h3 className="text-lg font-bold text-slate-800 tracking-tight">Syncing Progress</h3>
+          <p className="text-slate-400 text-sm">Calculating your study metrics...</p>
         </div>
       </div>
     );
@@ -182,7 +181,7 @@ export default function ProgressTracker() {
     <div className="max-w-7xl mx-auto px-6 py-12">
       <div className="mb-12 text-center">
         <h1 className="text-4xl font-black text-slate-900 tracking-tight mb-2">
-            Learning Journey
+          Learning Journey
         </h1>
         <p className="text-slate-500 font-medium">Visualizing your academic growth across all modules</p>
       </div>
