@@ -5,11 +5,8 @@ export const DASHBOARD_TABS = [
   { name: "notes", label: "Study Notes", icon: "📝" },
   { name: "mock", label: "Mock Test", icon: "📋" },
   { name: "community", label: "Community", icon: "👥" },
-  { name: "entranceNews", label: "Entrance News", icon: "📰" }, 
+  { name: "entranceNews", label: "Entrance News", icon: "📰" },
 ];
 
-
-
-export const TEST_DURATION = 120 * 60; 
-
-
+export const ENGINEERING_TEST_DURATION = 120 * 60;
+export const MEDICAL_TEST_DURATION = 180 * 60;

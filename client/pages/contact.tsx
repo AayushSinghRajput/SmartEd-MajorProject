@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { submitContactForm } from "../api/contact";
+import { FaEnvelope, FaPhone, FaMapMarkerAlt } from "react-icons/fa";
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -13,7 +14,7 @@ export default function ContactPage() {
   const [error, setError] = useState("");
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -54,7 +55,21 @@ export default function ContactPage() {
       {/* Cards Layout */}
       <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Let's Connect Form Card */}
-        <div className="bg-white/10 backdrop-blur-xl p-6 sm:p-8 rounded-3xl shadow-2xl border border-white/20 hover:bg-white/15 transition-all duration-500">
+        <div
+          className="relative
+                          bg-white/[0.09] backdrop-blur-2xl
+                          p-6 sm:p-8 rounded-3xl
+
+                          border border-white/20
+
+                          shadow-[0_30px_80px_rgba(0,0,0,0.65)]
+
+                          before:content-['']
+                          before:absolute before:inset-0 before:rounded-3xl
+                          before:bg-gradient-to-b
+                          before:from-white/20 before:via-transparent before:to-black/35
+                          before:pointer-events-none"
+        >
           <h2 className="text-2xl font-semibold text-white mb-4">
             Let's Connect
           </h2>
@@ -89,7 +104,16 @@ export default function ContactPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg transition duration-300 disabled:opacity-50"
+              className="w-full
+                          bg-blue-500 hover:bg-blue-600
+                          text-white font-semibold
+                          py-2 px-4 rounded-lg
+                          shadow-md shadow-black/30
+                          transition-all duration-300 ease-out
+                          hover:shadow-lg hover:shadow-black/40
+                          hover:-translate-y-0.5
+                          active:scale-95
+                          focus:outline-none focus:ring-2 focus:ring-blue-400/40"
             >
               {loading ? "Sending..." : "Send Message"}
             </button>
@@ -103,13 +127,30 @@ export default function ContactPage() {
         </div>
 
         {/* Contact Info Card */}
-        <div className="bg-white/10 backdrop-blur-xl p-6 sm:p-8 rounded-3xl shadow-2xl border border-white/20 hover:bg-white/15 transition-all duration-500">
+        <div
+          className="
+              
+              relative
+              bg-white/[0.09] backdrop-blur-2xl
+              p-6 sm:p-8 rounded-3xl
+
+              border border-white/20
+
+              shadow-[0_30px_80px_rgba(0,0,0,0.65)]
+
+              before:content-['']
+              before:absolute before:inset-0 before:rounded-3xl
+              before:bg-gradient-to-b
+              before:from-white/20 before:via-transparent before:to-black/35
+              before:pointer-events-none"
+        >
           <h2 className="text-2xl font-semibold text-white mb-4">
             Contact Information
           </h2>
           <div className="text-gray-300 space-y-4 text-lg">
-            <p>
-              📧 Email:{" "}
+            <p className="flex items-center gap-2">
+              <FaEnvelope className="text-blue-400 w-5 h-5" />
+              Email:{" "}
               <a
                 href="mailto:smartprep.ai@gmail.com"
                 className="text-blue-400 hover:underline"
@@ -117,8 +158,10 @@ export default function ContactPage() {
                 smartprep.ai@gmail.com
               </a>
             </p>
-            <p>
-              📞 Phone:{" "}
+
+            <p className="flex items-center gap-2">
+              <FaPhone className="text-blue-400 w-5 h-5" />
+              Phone:{" "}
               <a
                 href="tel:+9779860123456"
                 className="text-blue-400 hover:underline"
@@ -126,7 +169,11 @@ export default function ContactPage() {
                 +977 9860123456
               </a>
             </p>
-            <p>📍 Address: Dharan, Nepal</p>
+
+            <p className="flex items-center gap-2">
+              <FaMapMarkerAlt className="text-blue-400 w-5 h-5" />
+              Address: Dharan, Nepal
+            </p>
           </div>
 
           {/* Google Map Embed */}

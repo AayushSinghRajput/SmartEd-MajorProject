@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import Lottie from "lottie-react";
-import { FaCheckCircle } from "react-icons/fa";
+import { FaCheckCircle, FaStar,FaQuestionCircle  } from "react-icons/fa";
 import studentAnimation from "../animations/student.json";
 
 export default function About() {
@@ -84,9 +84,10 @@ export default function About() {
         </div>
 
         {/* Features Section */}
-        <h2 className="text-2xl font-semibold mt-16 mb-4" data-aos="fade-up">
-          ✨ Features You’ll Love
-        </h2>
+        <h2 className="text-2xl font-semibold mt-16 mb-4 flex items-center gap-2" data-aos="fade-up">
+  <FaStar className="text-amber-400" />
+  Features You’ll Love
+</h2>
         <ul
           className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10"
           data-aos="fade-up"
@@ -109,9 +110,10 @@ export default function About() {
 
         {/* FAQs */}
         <div className="mt-12" data-aos="fade-up">
-          <h2 className="text-2xl font-semibold mb-4">
-            🤔 Frequently Asked Questions
-          </h2>
+          <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
+  <FaQuestionCircle className="text-blue-500 w-6 h-6" />
+  Frequently Asked Questions
+</h2>
           <div className="space-y-4">
             {faqs.map((item, index) => (
               <div
