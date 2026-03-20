@@ -1,35 +1,40 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { FiBookOpen, FiMail, FiLock, FiAlertCircle, FiEye, FiEyeOff } from "react-icons/fi";
+import { motion } from "framer-motion"; // For animations
+import { FiBookOpen, FiMail, FiLock, FiAlertCircle, FiEye, FiEyeOff } from "react-icons/fi"; // Icons
 import { useState } from "react";
 import Link from "next/link";
-import { useAuth } from "../../context/AuthContext";
-import toast from "react-hot-toast";
+import { useAuth } from "../../context/AuthContext"; // Custom auth context
+import toast from "react-hot-toast"; // Toast notifications
 
 export default function Login() {
+  // Form state
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  // Auth context method to perform login
   const { login } = useAuth();
 
+  // Animation variants for framer-motion
   const containerVariants = {
     hidden: { opacity: 0, y: -30 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.6, delay: 0.1 } },
   };
-
   const itemVariants = {
     hidden: { opacity: 0, y: 15 },
     visible: { opacity: 1, y: 0 },
   };
 
+  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setLoading(true);
 
+    // Simple validation
     if (!email || !password) {
       toast.error("Please fill in all fields");
       setLoading(false);
@@ -38,7 +43,7 @@ export default function Login() {
 
     try {
       const credentials = { email, password };
-      const result = await login(credentials);
+      const result = await login(credentials); // Call login from AuthContext
 
       if (!result.success) {
         setError(result.message || "Invalid credentials");
@@ -46,6 +51,7 @@ export default function Login() {
         setLoading(false);
       } else {
         toast.success("Login successful! Redirecting to dashboard...");
+        // You could redirect user here after login
       }
     } catch (error) {
       toast.error("An unexpected error occurred");
@@ -53,19 +59,21 @@ export default function Login() {
     }
   };
 
+  // Toggle password visibility
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
 
   return (
     <div className="min-h-screen flex items-start justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 pt-24 md:pt-32 p-4">
+      {/* Container for the login card */}
       <motion.div
         className="w-full max-w-md bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-8 md:p-10 border border-white/20"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
       >
-        {/* Header */}
+        {/* Header with logo and welcome text */}
         <motion.div variants={itemVariants} className="text-center mb-10">
           <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg mb-6">
             <FiBookOpen className="text-white text-4xl" />
@@ -96,6 +104,7 @@ export default function Login() {
           onSubmit={handleSubmit}
           className="space-y-8"
         >
+          {/* Email Field */}
           <div>
             <label className="block text-sm font-semibold text-gray-800 mb-3">
               Email Address
@@ -115,6 +124,7 @@ export default function Login() {
             </div>
           </div>
 
+          {/* Password Field */}
           <div>
             <div className="flex justify-between items-center mb-3">
               <label className="block text-sm font-semibold text-gray-800">
@@ -154,6 +164,7 @@ export default function Login() {
             </div>
           </div>
 
+          {/* Submit Button */}
           <motion.button
             type="submit"
             disabled={loading}
@@ -178,11 +189,8 @@ export default function Login() {
           <div className="flex-grow border-t border-gray-300"></div>
         </div>
 
-        {/* Footer link */}
-        <motion.div
-          variants={itemVariants}
-          className="text-center"
-        >
+        {/* Footer Links */}
+        <motion.div variants={itemVariants} className="text-center">
           <p className="text-gray-600 text-base">
             Don&apos;t have an account?{" "}
             <Link

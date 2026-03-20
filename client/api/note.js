@@ -1,8 +1,13 @@
+// Base URL for API requests. Uses environment variable if available,
+// otherwise defaults to local development server.
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
 
 // ---------------------------
-// Helper: Get headers (skip Content-Type for multipart requests)
+// Helper: Get headers
 // ---------------------------
+// Returns headers object for fetch requests.
+// If the request is not multipart (i.e., not using FormData),
+// it sets "Content-Type" to "application/json".
 const getAuthHeaders = (isMultipart = false) => {
   const headers = {};
   if (!isMultipart) headers["Content-Type"] = "application/json";
@@ -12,16 +17,21 @@ const getAuthHeaders = (isMultipart = false) => {
 // ---------------------------
 // Handle fetch responses and errors
 // ---------------------------
+// Parses response as JSON and handles errors centrally.
+// Rejects the promise if response status is not OK (>= 400).
 const handleResponse = async (response) => {
   try {
-    const data = await response.json();
+    const data = await response.json(); // Convert response body to JSON
+
     if (!response.ok) {
+      // Extract error message from response or fallback to status text
       const error = (data && data.detail) || response.statusText || "Request failed";
       return Promise.reject(error);
     }
-    return data;
+
+    return data; // Return parsed data if successful
   } catch (error) {
-    console.error("[handleResponse] Error parsing response:", error);
+    // Handles invalid JSON or parsing errors
     throw error;
   }
 };
@@ -29,29 +39,28 @@ const handleResponse = async (response) => {
 // ---------------------------
 // Summarize notes for a day
 // ---------------------------
+// Sends a request to summarize notes for a specific book and day.
+// Parameters:
+//   - book_id: string (identifier of the book)
+//   - day_number: number (specific day to summarize)
+// The backend enforces "short" note summaries.
+// Returns summarized notes from the backend.
 export const summarizeDayNotes = async ({ book_id, day_number }) => {
   try {
-    console.log("[summarizeDayNotes] Fetching notes for book:", book_id, "day:", day_number);
-
     const response = await fetch(`${API_URL}/notes/summarize`, {
       method: "POST",
-      headers: getAuthHeaders(), // JSON headers
-      credentials: "include",    // send HttpOnly cookie
+      headers: getAuthHeaders(),   // JSON headers
+      credentials: "include",      // send cookies for authentication
       body: JSON.stringify({
         book_id,
         day_number,
-        note_type: "short", // enforced short notes
+        note_type: "short",        // fixed type for short summaries
       }),
     });
 
-    console.log("[summarizeDayNotes] Response status:", response.status);
-    const data = await handleResponse(response);
-
-    console.log("[summarizeDayNotes] Response data:", data);
-    return data;
-
+    const data = await handleResponse(response); // parse and handle errors
+    return data; // return summarized notes
   } catch (error) {
-    console.error("[summarizeDayNotes] Error:", error);
     throw error;
   }
 };

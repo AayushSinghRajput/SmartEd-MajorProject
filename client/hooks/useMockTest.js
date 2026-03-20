@@ -3,11 +3,16 @@ import toast from "react-hot-toast";
 import { getMockTest } from "../api/mock";
 import { calculateScore } from "../utils/calculateScore";
 
+/**
+ * useMockTest Hook
+ *
+ * Handles fetching, navigating, answering, and scoring a mock test.
+ */
 export const useMockTest = () => {
-  // ---------- STATES ----------
-  const [examData, setExamData] = useState(null);
+  // ---------- STATE ----------
+  const [examData, setExamData] = useState(null); // current mock test
   const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [answers, setAnswers] = useState({});
+  const [answers, setAnswers] = useState({}); // { questionIndex: selectedOption }
   const [score, setScore] = useState(0);
   const [showResult, setShowResult] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -22,16 +27,15 @@ export const useMockTest = () => {
     setIsLoading(true);
     try {
       const data = await getMockTest(mockType);
-      console.log(data);
       if (!data?.data || data.data.length === 0) {
         toast.error("No mock test found");
         return;
       }
-      
-      // Select a random mock test from the array of mock tests
+
+      // Pick a random mock from available tests
       const randomExam = data.data[Math.floor(Math.random() * data.data.length)];
 
-      // Set initial states
+      // Initialize states
       setExamData(randomExam);
       setCurrentQuestion(0);
       setAnswers({});
@@ -40,7 +44,7 @@ export const useMockTest = () => {
 
       toast.success("Mock test started");
     } catch (err) {
-      console.error(err);
+      console.error("[useMockTest] Failed to fetch mock test:", err);
       toast.error("Failed to load mock test");
     } finally {
       setIsLoading(false);
@@ -48,9 +52,9 @@ export const useMockTest = () => {
   };
 
   // ---------- SELECT ANSWER ----------
-  const selectAnswer = (option) => {
-    if (!examData) return; // defensive check
-    setAnswers((prev) => ({ ...prev, [currentQuestion]: option }));
+  const selectAnswer = (optionIndex) => {
+    if (!examData) return;
+    setAnswers((prev) => ({ ...prev, [currentQuestion]: optionIndex }));
   };
 
   // ---------- NAVIGATION ----------
@@ -94,6 +98,6 @@ export const useMockTest = () => {
     prevQuestion,
     nextQuestion,
     submitTest,
-    resetMockTest, // For Retake Test
+    resetMockTest,
   };
 };

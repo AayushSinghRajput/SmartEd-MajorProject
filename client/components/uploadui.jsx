@@ -1,20 +1,24 @@
 "use client";
 
 import { useState } from "react";
-import { FiLoader, FiUploadCloud } from "react-icons/fi";
-import { FaBookOpen } from "react-icons/fa";
-import { motion } from "framer-motion";
-import toast, { Toaster } from "react-hot-toast";
-import { uploadPdfAndGenerateSchedule } from "../api/pdf";
+import { FiLoader, FiUploadCloud } from "react-icons/fi"; // Loader and upload icons
+import { FaBookOpen } from "react-icons/fa"; // Book icon for button
+import { motion } from "framer-motion"; // Animations
+import toast, { Toaster } from "react-hot-toast"; // Toast notifications
+import { uploadPdfAndGenerateSchedule } from "../api/pdf"; // API function for PDF upload
 
 export default function UploadUI({ onUploadSuccess }) {
-  const [loading, setLoading] = useState(false);
-  const [pdfFile, setPdfFile] = useState(null); // store file object
-  const [filename, setFilename] = useState("");
-  const [days, setDays] = useState(""); // store number of study days
-  const [tempData, setTempData] = useState(null);
-  const [bookName, setBookName] = useState("");
+  // ────────────── State ──────────────
+  const [loading, setLoading] = useState(false); // API call / processing state
+  const [pdfFile, setPdfFile] = useState(null); // PDF file object
+  const [filename, setFilename] = useState(""); // File name to display
+  const [days, setDays] = useState(""); // Number of study days
+  const [tempData, setTempData] = useState(null); // Store API response temporarily
+  const [bookName, setBookName] = useState(""); // User-entered book name
 
+  // ────────────── Handlers ──────────────
+  
+  // Handle file selection
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -28,16 +32,19 @@ export default function UploadUI({ onUploadSuccess }) {
     setFilename(file.name);
   };
 
+  // Handle input for number of study days
   const handleDaysChange = (e) => {
     let value = e.target.value;
-    // Remove leading zeros
+    // Remove leading zeros like "05" -> "5"
     if (value.length > 1 && value.startsWith("0")) {
       value = value.replace(/^0+/, "");
     }
     setDays(value);
   };
 
+  // Handle the "Learn Now" button click
   const handleLearnNow = async () => {
+    // Validation
     if (!pdfFile || !days || !bookName) {
       toast.error("Please fill all fields.");
       return;
@@ -52,16 +59,17 @@ export default function UploadUI({ onUploadSuccess }) {
     setLoading(true);
 
     try {
+      // Call API to upload PDF & generate schedule
       const result = await uploadPdfAndGenerateSchedule(
         pdfFile,
         numDays,
         bookName
       );
+
       if (result.success) {
-        console.log("API Response:", result); //debug log
         setTempData(result);
         toast.success("Study schedule generated successfully!");
-        onUploadSuccess(result); // send schedule back to parent
+        onUploadSuccess(result); // send data back to parent component
       } else {
         toast.error(result.message || "Upload failed.");
       }
@@ -80,10 +88,10 @@ export default function UploadUI({ onUploadSuccess }) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
     >
-      {/* 🔔 Toaster for toast messages */}
+      {/* ────────────── Toaster ────────────── */}
       <Toaster position="top-right" reverseOrder={false} />
 
-      {/* LOADING OVERLAY */}
+      {/* ────────────── Loading Overlay ────────────── */}
       {loading && (
         <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-white/90 backdrop-blur-sm rounded-3xl">
           <FiLoader className="text-5xl text-indigo-600 animate-spin mb-4" />
@@ -96,7 +104,7 @@ export default function UploadUI({ onUploadSuccess }) {
         </div>
       )}
 
-      {/* PDF UPLOAD SECTION */}
+      {/* ────────────── PDF Upload Section ────────────── */}
       <label
         htmlFor="file-upload"
         className="cursor-pointer flex flex-col items-center justify-center border-2 border-dashed border-indigo-400 rounded-2xl p-10 w-full bg-white hover:bg-indigo-50 transition"
@@ -127,7 +135,7 @@ export default function UploadUI({ onUploadSuccess }) {
         />
       </label>
 
-      {/* DAYS INPUT (below PDF upload, same width) */}
+      {/* ────────────── Number of Study Days Input ────────────── */}
       <div className="mt-4 w-full flex justify-center">
         <input
           type="number"
@@ -138,7 +146,8 @@ export default function UploadUI({ onUploadSuccess }) {
           placeholder="Enter number of study days"
         />
       </div>
-      {/* BOOK NAME INPUT */}
+
+      {/* ────────────── Book Name Input ────────────── */}
       <div className="mt-4 w-full flex justify-center">
         <input
           type="text"
@@ -149,7 +158,7 @@ export default function UploadUI({ onUploadSuccess }) {
         />
       </div>
 
-      {/* LEARN NOW BUTTON */}
+      {/* ────────────── Learn Now Button ────────────── */}
       <div className="flex flex-col sm:flex-row justify-center gap-4 mt-6 w-full">
         <motion.button
           whileHover={{ scale: 1.05 }}
