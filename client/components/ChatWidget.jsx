@@ -12,17 +12,20 @@ import TypingDots from "./ui/TypingDots";
 
 /**
  * ChatWidget Component
- * Floating chatbot overlay
+ * Floating chatbot overlay for study assistance
  */
 export default function ChatWidget({ metaData, selectedSubtopic }) {
-  const [isOpen, setIsOpen] = useState(false);
-  const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState([]);
+  const [isOpen, setIsOpen] = useState(false);  // Chat overlay open/close
+  const [message, setMessage] = useState("");   // Current input message
+  const [messages, setMessages] = useState([]); // Chat history
 
   const { askChatbot, loading } = useChatbot({ metaData, selectedSubtopic });
 
   const toggleChat = () => setIsOpen((prev) => !prev);
 
+  /**
+   * Handles sending a message
+   */
   const sendMessage = async () => {
     if (!message.trim() || !selectedSubtopic) return;
 
@@ -32,7 +35,6 @@ export default function ChatWidget({ metaData, selectedSubtopic }) {
 
     try {
       const botReply = await askChatbot(userMessage);
-
       const botText =
         typeof botReply === "string"
           ? botReply
@@ -50,11 +52,11 @@ export default function ChatWidget({ metaData, selectedSubtopic }) {
     }
   };
 
-  const clearChat = () => setMessages([]);
+  const clearChat = () => setMessages([]); // Clear history
 
   return (
     <>
-      {/* Floating Toggle Button */}
+      {/* Floating Chat Toggle Button */}
       <button
         onClick={toggleChat}
         className="fixed bottom-6 right-6 z-50 bg-gradient-to-r from-blue-600 to-indigo-600 
@@ -75,7 +77,7 @@ export default function ChatWidget({ metaData, selectedSubtopic }) {
       {/* Chat Overlay */}
       {isOpen && (
         <div className="fixed bottom-24 right-6 w-96 h-[520px] bg-white rounded-2xl shadow-2xl flex flex-col z-50 border border-gray-200 overflow-hidden">
-          
+
           {/* Header */}
           <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-4 flex justify-between items-center">
             <div>
@@ -95,10 +97,7 @@ export default function ChatWidget({ metaData, selectedSubtopic }) {
                   Clear
                 </button>
               )}
-              <button
-                onClick={toggleChat}
-                className="hover:bg-white/20 p-1 rounded-full"
-              >
+              <button onClick={toggleChat} className="hover:bg-white/20 p-1 rounded-full">
                 <FaTimes />
               </button>
             </div>
@@ -107,6 +106,7 @@ export default function ChatWidget({ metaData, selectedSubtopic }) {
           {/* Messages Container */}
           <div className="flex-1 p-4 overflow-y-auto bg-gradient-to-b from-gray-50 to-white space-y-4">
             
+            {/* Initial Empty State */}
             {messages.length === 0 ? (
               <div className="h-full flex flex-col items-center justify-center text-center p-8">
                 <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
@@ -123,6 +123,7 @@ export default function ChatWidget({ metaData, selectedSubtopic }) {
                 </div>
               </div>
             ) : (
+              // Render all messages
               messages.map((msg, i) => (
                 <div
                   key={i}
@@ -160,7 +161,7 @@ export default function ChatWidget({ metaData, selectedSubtopic }) {
               ))
             )}
 
-            {/* Typing Dots Loader */}
+            {/* Typing Indicator */}
             {loading && <TypingDots />}
           </div>
 

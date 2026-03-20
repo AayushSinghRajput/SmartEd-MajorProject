@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion } from "framer-motion"; // For animations
 import {
   FiBookOpen,
   FiUser,
@@ -9,31 +9,35 @@ import {
   FiAlertCircle,
   FiEye,
   FiEyeOff,
-} from "react-icons/fi";
+} from "react-icons/fi"; // Icons for form fields and alerts
 import { useState } from "react";
-import Link from "next/link";
-import { useAuth } from "../../context/AuthContext";
-import toast from "react-hot-toast";
+import Link from "next/link"; // Navigation between pages
+import { useAuth } from "../../context/AuthContext"; // Custom authentication context
+import toast from "react-hot-toast"; // Toast notifications
 
 export default function Signup() {
+  // Form state
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false); // toggle password visibility
+  const [error, setError] = useState(""); // error messages
+  const [loading, setLoading] = useState(false); // loading state
+
+  // Auth context method to perform registration
   const { register } = useAuth();
 
+  // Animation variants for framer-motion
   const containerVariants = {
     hidden: { opacity: 0, y: -30 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.6, delay: 0.1 } },
   };
-
   const itemVariants = {
     hidden: { opacity: 0, y: 15 },
     visible: { opacity: 1, y: 0 },
   };
 
+  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -52,7 +56,7 @@ export default function Signup() {
     setLoading(true);
     try {
       const userData = { username, email, password };
-      const result = await register(userData);
+      const result = await register(userData); // Call register from AuthContext
 
       if (!result.success) {
         setError(result.message || "Registration failed");
@@ -60,6 +64,7 @@ export default function Signup() {
         setLoading(false);
       } else {
         toast.success("Account created successfully! Redirecting to dashboard...");
+        // Redirect logic can be added here if needed
       }
     } catch (error) {
       toast.error("An unexpected error occurred");
@@ -67,12 +72,14 @@ export default function Signup() {
     }
   };
 
+  // Toggle password visibility
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
 
   return (
     <div className="min-h-screen flex items-start justify-center bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 pt-24 md:pt-32 p-4">
+      {/* Signup card container */}
       <motion.div
         className="w-full max-w-md bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-8 md:p-10 border border-white/20"
         variants={containerVariants}
@@ -110,6 +117,7 @@ export default function Signup() {
           onSubmit={handleSubmit}
           className="space-y-8"
         >
+          {/* Username Field */}
           <div>
             <label className="block text-sm font-semibold text-gray-800 mb-3">
               Username
@@ -129,6 +137,7 @@ export default function Signup() {
             </div>
           </div>
 
+          {/* Email Field */}
           <div>
             <label className="block text-sm font-semibold text-gray-800 mb-3">
               Email Address
@@ -148,6 +157,7 @@ export default function Signup() {
             </div>
           </div>
 
+          {/* Password Field */}
           <div>
             <div className="flex justify-between items-center mb-3">
               <label className="block text-sm font-semibold text-gray-800">
@@ -190,6 +200,7 @@ export default function Signup() {
             </p>
           </div>
 
+          {/* Submit Button */}
           <motion.button
             type="submit"
             disabled={loading}
@@ -232,10 +243,7 @@ export default function Signup() {
         </div>
 
         {/* Footer link */}
-        <motion.div
-          variants={itemVariants}
-          className="text-center"
-        >
+        <motion.div variants={itemVariants} className="text-center">
           <p className="text-gray-600 text-base">
             Already have an account?{" "}
             <Link
