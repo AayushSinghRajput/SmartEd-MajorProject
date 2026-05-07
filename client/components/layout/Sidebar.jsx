@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { DASHBOARD_TABS } from "../lib/constants"; // Predefined tabs for dashboard navigation
-import { formatAcademicId, getCleanUsername } from "../lib/utils"; // Utility functions for formatting
+import { DASHBOARD_TABS } from "../../lib/constants"; // Predefined tabs for dashboard navigation
+import { formatAcademicId, getCleanUsername } from "../../lib/utils"; // Utility functions for formatting
 
 // Sidebar component props
 export default function Sidebar({
@@ -25,27 +25,28 @@ export default function Sidebar({
       `}
     >
       <div className="flex flex-col h-full px-4 py-5">
-
         {/* SIDEBAR TOGGLE BUTTON */}
-        <div className={`flex items-center mb-6 ${collapsed ? "justify-center" : "justify-end"}`}>
+        <div
+          className={`flex items-center mb-6 ${collapsed ? "justify-center" : "justify-end"}`}
+        >
           <button
             onClick={() => setCollapsed(!collapsed)} // Toggle collapsed state
             className="p-2 rounded-lg hover:bg-slate-100 text-slate-500 transition-colors"
             title={collapsed ? "Expand Sidebar" : "Collapse Sidebar"}
           >
             {/* Minimalist 3-line hamburger icon */}
-            <svg 
-              xmlns="http://www.w3.org/2000/svg" 
-              fill="none" 
-              viewBox="0 0 24 24" 
-              strokeWidth={2} 
-              stroke="currentColor" 
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={2}
+              stroke="currentColor"
               className="w-6 h-6"
             >
-              <path 
-                strokeLinecap="round" 
-                strokeLinejoin="round" 
-                d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" 
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
               />
             </svg>
           </button>
@@ -55,7 +56,8 @@ export default function Sidebar({
         <div className="text-center mb-8">
           {/* User avatar circle with initial */}
           <div className="w-14 h-14 mx-auto rounded-full bg-indigo-100 flex items-center justify-center text-xl font-bold text-indigo-700">
-            {getCleanUsername(user).charAt(0)} {/* Display first letter of username */}
+            {getCleanUsername(user).charAt(0)}{" "}
+            {/* Display first letter of username */}
           </div>
 
           {!collapsed && ( // Show user details only if sidebar is expanded
@@ -64,10 +66,12 @@ export default function Sidebar({
                 {getCleanUsername(user)} {/* Display cleaned username */}
               </h3>
               <p className="text-xs text-indigo-600 font-medium">
-                {user?.publicMetadata?.role || "Student"} {/* Display role or default */}
+                {user?.publicMetadata?.role || "Student"}{" "}
+                {/* Display role or default */}
               </p>
               <p className="mt-2 text-[10px] font-mono text-slate-400">
-                {formatAcademicId(user?._id || user?.id, user?.createdAt)} {/* Display formatted academic ID */}
+                {formatAcademicId(user?._id || user?.id, user?.createdAt)}{" "}
+                {/* Display formatted academic ID */}
               </p>
             </div>
           )}
@@ -91,9 +95,7 @@ export default function Sidebar({
             >
               <span className="text-xl">{tab.icon}</span> {/* Tab icon */}
               {!collapsed && ( // Show tab label only when expanded
-                <span className="truncate whitespace-nowrap">
-                  {tab.label}
-                </span>
+                <span className="truncate whitespace-nowrap">{tab.label}</span>
               )}
             </button>
           ))}

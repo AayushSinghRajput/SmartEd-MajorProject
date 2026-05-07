@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion"; // For animation effects
 import { FaFacebook, FaInstagram, FaTwitter, FaLinkedin } from "react-icons/fa"; // Social media icons
-import Company_Logo from "../assets/images/Company_Logo.png"; // Company logo image
+import Company_Logo from "../../assets/images/Company_Logo.png"; // Company logo image
 import Image from "next/image"; // Next.js optimized Image component
 
 export default function Footer() {

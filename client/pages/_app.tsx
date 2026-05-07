@@ -1,7 +1,7 @@
 import type { AppProps } from "next/app";
 import { useRouter } from "next/router"; // Hook to get current route
-import Navbar from "../components/navbar"; // Custom Navbar component
-import Footer from "../components/footer"; // Custom Footer component
+import Navbar from "../components/layout/Navbar"; // Custom Navbar component
+import Footer from "../components/layout/Footer"; // Custom Footer component
 import { AuthProvider } from "@/context/AuthContext"; // Context provider for authentication
 import "../styles/globals.css"; // Global Tailwind / CSS styles
 import { Toaster } from "react-hot-toast"; // Toast notification library
@@ -20,7 +20,6 @@ function AppLayout({ Component, pageProps }: AppProps) {
   return (
     // Main layout container
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-indigo-50 to-purple-50">
-      
       {/* Render Navbar only on allowed routes */}
       {showNavbar && <Navbar />}
 

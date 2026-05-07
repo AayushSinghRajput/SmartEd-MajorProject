@@ -1,6 +1,6 @@
 "use client"; // Client-side Next.js component
 
-import { useMCQ } from "../hooks/useMCQ"; // Custom hook for MCQ state & logic
+import { useMCQ } from "../../hooks/useMCQ"; // Custom hook for MCQ state & logic
 
 export default function MCQViewer({ mcqs, pdfHash, day }) {
   // Destructure state and actions from useMCQ hook

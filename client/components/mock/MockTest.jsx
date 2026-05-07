@@ -5,11 +5,11 @@ import ReactMarkdown from "react-markdown"; // Render Markdown for questions and
 import remarkMath from "remark-math"; // Enable LaTeX math in Markdown
 import rehypeKatex from "rehype-katex"; // Render LaTeX math
 import { Toaster } from "react-hot-toast"; // Toast notifications
-import { useMockTest } from "../hooks/useMockTest"; // Custom hook for mock test state & logic
-import { useExamTimer } from "../hooks/useExamTimer"; // Custom hook for countdown timer
-import { formatTime } from "../utils/formatTime"; // Format seconds into mm:ss
+import { useMockTest } from "../../hooks/useMockTest"; // Custom hook for mock test state & logic
+import { useExamTimer } from "../../hooks/useExamTimer"; // Custom hook for countdown timer
+import { formatTime } from "../../utils/formatTime"; // Format seconds into mm:ss
 import { FaBrain, FaCog, FaStethoscope } from "react-icons/fa"; // Icons for UI
-import { ENGINEERING_TEST_DURATION, MEDICAL_TEST_DURATION } from "../lib/constants"; // Exam durations
+import { ENGINEERING_TEST_DURATION, MEDICAL_TEST_DURATION } from "../../lib/constants"; // Exam durations
 
 export default function MockTest() {
   // Destructure all state and actions from mock test hook

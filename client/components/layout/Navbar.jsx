@@ -6,7 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { FiMenu, FiX, FiUser, FiLogOut, FiAward } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
-import Company_Logo from "../assets/images/Company_Logo.png";
+import Company_Logo from "../../assets/images/Company_Logo.png";
 import { useAuth } from "@/context/AuthContext";
 
 export default function Navbar() {

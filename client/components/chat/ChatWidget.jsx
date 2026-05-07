@@ -7,8 +7,8 @@ import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import "katex/dist/katex.min.css";
 
-import { useChatbot } from "../hooks/useChatbot";
-import TypingDots from "./ui/TypingDots";
+import { useChatbot } from "../../hooks/useChatbot";
+import TypingDots from "../ui/TypingDots";
 
 /**
  * ChatWidget Component

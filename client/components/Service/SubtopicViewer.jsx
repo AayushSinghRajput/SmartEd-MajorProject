@@ -10,7 +10,7 @@ import {
   FiPause,
 } from "react-icons/fi";
 import Loader from "../ui/Loader";
-import MCQViewer from "../MCQViewer";
+import MCQViewer from "../mcq/MCQViewer";
 import { cleanTextForSpeech, cleanText } from "../../utils/cleanTextForSpeech";
 
 export default function SubtopicViewer({

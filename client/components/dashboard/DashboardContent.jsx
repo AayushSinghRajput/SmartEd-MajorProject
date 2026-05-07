@@ -1,7 +1,7 @@
 "use client";
 
 import { FiX } from "react-icons/fi"; // Close (X) icon
-import UploadUI from "./uploadui"; // Upload component for PDFs or notes
+import UploadUI from "../ui/uploadui"; // Upload component for PDFs or notes
 
 export default function DashboardContent({ onUploadSuccess, onClose }) {
   return (

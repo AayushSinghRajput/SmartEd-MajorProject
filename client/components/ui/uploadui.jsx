@@ -5,7 +5,7 @@ import { FiLoader, FiUploadCloud } from "react-icons/fi"; // Loader and upload i
 import { FaBookOpen } from "react-icons/fa"; // Book icon for button
 import { motion } from "framer-motion"; // Animations
 import toast, { Toaster } from "react-hot-toast"; // Toast notifications
-import { uploadPdfAndGenerateSchedule } from "../api/pdf"; // API function for PDF upload
+import { uploadPdfAndGenerateSchedule } from "../../api/pdf"; // API function for PDF upload
 
 export default function UploadUI({ onUploadSuccess }) {
   // ────────────── State ──────────────

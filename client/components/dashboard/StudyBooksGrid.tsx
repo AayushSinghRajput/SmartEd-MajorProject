@@ -1,11 +1,11 @@
 "use client"; // Indicates this file is a client-side React component (Next.js convention)
 
 import { useEffect, useState } from "react";
-import StudyBookCard from "../components/ui/Card"; // Card component to display each book
-import { getUserBooks } from "../api/pdf"; // API call to fetch user's books
-import Loader from "../components/ui/Loader"; // Loader component for loading state
-import { TAB_HEADERS } from "../lib/studygridconstants"; // Constant for tab headings and icons
-import { fetchPerformance } from "../api/performance"; // API call to fetch performance data
+import StudyBookCard from "../ui/Card"; // Card component to display each book
+import { getUserBooks } from "../../api/pdf"; // API call to fetch user's books
+import Loader from "../ui/Loader"; // Loader component for loading state
+import { TAB_HEADERS } from "../../lib/studygridconstants"; // Constant for tab headings and icons
+import { fetchPerformance } from "../../api/performance"; // API call to fetch performance data
 
 // Define the shape of a StudyBook object
 interface StudyBook {
@@ -16,7 +16,8 @@ interface StudyBook {
   performance_progress?: number; // Optional overall performance progress %
   study_progress?: number; // Optional study progress %
   pdf_url: string; // Link to the PDF
-  day_wise_scores?: { // Optional array of scores for each day
+  day_wise_scores?: {
+    // Optional array of scores for each day
     day: number;
     score: number;
     total_questions: number;

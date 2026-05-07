@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, status
 from schemas.contact import ContactCreate, ContactResponse
-from services.contact_service import create_contact
+from services.contact.contact_service import create_contact
 
 router = APIRouter(prefix="/api/contact", tags=["Contact"])
 

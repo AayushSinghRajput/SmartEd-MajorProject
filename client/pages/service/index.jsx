@@ -1,12 +1,12 @@
 "use client"; // Indicates this file is a client-side React component
 
 // Importing necessary components and hooks
-import Sidebar from "../components/Service/Sidebar"; // Sidebar navigation component
-import SubtopicViewer from "../components/Service/SubtopicViewer"; // Component to display selected subtopic content
-import WelcomeState from "../components/Service/WelcomeState"; // Component to show initial welcome message
-import { useServiceLogic } from "../hooks/useServiceLogic"; // Custom hook for handling service state and actions
-import { getWelcomeText } from "../constants/getWelcomeText"; // Function to get dynamic welcome text
-import ChatWidget from "../components/ChatWidget"; // Chat interface component
+import Sidebar from "../../components/Service/Sidebar"; // Sidebar navigation component
+import SubtopicViewer from "../../components/Service/SubtopicViewer"; // Component to display selected subtopic content
+import WelcomeState from "../../components/Service/WelcomeState"; // Component to show initial welcome message
+import { useServiceLogic } from "../../hooks/useServiceLogic"; // Custom hook for handling service state and actions
+import { getWelcomeText } from "../../constants/getWelcomeText"; // Function to get dynamic welcome text
+import ChatWidget from "../../components/chat/ChatWidget"; // Chat interface component
 import { useEffect } from "react"; // React hook for side effects
 
 // Main Service component

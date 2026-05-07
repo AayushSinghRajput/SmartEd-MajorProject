@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { Doughnut } from "react-chartjs-2"; // Doughnut chart component
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js"; // Chart.js modules
 import { Loader2, AlertCircle } from "lucide-react"; // Icons for loading & alerts
-import { getUserStudyPlans } from "../lib/api"; // API call to fetch user study plans
+import { getUserStudyPlans } from "../../lib/api"; // API call to fetch user study plans
 import toast from "react-hot-toast"; // Notification library
 
 // Register required Chart.js components

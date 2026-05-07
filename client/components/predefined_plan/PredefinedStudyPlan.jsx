@@ -2,11 +2,11 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import books from "../assets/data/topviewedbooks.json";
-import { getGlobalPlan } from "../api/predefined";
-import StudyPlanModal from "./PredefinedPlan/StudyPlanModal";
+import books from "../../assets/data/topviewedbooks.json";
+import { getGlobalPlan } from "../../api/predefined";
+import StudyPlanModal from "./StudyPlanModal";
 import toast from "react-hot-toast";
-import { colors } from "../constants/colors";
+import { colors } from "../../constants/colors";
 import { FaBookOpen, FaStar } from "react-icons/fa";
 
 export default function PredefinedStudyPlan() {
@@ -209,7 +209,7 @@ export default function PredefinedStudyPlan() {
                           style={{ color: colors.neutral[600] }}
                         >
                           Complete {book.duration || "30 Days"} roadmap with
-                          daily targets and practice sessions
+                          daily targets
                         </p>
                       </div>
 

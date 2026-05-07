@@ -3,7 +3,7 @@ import AOS from "aos"; // Animate On Scroll library
 import "aos/dist/aos.css";
 import Lottie from "lottie-react"; // For animation
 import { FaCheckCircle, FaStar, FaQuestionCircle } from "react-icons/fa";
-import studentAnimation from "../animations/student.json"; // Lottie animation JSON
+import studentAnimation from "../../animations/student.json"; // Lottie animation JSON
 
 export default function About() {
   // State to manage which FAQ is currently open

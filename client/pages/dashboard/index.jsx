@@ -7,16 +7,16 @@ import { useState } from "react"; // React hook for state
 import { FiPlus } from "react-icons/fi"; // Plus icon for upload button
 import { toast } from "react-hot-toast"; // Toast notifications
 
-import ProtectedRoute from "../components/ProtectedRoute"; // Wraps content to restrict to logged-in users
-import Sidebar from "../components/Sidebar"; // Sidebar navigation
-import DashboardContent from "../components/dashboardcontent"; // Upload & dashboard content modal
-import StudyBooksGrid from "../components/StudyBooksGrid"; // Grid of study books
-import Service from "./service"; // Main learning service component
-import MockTest from "../components/MockTest"; // Mock test module
-import { useAuth } from "../context/AuthContext"; // User authentication context
-import { getBookSchedule } from "../api/pdf"; // API to fetch schedule for a PDF
-import CommunityPage from "../components/Community/CommunityPage"; // Community section
-import EntranceNews from "../components/EntranceNews/EntranceNews"; // Entrance exam news section
+import ProtectedRoute from "../../components/ui/ProtectedRoute"; // Wraps content to restrict to logged-in users
+import Sidebar from "../../components/layout/Sidebar"; // Sidebar navigation
+import DashboardContent from "../../components/dashboard/DashboardContent"; // Upload & dashboard content modal
+import StudyBooksGrid from "../../components/dashboard/StudyBooksGrid"; // Grid of study books
+import Service from "../service"; // Main learning service component
+import MockTest from "../../components/mock/MockTest"; // Mock test module
+import { useAuth } from "../../context/AuthContext"; // User authentication context
+import { getBookSchedule } from "../../api/pdf"; // API to fetch schedule for a PDF
+import CommunityPage from "../../components/community/CommunityPage"; // Community section
+import EntranceNews from "../../components/entrance_news/EntranceNews"; // Entrance exam news section
 
 // -----------------------------
 // COMPONENT: Dashboard

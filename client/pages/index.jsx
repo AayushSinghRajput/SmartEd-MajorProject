@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"; // Next.js router for navigation
 import Lottie from "lottie-react"; // For playing animations
 import { motion } from "framer-motion"; // For animations of elements
 import chatbotAnimation from "../animations/chatbot.json"; // Lottie animation JSON
-import PredefinedStudyPlan from "../components/PredefinedStudyPlan"; // Component showing sample study plans
+import PredefinedStudyPlan from "../components/predefined_plan/PredefinedStudyPlan"; // Component showing sample study plans
 import { useAuth } from "../context/AuthContext"; // Custom hook for user authentication state
 import Loader from "../components/ui/Loader"; // Loader component for loading state
 

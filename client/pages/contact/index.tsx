@@ -4,7 +4,7 @@
 // IMPORTS
 // -----------------------------
 import { useState } from "react"; // React state hook
-import { submitContactForm } from "../api/contact"; // API function to submit contact form
+import { submitContactForm } from "../../api/contact"; // API function to submit contact form
 import { FaEnvelope, FaPhone, FaMapMarkerAlt } from "react-icons/fa"; // Icons for contact info
 
 // -----------------------------
