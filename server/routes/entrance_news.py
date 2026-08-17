@@ -2,14 +2,10 @@ from fastapi import APIRouter, HTTPException
 from schemas.entrance_news import EntranceNewsResponse
 from db.entrance_news_repo import get_news, save_news
 from services.scraper_service.scraper_service import scrape_ioe, scrape_iom
-from services.scheduler_service.scheduler_service import start_scheduler
-
 router = APIRouter(
     prefix="/api/entrance-news",
     tags=["Entrance News"]
 )
-
-start_scheduler()
 
 @router.post("/scrape")
 async def scrape_news():

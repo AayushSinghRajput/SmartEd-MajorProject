@@ -15,7 +15,7 @@ import Service from "../service"; // Main learning service component
 import MockTest from "../../components/mock/MockTest"; // Mock test module
 import { useAuth } from "../../context/AuthContext"; // User authentication context
 import { getBookSchedule } from "../../api/pdf"; // API to fetch schedule for a PDF
-import CommunityPage from "../../components/community/CommunityPage"; // Community section
+import CommunityPage from "../../components/Community/CommunityPage"; // Community section
 import EntranceNews from "../../components/entrance_news/EntranceNews"; // Entrance exam news section
 
 // -----------------------------

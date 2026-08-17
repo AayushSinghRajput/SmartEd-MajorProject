@@ -1,0 +1,15 @@
+.env
+.env.*
+__pycache__/
+*.py[cod]
+myenv/
+venv/
+.venv/
+env/
+.git/
+.pytest_cache/
+.mypy_cache/
+ml_model/
+data/
+vector_store/
+*.db

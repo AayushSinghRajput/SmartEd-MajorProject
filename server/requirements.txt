@@ -20,6 +20,7 @@ transformers
 peft
 numpy
 pydantic
+pydantic-settings
 pandas
 langchain_openai
 langchain_huggingface

@@ -1,3 +1,5 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from routes import auth
 from routes import content
@@ -14,12 +16,20 @@ from routes import progress
 from routes import community
 from routes import entrance_news
 from routes import voice_chat
+from services.scheduler_service.scheduler_service import start_scheduler
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    start_scheduler()
+    yield
 
 
 app = FastAPI(
     title="AI Virtual Teacher",
     description="AI Teacher that converts textbooks into daily lessons",
     version="1.0.0",
+    lifespan=lifespan,
 )
 
 # Allow CORS (Optional)
