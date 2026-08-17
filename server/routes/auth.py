@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, Body, Response
-from services.auth.auth_service import register_user, login_user, logout_user
+from services.auth.auth_service import register_user, login_user, google_login_user, logout_user
 from middleware.auth_middleware import get_current_user
 
 router = APIRouter(prefix="/api/auth", tags=["Auth"])
@@ -22,6 +22,14 @@ async def login(
     password: str = Body(...)
 ):
     return await login_user(response, email, password)
+
+
+@router.post("/google", status_code=200)
+async def google_login(
+    response: Response,
+    credential: str = Body(..., embed=True)
+):
+    return await google_login_user(response, credential)
 
 
 @router.get("/me", status_code=200)

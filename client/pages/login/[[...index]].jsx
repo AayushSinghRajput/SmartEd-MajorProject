@@ -4,6 +4,7 @@ import { motion } from "framer-motion"; // For animations
 import { FiBookOpen, FiMail, FiLock, FiAlertCircle, FiEye, FiEyeOff } from "react-icons/fi"; // Icons
 import { useState } from "react";
 import Link from "next/link";
+import { GoogleLogin } from "@react-oauth/google"; // "Continue with Google" button
 import { useAuth } from "../../context/AuthContext"; // Custom auth context
 import toast from "react-hot-toast"; // Toast notifications
 
@@ -16,7 +17,17 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
 
   // Auth context method to perform login
-  const { login } = useAuth();
+  const { login, loginWithGoogle } = useAuth();
+
+  // Handle "Continue with Google" response
+  const handleGoogleSuccess = async (credentialResponse) => {
+    const result = await loginWithGoogle(credentialResponse.credential);
+    if (!result.success) {
+      toast.error(result.message || "Google sign-in failed");
+    } else {
+      toast.success("Login successful! Redirecting to dashboard...");
+    }
+  };
 
   // Animation variants for framer-motion
   const containerVariants = {
@@ -187,6 +198,14 @@ export default function Login() {
           <div className="flex-grow border-t border-gray-300"></div>
           <span className="flex-shrink mx-4 text-gray-500 text-sm">or</span>
           <div className="flex-grow border-t border-gray-300"></div>
+        </div>
+
+        {/* Continue with Google */}
+        <div className="flex justify-center">
+          <GoogleLogin
+            onSuccess={handleGoogleSuccess}
+            onError={() => toast.error("Google sign-in failed")}
+          />
         </div>
 
         {/* Footer Links */}

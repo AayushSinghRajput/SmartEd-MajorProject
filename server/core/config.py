@@ -17,6 +17,7 @@ class Settings(BaseSettings):
     DB_NAME: str
     JWT_SECRET: str
     JWT_ALGORITHM: str = "HS256"
+    GOOGLE_OAUTH_CLIENT_ID: str | None = None
 
     #Cloudinary
     CLOUDINARY_CLOUD_NAME : str

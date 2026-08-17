@@ -12,6 +12,7 @@ import {
 } from "react-icons/fi"; // Icons for form fields and alerts
 import { useState } from "react";
 import Link from "next/link"; // Navigation between pages
+import { GoogleLogin } from "@react-oauth/google"; // "Continue with Google" button
 import { useAuth } from "../../context/AuthContext"; // Custom authentication context
 import toast from "react-hot-toast"; // Toast notifications
 
@@ -25,7 +26,17 @@ export default function Signup() {
   const [loading, setLoading] = useState(false); // loading state
 
   // Auth context method to perform registration
-  const { register } = useAuth();
+  const { register, loginWithGoogle } = useAuth();
+
+  // Handle "Continue with Google" response
+  const handleGoogleSuccess = async (credentialResponse) => {
+    const result = await loginWithGoogle(credentialResponse.credential);
+    if (!result.success) {
+      toast.error(result.message || "Google sign-in failed");
+    } else {
+      toast.success("Account ready! Redirecting to dashboard...");
+    }
+  };
 
   // Animation variants for framer-motion
   const containerVariants = {
@@ -240,6 +251,14 @@ export default function Signup() {
           <div className="flex-grow border-t border-gray-300"></div>
           <span className="flex-shrink mx-4 text-gray-500 text-sm">or</span>
           <div className="flex-grow border-t border-gray-300"></div>
+        </div>
+
+        {/* Continue with Google */}
+        <div className="flex justify-center">
+          <GoogleLogin
+            onSuccess={handleGoogleSuccess}
+            onError={() => toast.error("Google sign-in failed")}
+          />
         </div>
 
         {/* Footer link */}

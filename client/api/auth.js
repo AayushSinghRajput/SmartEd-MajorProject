@@ -32,6 +32,20 @@ export const registerUser = async (userData) => {
   return response.json(); // Return server response as JSON
 };
 
+// Function to log in (or register, on first use) via "Continue with Google"
+// Accepts the ID token credential returned by Google Identity Services
+export const googleLogin = async (credential) => {
+  const response = await fetch(`${API_URL}/auth/google`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include", // Include cookies for authentication
+    body: JSON.stringify({ credential }),
+  });
+  return response.json();
+};
+
 // Function to get the currently logged-in user's data
 export const getCurrentUser = async () => {
   const response = await fetch(`${API_URL}/auth/me`, {

@@ -5,6 +5,7 @@ import Footer from "../components/layout/Footer"; // Custom Footer component
 import { AuthProvider } from "@/context/AuthContext"; // Context provider for authentication
 import "../styles/globals.css"; // Global Tailwind / CSS styles
 import { Toaster } from "react-hot-toast"; // Toast notification library
+import { GoogleOAuthProvider } from "@react-oauth/google"; // "Continue with Google" support
 
 /**
  * AppLayout Component
@@ -41,13 +42,16 @@ function AppLayout({ Component, pageProps }: AppProps) {
  */
 export default function MyApp(props: AppProps) {
   return (
-    // AuthProvider gives access to authentication context for all pages
-    <AuthProvider>
-      {/* AppLayout provides consistent layout with navbar/footer */}
-      <AppLayout {...props} />
+    // GoogleOAuthProvider enables the "Continue with Google" button on login/signup
+    <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || ""}>
+      {/* AuthProvider gives access to authentication context for all pages */}
+      <AuthProvider>
+        {/* AppLayout provides consistent layout with navbar/footer */}
+        <AppLayout {...props} />
 
-      {/* Toast notifications will appear on the top-right corner */}
-      <Toaster position="top-right" />
-    </AuthProvider>
+        {/* Toast notifications will appear on the top-right corner */}
+        <Toaster position="top-right" />
+      </AuthProvider>
+    </GoogleOAuthProvider>
   );
 }

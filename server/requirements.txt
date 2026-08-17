@@ -4,6 +4,7 @@ pymongo
 python-dotenv
 passlib[argon2]
 pyjwt
+google-auth
 email-validator
 langchain
 pymupdf

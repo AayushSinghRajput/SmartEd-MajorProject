@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { loginUser, registerUser, getCurrentUser, logoutUser } from "../api/auth";
+import { loginUser, registerUser, googleLogin, getCurrentUser, logoutUser } from "../api/auth";
 
 // ---------------------------
 // Auth context
@@ -12,6 +12,7 @@ const AuthContext = createContext({
   user: null,            // current logged-in user object
   loading: true,         // whether auth state is being initialized
   login: async () => {}, // login function
+  loginWithGoogle: async () => {}, // "Continue with Google" function
   register: async () => {}, // registration function
   logout: async () => {}, // logout function
 });
@@ -68,6 +69,24 @@ export const AuthProvider = ({ children }) => {
   };
 
   // ---------------------------
+  // Continue with Google
+  // ---------------------------
+  // credential: the ID token returned by Google Identity Services
+  const loginWithGoogle = async (credential) => {
+    try {
+      const data = await googleLogin(credential);
+      if (data.success) {
+        setUser(data.user);     // update context
+        router.push("/dashboard"); // redirect after login
+        return { success: true };
+      }
+      return { success: false, message: data.message };
+    } catch (error) {
+      return { success: false, message: "Google sign-in failed. Please try again." };
+    }
+  };
+
+  // ---------------------------
   // Register
   // ---------------------------
   // userData: { name, email, password }
@@ -101,7 +120,7 @@ export const AuthProvider = ({ children }) => {
 
   // Provide auth state and functions to child components
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, loginWithGoogle, register, logout }}>
       {children}
     </AuthContext.Provider>
   );
